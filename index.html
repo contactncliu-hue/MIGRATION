@@ -4,12 +4,111 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZOO</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .login-screen {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      font-family: 'Poppins', sans-serif;
+      gap: 40px;
+      padding: 20px;
+    }
+
+    .logo-img {
+      width: 300px;
+      max-width: 80%;
+    }
+
+    .login-btn {
+      background: #F5A623;
+      color: white;
+      border: none;
+      padding: 18px 60px;
+      border-radius: 14px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background: #e0961a;
+    }
+
+    .guest-link {
+      color: #3B5BDB;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.5;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 4px 30px rgba(245, 166, 35, 0.3);
+      padding: 40px;
+      width: 340px;
+      max-width: 90%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .login-card h2 {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .login-card input {
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    .login-card button {
+      background: #F5A623;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .error {
+      color: #e03131;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
   <div class="login-screen" id="login-screen">
-    <img src="assets/logo.png" alt="Logo" class="logo-img" id="logo-img" />
+    <img
+      src="https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/Copy%20of%20PPT%20Goodies%20for%20Good%20Deeds%20-%205.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvQ29weSBvZiBQUFQgR29vZGllcyBmb3IgR29vZCBEZWVkcyAtIDUucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODQ2MTY0NSwiZXhwIjoyNjUyNDYxNjQ1fQ.iEbfx8yPFJXiyPkVGuv10iow4tXT52m1DRS7cjlB5JLIdyhAlV_rWy00a8OUMR8rvL0AMnrr659uwex3ANlpXQ"
+      alt="Logo"
+      class="logo-img"
+      id="logo-img"
+    />
 
     <button class="login-btn" id="show-form-btn">LOG IN</button>
 
@@ -26,8 +125,48 @@
     </form>
   </div>
 
-  <!-- Supabase client library, no build tools needed -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
+  <script>
+    // ---- Supabase setup ----
+    const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
+    const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    // ---- Element references ----
+    const showFormBtn = document.getElementById('show-form-btn')
+    const guestBtn = document.getElementById('guest-btn')
+    const loginForm = document.getElementById('login-form')
+    const logoImg = document.getElementById('logo-img')
+    const errorMsg = document.getElementById('error-msg')
+
+    // ---- Show the login form ----
+    showFormBtn.addEventListener('click', () => {
+      showFormBtn.style.display = 'none'
+      guestBtn.style.display = 'none'
+      logoImg.style.width = '150px'
+      loginForm.style.display = 'flex'
+      loginForm.style.flexDirection = 'column'
+    })
+
+    // ---- Handle login submit ----
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        errorMsg.textContent = error.message
+      } else {
+        window.location.href = "home.html"
+      }
+    })
+
+    // ---- Guest button ----
+    guestBtn.addEventListener('click', () => {
+      window.location.href = "home.html"
+    })
+  </script>
 </body>
 </html>
