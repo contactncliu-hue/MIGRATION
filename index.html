@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZOO</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
     }
 
     .login-screen {
@@ -19,7 +19,6 @@
       align-items: center;
       justify-content: center;
       background: white;
-      font-family: 'Poppins', sans-serif;
       gap: 40px;
       padding: 20px;
     }
@@ -41,9 +40,7 @@
       cursor: pointer;
     }
 
-    .login-btn:hover {
-      background: #e0961a;
-    }
+    .login-btn:hover { background: #e0961a; }
 
     .guest-link {
       color: #3B5BDB;
@@ -55,73 +52,146 @@
       cursor: pointer;
     }
 
-    .login-card {
+    /* ---- Modal overlay ---- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
       background: white;
       border-radius: 24px;
-      box-shadow: 0 4px 30px rgba(245, 166, 35, 0.3);
-      padding: 40px;
+      box-shadow: 0 10px 40px rgba(245, 166, 35, 0.25);
+      padding: 40px 32px;
       width: 340px;
       max-width: 90%;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      position: relative;
     }
 
-    .login-card h2 {
+    .modal-card h2 {
       text-align: center;
       font-size: 24px;
       font-weight: 800;
-      margin-bottom: 10px;
+      color: #1a1a2e;
+      margin-bottom: 8px;
     }
 
-    .login-card input {
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
+    .modal-card input {
+      padding: 14px 16px;
+      border: 1.5px solid #F5D9A8;
+      border-radius: 12px;
       font-size: 16px;
+      outline: none;
     }
 
-    .login-card button {
+    .modal-card input:focus {
+      border-color: #F5A623;
+    }
+
+    .modal-card button[type="submit"] {
       background: #F5A623;
       color: white;
       border: none;
-      padding: 14px;
-      border-radius: 10px;
+      padding: 16px;
+      border-radius: 12px;
       font-weight: 700;
       font-size: 16px;
       cursor: pointer;
       margin-top: 6px;
     }
 
+    .modal-card button[type="submit"]:hover {
+      background: #e0961a;
+    }
+
+    .signup-line {
+      text-align: center;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .signup-line a {
+      color: #F5A623;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .modal-guest-link {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #3B5BDB;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+
     .error {
       color: #e03131;
-      font-size: 14px;
+      font-size: 13px;
       text-align: center;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #999;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-screen" id="login-screen">
+  <div class="login-screen">
     <img
       src="https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/Copy%20of%20PPT%20Goodies%20for%20Good%20Deeds%20-%205.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvQ29weSBvZiBQUFQgR29vZGllcyBmb3IgR29vZCBEZWVkcyAtIDUucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODQ2MTY0NSwiZXhwIjoyNjUyNDYxNjQ1fQ.iEbfx8yPFJXiyPkVGuv10iow4tXT52m1DRS7cjlB5JLIdyhAlV_rWy00a8OUMR8rvL0AMnrr659uwex3ANlpXQ"
       alt="Logo"
       class="logo-img"
-      id="logo-img"
     />
+    <button class="login-btn" id="open-login-btn">LOG IN</button>
+    <p class="guest-link" id="guest-btn-main">PROCEED<br />AS GUEST</p>
+  </div>
 
-    <button class="login-btn" id="show-form-btn">LOG IN</button>
-
-    <p class="guest-link" id="guest-btn">
-      PROCEED<br />AS GUEST
-    </p>
-
-    <form class="login-card" id="login-form" style="display:none;">
+  <!-- ---- LOGIN MODAL ---- -->
+  <div class="modal-overlay" id="login-modal">
+    <form class="modal-card" id="login-form">
+      <button type="button" class="close-modal" data-close>&times;</button>
       <h2>WELCOME BACK</h2>
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <p class="error" id="error-msg"></p>
+      <input type="text" id="login-username" placeholder="Username" required />
+      <input type="password" id="login-password" placeholder="Password" required />
+      <p class="error" id="login-error"></p>
       <button type="submit">LOG IN</button>
+      <p class="signup-line">Don't have an account? <a id="open-signup-link">SIGN UP</a></p>
+      <p class="modal-guest-link" id="guest-btn-modal">PROCEED AS GUEST</p>
+    </form>
+  </div>
+
+  <!-- ---- SIGNUP MODAL ---- -->
+  <div class="modal-overlay" id="signup-modal">
+    <form class="modal-card" id="signup-form">
+      <button type="button" class="close-modal" data-close>&times;</button>
+      <h2>CREATE ACCOUNT</h2>
+      <input type="text" id="signup-username" placeholder="Username (any language)" required />
+      <input type="password" id="signup-password" placeholder="Password" required />
+      <p class="error" id="signup-error"></p>
+      <button type="submit">SIGN UP</button>
+      <p class="signup-line">Already have an account? <a id="open-login-link">LOG IN</a></p>
     </form>
   </div>
 
@@ -132,39 +202,92 @@
     const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    // ---- Element references ----
-    const showFormBtn = document.getElementById('show-form-btn')
-    const guestBtn = document.getElementById('guest-btn')
-    const loginForm = document.getElementById('login-form')
-    const logoImg = document.getElementById('logo-img')
-    const errorMsg = document.getElementById('error-msg')
+    // ---- Convert any username (unicode-safe) into a fake email ----
+    function usernameToEmail(username) {
+      const cleaned = username.trim().toLowerCase()
+      const safe = encodeURIComponent(cleaned).replace(/%/g, '')
+      return `${safe}@zoo.local`
+    }
 
-    // ---- Show the login form ----
-    showFormBtn.addEventListener('click', () => {
-      showFormBtn.style.display = 'none'
-      guestBtn.style.display = 'none'
-      logoImg.style.width = '150px'
-      loginForm.style.display = 'flex'
-      loginForm.style.flexDirection = 'column'
+    // ---- Modal open/close helpers ----
+    const loginModal = document.getElementById('login-modal')
+    const signupModal = document.getElementById('signup-modal')
+
+    document.getElementById('open-login-btn').addEventListener('click', () => {
+      loginModal.classList.add('active')
     })
 
-    // ---- Handle login submit ----
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      const email = document.getElementById('email').value
-      const password = document.getElementById('password').value
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        loginModal.classList.remove('active')
+        signupModal.classList.remove('active')
+      })
+    })
 
+    document.getElementById('open-signup-link').addEventListener('click', () => {
+      loginModal.classList.remove('active')
+      signupModal.classList.add('active')
+    })
+
+    document.getElementById('open-login-link').addEventListener('click', () => {
+      signupModal.classList.remove('active')
+      loginModal.classList.add('active')
+    })
+
+    // ---- Guest buttons ----
+    document.getElementById('guest-btn-main').addEventListener('click', () => {
+      window.location.href = "home.html"
+    })
+    document.getElementById('guest-btn-modal').addEventListener('click', () => {
+      window.location.href = "home.html"
+    })
+
+    // ---- LOGIN ----
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const username = document.getElementById('login-username').value
+      const password = document.getElementById('login-password').value
+      const errorEl = document.getElementById('login-error')
+
+      const email = usernameToEmail(username)
       const { error } = await supabase.auth.signInWithPassword({ email, password })
 
       if (error) {
-        errorMsg.textContent = error.message
+        errorEl.textContent = "Incorrect username or password"
       } else {
         window.location.href = "home.html"
       }
     })
 
-    // ---- Guest button ----
-    guestBtn.addEventListener('click', () => {
+    // ---- SIGNUP ----
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const username = document.getElementById('signup-username').value.trim()
+      const password = document.getElementById('signup-password').value
+      const errorEl = document.getElementById('signup-error')
+
+      if (!username) {
+        errorEl.textContent = "Please enter a username"
+        return
+      }
+
+      const email = usernameToEmail(username)
+
+      const { data, error } = await supabase.auth.signUp({ email, password })
+
+      if (error) {
+        errorEl.textContent = error.message
+        return
+      }
+
+      if (data.user) {
+        await supabase.from('profiles').insert({
+          id: data.user.id,
+          display_name: username,
+          role: 'member'
+        })
+      }
+
       window.location.href = "home.html"
     })
   </script>
