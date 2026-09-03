@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZOO</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="login-screen" id="login-screen">
+    <img src="assets/logo.png" alt="Logo" class="logo-img" id="logo-img" />
+
+    <button class="login-btn" id="show-form-btn">LOG IN</button>
+
+    <p class="guest-link" id="guest-btn">
+      PROCEED<br />AS GUEST
+    </p>
+
+    <form class="login-card" id="login-form" style="display:none;">
+      <h2>WELCOME BACK</h2>
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <p class="error" id="error-msg"></p>
+      <button type="submit">LOG IN</button>
+    </form>
+  </div>
+
+  <!-- Supabase client library, no build tools needed -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
