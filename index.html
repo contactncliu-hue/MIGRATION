@@ -3,292 +3,253 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZOO</title>
+  <title>ZOO - Home</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; background: #f4f5fa; }
 
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
-
-    .login-screen {
-      min-height: 100vh;
-      width: 100%;
+    .sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #eee;
       display: flex;
       flex-direction: column;
+      padding: 24px 0;
+    }
+
+    .sidebar .logo-img {
+      width: 70px;
+      margin: 0 auto 20px auto;
+      display: block;
+    }
+
+    .user-block {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      background: white;
-      gap: 40px;
-      padding: 20px;
+      gap: 12px;
+      padding: 0 20px 20px 20px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 12px;
     }
 
-    .logo-img {
-      width: 300px;
-      max-width: 80%;
-    }
-
-    .login-btn {
-      background: #F5A623;
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #3B5BDB;
       color: white;
-      border: none;
-      padding: 18px 60px;
-      border-radius: 14px;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-    }
-
-    .login-btn:hover { background: #e0961a; }
-
-    .guest-link {
-      color: #3B5BDB;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 1.5;
-      letter-spacing: 1px;
-      cursor: pointer;
-    }
-
-    /* ---- Modal overlay ---- */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
+      display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 100;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
     }
 
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: white;
-      border-radius: 24px;
-      box-shadow: 0 10px 40px rgba(245, 166, 35, 0.25);
-      padding: 40px 32px;
-      width: 340px;
-      max-width: 90%;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      position: relative;
-    }
-
-    .modal-card h2 {
-      text-align: center;
-      font-size: 24px;
-      font-weight: 800;
+    .user-info .user-name {
+      font-weight: 700;
+      font-size: 14px;
       color: #1a1a2e;
-      margin-bottom: 8px;
     }
 
-    .modal-card input {
-      padding: 14px 16px;
-      border: 1.5px solid #F5D9A8;
-      border-radius: 12px;
-      font-size: 16px;
-      outline: none;
+    .user-info .user-role {
+      font-size: 12px;
+      color: #888;
     }
 
-    .modal-card input:focus {
-      border-color: #F5A623;
-    }
-
-    .modal-card button[type="submit"] {
-      background: #F5A623;
-      color: white;
-      border: none;
-      padding: 16px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 6px;
-    }
-
-    .modal-card button[type="submit"]:hover {
-      background: #e0961a;
-    }
-
-    .signup-line {
-      text-align: center;
-      font-size: 14px;
-      color: #333;
-    }
-
-    .signup-line a {
-      color: #F5A623;
-      font-weight: 700;
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 20px;
+      color: #444;
       text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
+      letter-spacing: 0.3px;
     }
 
-    .modal-guest-link {
-      text-align: center;
-      font-size: 14px;
+    .nav-link:hover { background: #f4f5fa; }
+
+    .nav-link.active {
+      background: #3B5BDB;
+      color: white;
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 16px 20px 0 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar-bottom label {
+      font-size: 11px;
       font-weight: 700;
-      color: #3B5BDB;
-      cursor: pointer;
+      color: #999;
       letter-spacing: 0.5px;
     }
 
-    .error {
-      color: #e03131;
-      font-size: 13px;
-      text-align: center;
+    .lang-select {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .close-modal {
-      position: absolute;
-      top: 14px;
-      right: 18px;
+    .logout-btn {
       background: none;
-      border: none;
-      font-size: 20px;
+      border: 1.5px solid #e03131;
+      color: #e03131;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: 700;
       cursor: pointer;
-      color: #999;
+      font-size: 13px;
+    }
+
+    .logout-btn:hover { background: #fff0f0; }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+    }
+
+    .main-content h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+    }
+
+    .main-content p {
+      color: #666;
+      font-size: 15px;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-screen">
-    <img
-      src="https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/Copy%20of%20PPT%20Goodies%20for%20Good%20Deeds%20-%205.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvQ29weSBvZiBQUFQgR29vZGllcyBmb3IgR29vZCBEZWVkcyAtIDUucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODQ2MTY0NSwiZXhwIjoyNjUyNDYxNjQ1fQ.iEbfx8yPFJXiyPkVGuv10iow4tXT52m1DRS7cjlB5JLIdyhAlV_rWy00a8OUMR8rvL0AMnrr659uwex3ANlpXQ"
-      alt="Logo"
-      class="logo-img"
-    />
-    <button class="login-btn" id="open-login-btn">LOG IN</button>
-    <p class="guest-link" id="guest-btn-main">PROCEED<br />AS GUEST</p>
-  </div>
+  <aside class="sidebar">
+    <img src="https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/Copy%20of%20PPT%20Goodies%20for%20Good%20Deeds%20-%205.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvQ29weSBvZiBQUFQgR29vZGllcyBmb3IgR29vZCBEZWVkcyAtIDUucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODQ2MTY0NSwiZXhwIjoyNjUyNDYxNjQ1fQ.iEbfx8yPFJXiyPkVGuv10iow4tXT52m1DRS7cjlB5JLIdyhAlV_rWy00a8OUMR8rvL0AMnrr659uwex3ANlpXQ" alt="Logo" class="logo-img" />
 
-  <!-- ---- LOGIN MODAL ---- -->
-  <div class="modal-overlay" id="login-modal">
-    <form class="modal-card" id="login-form">
-      <button type="button" class="close-modal" data-close>&times;</button>
-      <h2>WELCOME BACK</h2>
-      <input type="text" id="login-username" placeholder="Username" required />
-      <input type="password" id="login-password" placeholder="Password" required />
-      <p class="error" id="login-error"></p>
-      <button type="submit">LOG IN</button>
-      <p class="signup-line">Don't have an account? <a id="open-signup-link">SIGN UP</a></p>
-      <p class="modal-guest-link" id="guest-btn-modal">PROCEED AS GUEST</p>
-    </form>
-  </div>
+    <div class="user-block">
+      <div class="user-avatar" id="user-initial">?</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name">Loading...</div>
+        <div class="user-role" data-i18n="role_label">Role: <span id="user-role">MEMBER</span></div>
+      </div>
+    </div>
 
-  <!-- ---- SIGNUP MODAL ---- -->
-  <div class="modal-overlay" id="signup-modal">
-    <form class="modal-card" id="signup-form">
-      <button type="button" class="close-modal" data-close>&times;</button>
-      <h2>CREATE ACCOUNT</h2>
-      <input type="text" id="signup-username" placeholder="Username (any language)" required />
-      <input type="password" id="signup-password" placeholder="Password" required />
-      <p class="error" id="signup-error"></p>
-      <button type="submit">SIGN UP</button>
-      <p class="signup-line">Already have an account? <a id="open-login-link">LOG IN</a></p>
-    </form>
-  </div>
+    <a href="index.html" class="nav-link active" data-i18n="nav_home">HOMEPAGE</a>
+    <a href="transfer.html" class="nav-link" data-i18n="nav_transfer">TRANSFER</a>
+
+    <div class="sidebar-bottom">
+      <label data-i18n="lang_label">LANGUAGE</label>
+      <select class="lang-select" id="lang-select">
+        <option value="en">🇺🇸 English</option>
+        <option value="kr">🇰🇷 한국어</option>
+        <option value="cn">🇨🇳 中文</option>
+        <option value="br">🇧🇷 Português</option>
+        <option value="vn">🇻🇳 Tiếng Việt</option>
+        <option value="fr">🇫🇷 Français</option>
+      </select>
+      <button class="logout-btn" id="logout-btn" data-i18n="logout">LOG OUT</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <h1 data-i18n="welcome_heading">Welcome Back</h1>
+    <p data-i18n="welcome_sub">Here's what's happening on your site.</p>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ---- Supabase setup ----
     const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
     const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    // ---- Convert any username (unicode-safe) into a fake email ----
-    function usernameToEmail(username) {
-      const cleaned = username.trim().toLowerCase()
-      const safe = encodeURIComponent(cleaned).replace(/%/g, '')
-      return `${safe}@zoo.local`
+    const translations = {
+      en: {
+        nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", lang_label: "LANGUAGE",
+        logout: "LOG OUT", role_label: "Role: ",
+        welcome_heading: "Welcome Back", welcome_sub: "Here's what's happening on your site."
+      },
+      kr: {
+        nav_home: "홈페이지", nav_transfer: "송금", lang_label: "언어",
+        logout: "로그아웃", role_label: "역할: ",
+        welcome_heading: "다시 오신 것을 환영합니다", welcome_sub: "사이트에서 일어나고 있는 일입니다."
+      },
+      cn: {
+        nav_home: "主页", nav_transfer: "转账", lang_label: "语言",
+        logout: "登出", role_label: "角色: ",
+        welcome_heading: "欢迎回来", welcome_sub: "这是您网站上正在发生的事情。"
+      },
+      br: {
+        nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", lang_label: "IDIOMA",
+        logout: "SAIR", role_label: "Função: ",
+        welcome_heading: "Bem-vindo de volta", welcome_sub: "Aqui está o que está acontecendo no seu site."
+      },
+      vn: {
+        nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", lang_label: "NGÔN NGỮ",
+        logout: "ĐĂNG XUẤT", role_label: "Vai trò: ",
+        welcome_heading: "Chào mừng trở lại", welcome_sub: "Đây là những gì đang diễn ra trên trang của bạn."
+      },
+      fr: {
+        nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", lang_label: "LANGUE",
+        logout: "DÉCONNEXION", role_label: "Rôle : ",
+        welcome_heading: "Bon retour", welcome_sub: "Voici ce qui se passe sur votre site."
+      }
     }
 
-    // ---- Modal open/close helpers ----
-    const loginModal = document.getElementById('login-modal')
-    const signupModal = document.getElementById('signup-modal')
+    let currentLang = localStorage.getItem('lang') || 'en'
+    document.getElementById('lang-select').value = currentLang
 
-    document.getElementById('open-login-btn').addEventListener('click', () => {
-      loginModal.classList.add('active')
-    })
-
-    document.querySelectorAll('[data-close]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        loginModal.classList.remove('active')
-        signupModal.classList.remove('active')
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n')
+        if (key === 'role_label') return
+        if (translations[currentLang][key]) el.textContent = translations[currentLang][key]
       })
+      document.querySelector('[data-i18n="role_label"]').childNodes[0].textContent = translations[currentLang]['role_label']
+    }
+
+    document.getElementById('lang-select').addEventListener('change', (e) => {
+      currentLang = e.target.value
+      localStorage.setItem('lang', currentLang)
+      applyTranslations()
     })
 
-    document.getElementById('open-signup-link').addEventListener('click', () => {
-      loginModal.classList.remove('active')
-      signupModal.classList.add('active')
-    })
+    applyTranslations()
 
-    document.getElementById('open-login-link').addEventListener('click', () => {
-      signupModal.classList.remove('active')
-      loginModal.classList.add('active')
-    })
-
-    // ---- Guest buttons ----
-    document.getElementById('guest-btn-main').addEventListener('click', () => {
-      window.location.href = "home.html"
-    })
-    document.getElementById('guest-btn-modal').addEventListener('click', () => {
-      window.location.href = "home.html"
-    })
-
-    // ---- LOGIN ----
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault()
-      const username = document.getElementById('login-username').value
-      const password = document.getElementById('login-password').value
-      const errorEl = document.getElementById('login-error')
-
-      const email = usernameToEmail(username)
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-
-      if (error) {
-        errorEl.textContent = "Incorrect username or password"
-      } else {
-        window.location.href = "home.html"
-      }
-    })
-
-    // ---- SIGNUP ----
-    document.getElementById('signup-form').addEventListener('submit', async (e) => {
-      e.preventDefault()
-      const username = document.getElementById('signup-username').value.trim()
-      const password = document.getElementById('signup-password').value
-      const errorEl = document.getElementById('signup-error')
-
-      if (!username) {
-        errorEl.textContent = "Please enter a username"
+    async function loadUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        window.location.href = "login.html"
         return
       }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, role')
+        .eq('id', user.id)
+        .single()
 
-      const email = usernameToEmail(username)
-
-      const { data, error } = await supabase.auth.signUp({ email, password })
-
-      if (error) {
-        errorEl.textContent = error.message
-        return
+      if (profile) {
+        document.getElementById('user-name').textContent = profile.display_name
+        document.getElementById('user-role').textContent = profile.role.toUpperCase()
+        document.getElementById('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
       }
+    }
+    loadUser()
 
-      if (data.user) {
-        await supabase.from('profiles').insert({
-          id: data.user.id,
-          display_name: username,
-          role: 'member'
-        })
-      }
-
-      window.location.href = "home.html"
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await supabase.auth.signOut()
+      window.location.href = "login.html"
     })
   </script>
 </body>
