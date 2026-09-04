@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZOO - Log In</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- INTRO (logo + flames + ring) ---------- */
+  .intro {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .intro.hidden {
+    opacity: 0;
+    transform: scale(0.94);
+    pointer-events: none;
+  }
+
+  .logo-wrap {
+    position: relative;
+    width: 320px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-img {
+    position: relative;
+    z-index: 5;
+    width: 260px;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
+    transition: transform 0.4s ease;
+  }
+
+  .stage.launching .logo-img {
+    animation: logoPulse 1.6s ease-in-out 1;
+  }
+
+  @keyframes logoPulse {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.08); }
+    60%  { transform: scale(0.98); }
+    100% { transform: scale(1); }
+  }
+
+  /* Ring / spiral swirl behind the logo */
+  .ring-img {
+    position: absolute;
+    z-index: 2;
+    width: 560px;
+    max-width: none;
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+  }
+
+  .stage.launching .ring-img {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    animation: ringSpin 2.4s linear infinite, ringPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes ringSpin {
+    from { transform: scale(1) rotate(0deg); }
+    to   { transform: scale(1) rotate(360deg); }
+  }
+
+  @keyframes ringPulse {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+  }
+
+  /* Flame wisps sliding in from the corners */
+  .flame {
+    position: fixed;
+    z-index: 1;
+    width: 45vw;
+    max-width: 620px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .flame-left {
+    left: -30%;
+    bottom: 6%;
+    transform: translate(-10%, 20%) rotate(-4deg);
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .flame-right {
+    right: -30%;
+    bottom: 6%;
+    transform: translate(10%, 20%) scaleX(-1) rotate(-4deg);
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .stage.launching .flame-left {
+    opacity: 1;
+    transform: translate(6%, -4%) rotate(-2deg);
+  }
+
+  .stage.launching .flame-right {
+    opacity: 1;
+    transform: translate(-6%, -4%) scaleX(-1) rotate(-2deg);
+  }
+
+  .stage.fading .flame,
+  .stage.fading .ring-img {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn-login {
+    position: relative;
+    z-index: 5;
+    background: #f2a90f;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 56px;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #c98c0c;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .btn-login:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #c98c0c;
+  }
+
+  .guest-link {
+    position: relative;
+    z-index: 5;
+    background: none;
+    border: none;
+    color: #3B5BDB;
+    font-weight: 700;
+    font-size: 15px;
+    text-align: center;
+    line-height: 1.5;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+
+  .guest-link:hover { text-decoration: underline; }
+
+  /* ---------- LOGIN FORM (fades in after animation) ---------- */
+  .login-form {
+    position: absolute;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    opacity: 0;
+    transform: translateY(14px);
+    pointer-events: none;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .login-form.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .login-form img.form-logo {
+    width: 140px;
+    margin-bottom: 4px;
+  }
+
+  .login-form h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1a1a2e;
+  }
+
+  .field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #888;
+    letter-spacing: 0.4px;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1.5px solid #e3e3ec;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .field input:focus {
+    border-color: #3B5BDB;
+  }
+
+  .form-error {
+    width: 100%;
+    background: #fff0f0;
+    color: #e03131;
+    border: 1px solid #ffd6d6;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    display: none;
+  }
+
+  .form-error.visible { display: block; }
+
+  .submit-btn {
+    width: 100%;
+    background: #f2a90f;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #c98c0c;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
+  }
+
+  .submit-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #c98c0c;
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+
+  .back-link {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .back-link:hover { color: #666; }
+
+  @media (max-width: 480px) {
+    .logo-wrap { width: 240px; height: 170px; }
+    .logo-img { width: 190px; }
+    .ring-img { width: 420px; }
+    .flame { width: 65vw; }
+    .login-form { width: 88%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stage.launching .logo-img,
+    .stage.launching .ring-img { animation: none; }
+    .flame, .ring-img, .intro, .login-form { transition-duration: 0.15s; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="stage" id="stage">
+
+    <!-- Flame wisps -->
+    <img src="assets/flame-b.png" class="flame flame-left" alt="" />
+    <img src="assets/flame-a.png" class="flame flame-right" alt="" />
+
+    <!-- Intro: logo + buttons -->
+    <div class="intro" id="intro">
+      <div class="logo-wrap">
+        <img src="assets/ring.png" class="ring-img" alt="" />
+        <img src="assets/logo.png" class="logo-img" alt="ZOO" />
+      </div>
+      <button class="btn-login" id="login-trigger">LOG IN</button>
+      <button class="guest-link" id="guest-btn">PROCEED<br />AS GUEST</button>
+    </div>
+
+    <!-- Login form -->
+    <form class="login-form" id="login-form">
+      <img src="assets/logo.png" class="form-logo" alt="ZOO" />
+      <h1>Welcome back</h1>
+
+      <div class="form-error" id="form-error">Something went wrong.</div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" autocomplete="email" required />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" autocomplete="current-password" required />
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">LOG IN</button>
+      <button type="button" class="back-link" id="back-btn">&larr; Back</button>
+    </form>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
+    const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    const stage = document.getElementById('stage')
+    const intro = document.getElementById('intro')
+    const loginForm = document.getElementById('login-form')
+    const loginTrigger = document.getElementById('login-trigger')
+    const guestBtn = document.getElementById('guest-btn')
+    const backBtn = document.getElementById('back-btn')
+    const formError = document.getElementById('form-error')
+    const submitBtn = document.getElementById('submit-btn')
+
+    function showError(message) {
+      formError.textContent = message
+      formError.classList.add('visible')
+    }
+
+    function clearError() {
+      formError.classList.remove('visible')
+    }
+
+    // Redirect immediately if already logged in
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) window.location.href = 'index.html'
+    })
+
+    loginTrigger.addEventListener('click', () => {
+      if (stage.classList.contains('launching')) return
+      stage.classList.add('launching')
+
+      // Let the flames + ring play, then fade the intro out
+      // and the form in.
+      setTimeout(() => {
+        stage.classList.add('fading')
+      }, 1300)
+
+      setTimeout(() => {
+        intro.classList.add('hidden')
+        loginForm.classList.add('visible')
+        document.getElementById('email').focus()
+      }, 1700)
+    })
+
+    guestBtn.addEventListener('click', () => {
+      window.location.href = 'index.html'
+    })
+
+    backBtn.addEventListener('click', () => {
+      loginForm.classList.remove('visible')
+      intro.classList.remove('hidden')
+      stage.classList.remove('launching', 'fading')
+      clearError()
+      loginForm.reset()
+    })
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      clearError()
+
+      const email = document.getElementById('email').value.trim()
+      const password = document.getElementById('password').value
+
+      submitBtn.disabled = true
+      submitBtn.textContent = 'LOGGING IN...'
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        showError(error.message)
+        submitBtn.disabled = false
+        submitBtn.textContent = 'LOG IN'
+        return
+      }
+
+      window.location.href = 'index.html'
+    })
+  </script>
+</body>
+</html>
