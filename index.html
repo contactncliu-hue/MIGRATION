@@ -136,7 +136,7 @@
 <body>
 
   <aside class="sidebar">
-    <img src="https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/Copy%20of%20PPT%20Goodies%20for%20Good%20Deeds%20-%205.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvQ29weSBvZiBQUFQgR29vZGllcyBmb3IgR29vZCBEZWVkcyAtIDUucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODQ2MTY0NSwiZXhwIjoyNjUyNDYxNjQ1fQ.iEbfx8yPFJXiyPkVGuv10iow4tXT52m1DRS7cjlB5JLIdyhAlV_rWy00a8OUMR8rvL0AMnrr659uwex3ANlpXQ" alt="Logo" class="logo-img" />
+    <img src="assets/logo.png" alt="Logo" class="logo-img" />
 
     <div class="user-block">
       <div class="user-avatar" id="user-initial">?</div>
@@ -228,27 +228,44 @@
     applyTranslations()
 
     async function loadUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        window.location.href = "login.html"
-        return
-      }
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('display_name, role')
-        .eq('id', user.id)
-        .single()
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) throw sessionError
 
-      if (profile) {
-        document.getElementById('user-name').textContent = profile.display_name
-        document.getElementById('user-role').textContent = profile.role.toUpperCase()
-        document.getElementById('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
+        const user = session?.user
+        if (!user) {
+          window.location.href = "login.html"
+          return
+        }
+
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('display_name, role')
+          .eq('id', user.id)
+          .single()
+
+        if (profileError) throw profileError
+
+        if (profile) {
+          document.getElementById('user-name').textContent = profile.display_name
+          document.getElementById('user-role').textContent = profile.role.toUpperCase()
+          document.getElementById('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
+        }
+      } catch (err) {
+        console.error('loadUser failed:', err)
+        // If we truly can't verify the session, send the person to log in
+        // rather than leaving them stuck on "Loading..." forever.
+        window.location.href = "login.html"
       }
     }
     loadUser()
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
-      await supabase.auth.signOut()
+      try {
+        await supabase.auth.signOut()
+      } catch (err) {
+        console.error('signOut failed:', err)
+      }
       window.location.href = "login.html"
     })
   </script>
