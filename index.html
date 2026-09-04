@@ -170,6 +170,27 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    function showFatalError(message) {
+      const nameEl = document.getElementById('user-name')
+      const mainEl = document.querySelector('.main-content')
+      if (nameEl) nameEl.textContent = 'Error'
+      if (mainEl) {
+        mainEl.innerHTML = '<h1 style="color:#e03131">Something went wrong</h1>' +
+          '<p style="color:#e03131; font-family: monospace; white-space: pre-wrap;">' +
+          String(message).replace(/</g, '&lt;') + '</p>'
+      }
+    }
+
+    if (!window.supabase) {
+      showFatalError(
+        'The Supabase library did not load from the CDN.\n' +
+        'This is usually caused by an ad blocker, content blocker, ' +
+        'or "Prevent Cross-Site Tracking" blocking cdn.jsdelivr.net.\n' +
+        'Try disabling content blockers for this site, or open it in a different browser.'
+      )
+      throw new Error('window.supabase is undefined — CDN script failed to load')
+    }
+
     const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
     const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -253,9 +274,12 @@
         }
       } catch (err) {
         console.error('loadUser failed:', err)
-        // If we truly can't verify the session, send the person to log in
-        // rather than leaving them stuck on "Loading..." forever.
-        window.location.href = "login.html"
+        // Show the real error instead of silently redirecting, so it's
+        // visible even without access to devtools.
+        showFatalError(
+          (err && (err.message || err.error_description || err.toString())) ||
+          'Unknown error while checking your session.'
+        )
       }
     }
     loadUser()
@@ -263,10 +287,14 @@
     document.getElementById('logout-btn').addEventListener('click', async () => {
       try {
         await supabase.auth.signOut()
+        window.location.href = "login.html"
       } catch (err) {
         console.error('signOut failed:', err)
+        showFatalError(
+          (err && (err.message || err.error_description || err.toString())) ||
+          'Unknown error while logging out.'
+        )
       }
-      window.location.href = "login.html"
     })
   </script>
 </body>
