@@ -425,10 +425,10 @@
     .logo-img { width: 260px; }
     .ring-img { width: 440px; }
     .shark-sprite { max-width: 420px; }
-    .flame { width: 66vw; min-width: 240px; max-width: 420px; top: 60vh; }
-    .flame-left { width: 78vw; max-width: 500px; transform: translate(-118%, -50%) rotate(-3deg); }
-    .stage.launching .flame-left { transform: translate(-6%, -44%) rotate(-1deg); }
-    .stage.launching .flame-right { transform: translate(4%, -44%) rotate(-1deg); }
+    .flame { width: 72vw; min-width: 260px; max-width: 460px; top: 60vh; }
+    .flame-left { width: 84vw; max-width: 540px; transform: translate(-118%, -50%) rotate(-3deg); }
+    .stage.launching .flame-left { transform: translate(-16%, -44%) rotate(-2deg); }
+    .stage.launching .flame-right { transform: translate(11%, -44%) rotate(-2deg); }
     .login-form { width: 88%; }
   }
 
@@ -592,27 +592,27 @@
     loginTrigger.addEventListener('click', () => {
       if (stage.classList.contains('launching')) return
       stage.classList.add('launching')
-      // Timeline (~3.2s total — sped up + tightened for a faster, more
-      // seamless bite than before):
+      // Timeline (~3.8s total — faster than the original 4.6s, but eased
+      // back a bit from an earlier overly-rushed 3.2s version):
       //  0.0s  logo pulses, flames begin their sweep in from the edges
-      //  0.6s  shark fades in behind the logo, open-mouthed, logo still visible inside it
-      //  0.9s  mouth opening further — shark grows slightly and rises, like it's lunging closer
-      //  1.2s  mouth wide open — grows/rises again, closing the distance
-      //  1.6s  chomp shut (snap) — shark glides back to resting size, and jumps in
+      //  0.75s shark fades in behind the logo, open-mouthed, logo still visible inside it
+      //  1.05s mouth opening further — shark grows slightly and rises, like it's lunging closer
+      //  1.35s mouth wide open — grows/rises again, closing the distance
+      //  1.85s chomp shut (snap) — shark glides back to resting size, and jumps in
       //        front of the logo so it visually clamps shut over it ("biting it off")
-      //  2.1s  everything fades
-      //  2.5s  login form appears
-      setTimeout(() => stage.classList.add('shark-active'), 600)
-      setTimeout(() => kickFrame(sharkFrames[1], 'frame-2'), 900)
-      setTimeout(() => kickFrame(sharkFrames[2], 'frame-3'), 1200)
+      //  2.4s  everything fades
+      //  2.8s  login form appears
+      setTimeout(() => stage.classList.add('shark-active'), 750)
+      setTimeout(() => kickFrame(sharkFrames[1], 'frame-2'), 1050)
+      setTimeout(() => kickFrame(sharkFrames[2], 'frame-3'), 1350)
       setTimeout(() => {
         kickFrame(sharkFrames[3], null)
         stage.classList.add('chomp')
-      }, 1600)
+      }, 1850)
 
       setTimeout(() => {
         stage.classList.add('fading')
-      }, 2100)
+      }, 2400)
 
       setTimeout(() => {
         intro.classList.add('hidden')
@@ -622,7 +622,7 @@
         sharkSprite.src = sharkFrames[0]
         sharkSprite.classList.remove('frame-2', 'frame-3')
         stage.classList.remove('shark-active', 'chomp')
-      }, 2500)
+      }, 2800)
     })
 
     guestBtn.addEventListener('click', () => {
