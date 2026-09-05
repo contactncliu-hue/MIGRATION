@@ -11,11 +11,20 @@
   // was pushing the ring/logo/flames down. window.innerHeight is the one
   // source that reliably reflects the ACTUAL visible viewport at any given
   // moment, so we measure it ourselves into a CSS var and keep it updated.
+  //
+  // FIX: prefer visualViewport.height when available (more reliable than
+  // innerHeight for tracking iOS toolbar collapse/expand), and also listen
+  // on visualViewport's own resize event, since that fires more reliably
+  // than window 'resize' while iOS is still settling its chrome.
   function setAppHeight() {
-    document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px')
+    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight
+    document.documentElement.style.setProperty('--app-height', h + 'px')
   }
   setAppHeight()
   window.addEventListener('resize', setAppHeight)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setAppHeight)
+  }
   window.addEventListener('orientationchange', () => {
     // iOS reports innerHeight before it finishes settling the toolbar after
     // a rotation, so re-measure a couple of times shortly after.
@@ -26,6 +35,38 @@
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) setAppHeight()
   })
+
+  // FIX: on a cold refresh, iPad Safari sometimes doesn't fire 'load' the
+  // same way (or fires it before the toolbar has actually settled), which
+  // is why the earlier single 300ms retry wasn't enough. 'pageshow' fires
+  // reliably on both fresh loads and bfcache restores, so we hook height
+  // re-measurement there too, with a longer/extra retry window since iPad
+  // settles slower than iPhone.
+  window.addEventListener('pageshow', () => {
+    setAppHeight()
+    requestAnimationFrame(() => requestAnimationFrame(setAppHeight))
+    setTimeout(setAppHeight, 400)
+    setTimeout(setAppHeight, 900)
+
+    // FIX (the actual "ring is low" bug): the ring is the only element with
+    // a continuously-running CSS animation from page load (ringSpin /
+    // ringPulse). iOS Safari composites actively-animating transforms into
+    // their own GPU layer using whatever layout pass was current when the
+    // animation started — which on a cold refresh is often BEFORE the
+    // toolbar/dvh has settled. Static elements (logo, shark, flames) get a
+    // clean repaint once --app-height corrects itself, but the ring's
+    // compositor layer doesn't get rebuilt until something forces a full
+    // re-layout — which is exactly what rotating the device does today.
+    // Instead of relying on rotation, force that rebuild ourselves once
+    // things have settled.
+    setTimeout(() => {
+      const ring = document.querySelector('.ring-img')
+      if (!ring) return
+      ring.style.animation = 'none'
+      void ring.offsetHeight // force reflow
+      ring.style.animation = ''
+    }, 950)
+  })
 </script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -35,7 +76,7 @@
     min-height: 100vh;
     min-height: 100dvh;
     min-height: calc(var(--app-height, 100dvh));
-    background: #ffffff;
+    background: linear-gradient(to top, #FFFAF1, #ffffff);
     display: flex;
     align-items: center;
     justify-content: center;
