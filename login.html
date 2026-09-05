@@ -76,7 +76,7 @@
     min-height: 100vh;
     min-height: 100dvh;
     min-height: calc(var(--app-height, 100dvh));
-    background: linear-gradient(to top, #FFFAF1, #ffffff);
+    background: linear-gradient(to top, #FFFAF1 0%, #ffffff 45%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -531,6 +531,20 @@
     .flame { width: 72vw; min-width: 260px; max-width: 460px; top: 60vh; top: 60dvh; top: calc(var(--app-height, 100dvh) * 0.6); }
     .scene-left,
     .scene-right { width: 62vw; max-width: 340px; }
+    /* Left half: hard-pinned to the bottom-left corner, no transform to
+       ever pull it off the bottom edge. */
+    .scene-left {
+      left: -2vw;
+      bottom: 0;
+    }
+    /* Right half: a touch bigger than the left, and lifted up off the
+       bottom edge — tune the -8% if it still crowds/overlaps the left
+       half's center, or if it's not raised enough yet. */
+    .scene-right {
+      width: 70vw;
+      max-width: 360px;
+      transform: translateY(-8%);
+    }
     .flame-left { width: 92vw; max-width: 600px; transform: translate(-132%, -50%) rotate(-3deg); }
     .stage.launching .flame-left { transform: translate(-42%, -44%) rotate(-3deg); }
     .stage.launching .flame-right { transform: translate(23%, -44%) rotate(-3deg); }
