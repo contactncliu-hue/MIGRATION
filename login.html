@@ -47,8 +47,9 @@
 
   .logo-wrap {
     position: relative;
-    width: 420px;
-    height: 300px;
+    width: 460px;
+    height: 320px;
+    margin-top: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -57,7 +58,7 @@
   .logo-img {
     position: relative;
     z-index: 5;
-    width: 300px;
+    width: 380px;
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
     transition: opacity 0.5s ease, transform 0.5s ease;
   }
@@ -119,8 +120,8 @@
     top: 50%;
     left: 50%;
     z-index: 3;
-    width: 180%;
-    max-width: 760px;
+    width: 155%;
+    max-width: 620px;
     height: auto;
     opacity: 0;
     transform: translate(-50%, -50%);
@@ -154,32 +155,35 @@
 
   .flame {
     position: absolute;
-    top: 55%;
+    top: 52%;
     z-index: 1;
-    width: 480px;
+    width: 580px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
+  /* Idle: parked fully off-screen past the edge, ready to slide in */
   .flame-left {
     left: 0;
-    transform: translate(-95%, -50%) rotate(-4deg);
+    transform: translate(-100%, -50%) rotate(-4deg);
   }
 
   .flame-right {
     right: 0;
-    transform: translate(95%, -50%) scaleX(-1) rotate(-4deg);
+    transform: translate(100%, -50%) scaleX(-1) rotate(-4deg);
   }
 
+  /* Launch: flush against the screen edge, sweeping in toward the button
+     (matches reference — tip clipped by the edge, body reaching the button) */
   .stage.launching .flame-left {
     opacity: 1;
-    transform: translate(-38%, -46%) rotate(-2deg);
+    transform: translate(-4%, -48%) rotate(-2deg);
   }
 
   .stage.launching .flame-right {
     opacity: 1;
-    transform: translate(38%, -46%) scaleX(-1) rotate(-2deg);
+    transform: translate(4%, -48%) scaleX(-1) rotate(-2deg);
   }
 
   .stage.fading .flame,
@@ -368,13 +372,13 @@
   .load-error.visible { display: block; }
 
   @media (max-width: 480px) {
-    .logo-wrap { width: 280px; height: 200px; }
-    .logo-img { width: 200px; }
+    .logo-wrap { width: 320px; height: 220px; margin-top: 36px; }
+    .logo-img { width: 260px; }
     .ring-img { width: 440px; }
-    .shark-sprite { max-width: 520px; }
-    .flame { width: 300px; }
-    .stage.launching .flame-left { transform: translate(-25%, -46%) rotate(-2deg); }
-    .stage.launching .flame-right { transform: translate(25%, -46%) scaleX(-1) rotate(-2deg); }
+    .shark-sprite { max-width: 420px; }
+    .flame { width: 340px; top: 52%; }
+    .stage.launching .flame-left { transform: translate(-4%, -48%) rotate(-2deg); }
+    .stage.launching .flame-right { transform: translate(4%, -48%) scaleX(-1) rotate(-2deg); }
     .login-form { width: 88%; }
   }
 
