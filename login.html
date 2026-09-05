@@ -4,6 +4,29 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ZOO - Log In</title>
+<script>
+  // iOS Safari (especially iPadOS with a tab bar visible) doesn't always
+  // recalculate 100dvh correctly on the very first paint after a refresh —
+  // it can briefly measure against a stale/incorrect height, which is what
+  // was pushing the ring/logo/flames down. window.innerHeight is the one
+  // source that reliably reflects the ACTUAL visible viewport at any given
+  // moment, so we measure it ourselves into a CSS var and keep it updated.
+  function setAppHeight() {
+    document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px')
+  }
+  setAppHeight()
+  window.addEventListener('resize', setAppHeight)
+  window.addEventListener('orientationchange', () => {
+    // iOS reports innerHeight before it finishes settling the toolbar after
+    // a rotation, so re-measure a couple of times shortly after.
+    setAppHeight()
+    setTimeout(setAppHeight, 50)
+    setTimeout(setAppHeight, 300)
+  })
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) setAppHeight()
+  })
+</script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -513,6 +536,16 @@
     const formSuccess = document.getElementById('form-success')
     const submitBtn = document.getElementById('submit-btn')
     const loadErrorEl = document.getElementById('load-error')
+
+    // Re-measure once more after full load (and shortly after), since the
+    // iPad Safari toolbar can still settle into its final size a moment
+    // after DOMContentLoaded/inline-script time.
+    if (typeof setAppHeight === 'function') {
+      window.addEventListener('load', () => {
+        setAppHeight()
+        setTimeout(setAppHeight, 300)
+      })
+    }
     const formTitle = document.getElementById('form-title')
     const signupPrompt = document.getElementById('signup-prompt')
     const signupToggleBtn = document.getElementById('signup-toggle-btn')
