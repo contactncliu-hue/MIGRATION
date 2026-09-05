@@ -178,9 +178,12 @@
     transform: translate(-115%, -50%) rotate(-4deg);
   }
 
+  /* Right flame uses the SAME orientation as the left (no mirroring) —
+     mirroring flipped its internal curl direction and made it read
+     wrong against the reference art. */
   .flame-right {
     right: 0;
-    transform: translate(100%, -50%) scaleX(-1) rotate(-4deg);
+    transform: translate(100%, -50%) rotate(-4deg);
   }
 
   /* Launch: left sweeps in bigger but stays pulled back so its faded
@@ -193,7 +196,7 @@
 
   .stage.launching .flame-right {
     opacity: 1;
-    transform: translate(9%, -46%) scaleX(-1) rotate(-2deg);
+    transform: translate(9%, -46%) rotate(-2deg);
   }
 
   .stage.fading .flame,
@@ -322,6 +325,20 @@
 
   .form-error.visible { display: block; }
 
+  .form-success {
+    width: 100%;
+    background: #f0fff4;
+    color: #2b8a3e;
+    border: 1px solid #d3f9d8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    display: none;
+  }
+
+  .form-success.visible { display: block; }
+
   .submit-btn {
     width: 100%;
     background: #f2a90f;
@@ -358,6 +375,27 @@
 
   .back-link:hover { color: #666; }
 
+  /* New-here / sign-up prompt shown under the login form */
+  .signup-prompt {
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+  }
+
+  .signup-prompt .signup-link-btn {
+    background: none;
+    border: none;
+    color: #3B5BDB;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .signup-prompt .signup-link-btn:hover { text-decoration: underline; }
+
   /* Shown at the top of the stage if Supabase itself never loaded */
   .load-error {
     display: none;
@@ -389,7 +427,7 @@
     .flame { width: 60vw; min-width: 220px; max-width: 380px; top: 57vh; }
     .flame-left { width: 72vw; max-width: 460px; transform: translate(-115%, -50%) rotate(-4deg); }
     .stage.launching .flame-left { transform: translate(-14%, -46%) rotate(-2deg); }
-    .stage.launching .flame-right { transform: translate(9%, -46%) scaleX(-1) rotate(-2deg); }
+    .stage.launching .flame-right { transform: translate(9%, -46%) rotate(-2deg); }
     .login-form { width: 88%; }
   }
 
@@ -420,12 +458,13 @@
       <button class="guest-link" id="guest-btn">PROCEED<br />AS GUEST</button>
     </div>
 
-    <!-- Login form -->
+    <!-- Login / Sign up form -->
     <form class="login-form" id="login-form">
       <img src="assets/logo.png.PNG" class="form-logo" alt="ZOO" />
-      <h1>Welcome back</h1>
+      <h1 id="form-title">Welcome back</h1>
 
       <div class="form-error" id="form-error">Something went wrong.</div>
+      <div class="form-success" id="form-success"></div>
 
       <div class="field">
         <label for="email">Email</label>
@@ -438,6 +477,12 @@
       </div>
 
       <button type="submit" class="submit-btn" id="submit-btn">LOG IN</button>
+
+      <div class="signup-prompt" id="signup-prompt">
+        Don't have an account?
+        <button type="button" class="signup-link-btn" id="signup-toggle-btn">Sign up</button>
+      </div>
+
       <button type="button" class="back-link" id="back-btn">&larr; Back</button>
     </form>
 
@@ -455,16 +500,34 @@
     const guestBtn = document.getElementById('guest-btn')
     const backBtn = document.getElementById('back-btn')
     const formError = document.getElementById('form-error')
+    const formSuccess = document.getElementById('form-success')
     const submitBtn = document.getElementById('submit-btn')
     const loadErrorEl = document.getElementById('load-error')
+    const formTitle = document.getElementById('form-title')
+    const signupPrompt = document.getElementById('signup-prompt')
+    const signupToggleBtn = document.getElementById('signup-toggle-btn')
+
+    // Whether the form is currently in "sign up" mode or "log in" mode
+    let mode = 'login'
 
     function showError(message) {
+      formSuccess.classList.remove('visible')
       formError.textContent = message
       formError.classList.add('visible')
     }
 
     function clearError() {
       formError.classList.remove('visible')
+    }
+
+    function showSuccess(message) {
+      formError.classList.remove('visible')
+      formSuccess.textContent = message
+      formSuccess.classList.add('visible')
+    }
+
+    function clearSuccess() {
+      formSuccess.classList.remove('visible')
     }
 
     function showLoadError(message) {
@@ -480,6 +543,29 @@
         )
       ])
     }
+
+    function setMode(newMode) {
+      mode = newMode
+      clearError()
+      clearSuccess()
+      if (mode === 'signup') {
+        formTitle.textContent = 'Create your account'
+        submitBtn.textContent = 'SIGN UP'
+        signupPrompt.innerHTML = 'Already have an account? <button type="button" class="signup-link-btn" id="signup-toggle-btn">Log in</button>'
+      } else {
+        formTitle.textContent = 'Welcome back'
+        submitBtn.textContent = 'LOG IN'
+        signupPrompt.innerHTML = "Don't have an account? <button type=\"button\" class=\"signup-link-btn\" id=\"signup-toggle-btn\">Sign up</button>"
+      }
+      // Re-bind, since innerHTML replaced the button node
+      document.getElementById('signup-toggle-btn').addEventListener('click', () => {
+        setMode(mode === 'login' ? 'signup' : 'login')
+      })
+    }
+
+    signupToggleBtn.addEventListener('click', () => {
+      setMode(mode === 'login' ? 'signup' : 'login')
+    })
 
     const sharkSprite = document.getElementById('shark-sprite')
     const sharkFrames = [
@@ -541,7 +627,9 @@
       sharkSprite.src = sharkFrames[0]
       sharkSprite.classList.remove('frame-2', 'frame-3')
       clearError()
+      clearSuccess()
       loginForm.reset()
+      setMode('login')
     })
 
     // ---------- Supabase init (guarded) ----------
@@ -572,35 +660,60 @@
       loginForm.addEventListener('submit', async (e) => {
         e.preventDefault()
         clearError()
+        clearSuccess()
 
         const email = document.getElementById('email').value.trim()
         const password = document.getElementById('password').value
 
         submitBtn.disabled = true
-        submitBtn.textContent = 'LOGGING IN...'
+        submitBtn.textContent = mode === 'signup' ? 'SIGNING UP...' : 'LOGGING IN...'
 
         try {
-          const { error } = await withTimeout(
-            supabaseClient.auth.signInWithPassword({ email, password }),
-            8000, 'signInWithPassword'
-          )
+          if (mode === 'signup') {
+            const { data, error } = await withTimeout(
+              supabaseClient.auth.signUp({ email, password }),
+              8000, 'signUp'
+            )
 
-          if (error) {
-            showError(error.message)
-            submitBtn.disabled = false
-            submitBtn.textContent = 'LOG IN'
-            return
+            if (error) {
+              showError(error.message)
+              submitBtn.disabled = false
+              submitBtn.textContent = 'SIGN UP'
+              return
+            }
+
+            // If email confirmation is on, there's no session yet — tell the user to check their inbox.
+            if (data && data.session) {
+              window.location.href = 'index.html'
+            } else {
+              showSuccess('Account created! Check your email to confirm, then log in.')
+              submitBtn.disabled = false
+              submitBtn.textContent = 'SIGN UP'
+              setMode('login')
+            }
+          } else {
+            const { error } = await withTimeout(
+              supabaseClient.auth.signInWithPassword({ email, password }),
+              8000, 'signInWithPassword'
+            )
+
+            if (error) {
+              showError(error.message)
+              submitBtn.disabled = false
+              submitBtn.textContent = 'LOG IN'
+              return
+            }
+
+            window.location.href = 'index.html'
           }
-
-          window.location.href = 'index.html'
         } catch (err) {
-          console.error('Login failed:', err)
+          console.error((mode === 'signup' ? 'Sign up' : 'Login') + ' failed:', err)
           showError(
             (err && (err.message || err.error_description || err.toString())) ||
-            'Unknown error while logging in.'
+            'Unknown error while ' + (mode === 'signup' ? 'signing up.' : 'logging in.')
           )
           submitBtn.disabled = false
-          submitBtn.textContent = 'LOG IN'
+          submitBtn.textContent = mode === 'signup' ? 'SIGN UP' : 'LOG IN'
         }
       })
     }
