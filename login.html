@@ -47,70 +47,133 @@
 
   .logo-wrap {
     position: relative;
-    width: 340px;
-    height: 240px;
+    width: 420px;
+    height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .shark-sprite {
+  .logo-img {
     position: relative;
     z-index: 5;
+    width: 300px;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .stage.launching .logo-img {
+    animation: logoPulse 1.4s ease-in-out 1;
+  }
+
+  /* Once the shark takes over, fade the logo out */
+  .stage.shark-active .logo-img {
+    opacity: 0;
+  }
+
+  @keyframes logoPulse {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.1); }
+    60%  { transform: scale(0.98); }
+    100% { transform: scale(1); }
+  }
+
+  /* Ring / spiral swirl behind the logo */
+  .ring-img {
+    position: absolute;
+    z-index: 2;
+    width: 640px;
+    max-width: none;
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+  }
+
+  .stage.launching .ring-img {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    animation: ringSpin 2.4s linear infinite, ringPulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes ringSpin {
+    from { transform: scale(1) rotate(0deg); }
+    to   { transform: scale(1) rotate(360deg); }
+  }
+
+  @keyframes ringPulse {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+  }
+
+  /* Shark bite sequence — overlays the same spot as the logo, hidden until triggered */
+  .shark-sprite {
+    position: absolute;
+    z-index: 6;
     width: 100%;
-    max-width: 340px;
+    max-width: 400px;
     height: auto;
+    opacity: 0;
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.10));
-    transition: transform 0.12s ease-out;
+    transition: opacity 0.4s ease, transform 0.14s ease-out;
+  }
+
+  .stage.shark-active .shark-sprite {
+    opacity: 1;
   }
 
   /* Quick punchy scale-kick on each frame change, like a bite snap */
   .shark-sprite.bite-kick {
-    animation: biteKick 0.16s ease-out 1;
+    animation: biteKick 0.18s ease-out 1;
   }
 
   @keyframes biteKick {
     0%   { transform: scale(1); }
-    45%  { transform: scale(1.09); }
+    45%  { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
 
-  /* Flame wisps sliding in from the corners */
+  /* Flames flanking the LOG IN button */
+  .btn-flame-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .flame {
-    position: fixed;
+    position: absolute;
+    top: 50%;
     z-index: 1;
-    width: 45vw;
-    max-width: 620px;
+    width: 260px;
     opacity: 0;
     pointer-events: none;
+    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .flame-left {
     left: 0;
-    bottom: 6%;
-    transform: translateX(-75%) translateY(20%) rotate(-4deg);
-    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translate(-85%, -50%) rotate(-4deg);
   }
 
   .flame-right {
     right: 0;
-    bottom: 6%;
-    transform: translateX(75%) translateY(20%) scaleX(-1) rotate(-4deg);
-    transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: translate(85%, -50%) scaleX(-1) rotate(-4deg);
   }
 
   .stage.launching .flame-left {
     opacity: 1;
-    transform: translateX(-25%) translateY(-4%) rotate(-2deg);
+    transform: translate(-46%, -55%) rotate(-2deg);
   }
 
   .stage.launching .flame-right {
     opacity: 1;
-    transform: translateX(25%) translateY(-4%) scaleX(-1) rotate(-2deg);
+    transform: translate(46%, -55%) scaleX(-1) rotate(-2deg);
   }
 
   .stage.fading .flame,
-  .stage.fading .shark-sprite {
+  .stage.fading .shark-sprite,
+  .stage.fading .ring-img {
     opacity: 0;
     transition: opacity 0.5s ease;
   }
@@ -294,15 +357,17 @@
   .load-error.visible { display: block; }
 
   @media (max-width: 480px) {
-    .logo-wrap { width: 240px; height: 170px; }
-    .shark-sprite { max-width: 240px; }
-    .flame { width: 65vw; }
+    .logo-wrap { width: 280px; height: 200px; }
+    .logo-img { width: 200px; }
+    .ring-img { width: 440px; }
+    .shark-sprite { max-width: 280px; }
+    .flame { width: 160px; }
     .login-form { width: 88%; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .shark-sprite.bite-kick { animation: none; }
-    .flame, .shark-sprite, .intro, .login-form { transition-duration: 0.15s; }
+    .flame, .shark-sprite, .ring-img, .intro, .login-form { transition-duration: 0.15s; }
   }
 </style>
 </head>
@@ -312,16 +377,18 @@
 
     <div class="load-error" id="load-error"></div>
 
-    <!-- Flame wisps -->
-    <img src="assets/flame-b.png.PNG" class="flame flame-left" alt="" />
-    <img src="assets/flame-a.PNG" class="flame flame-right" alt="" />
-
-    <!-- Intro: shark bite sequence + buttons -->
+    <!-- Intro: logo (idle) -> ring + shark bite sequence (on click) + buttons -->
     <div class="intro" id="intro">
       <div class="logo-wrap">
-        <img src="assets/shark-1.PNG" class="shark-sprite" id="shark-sprite" alt="ZOO" />
+        <img src="assets/ring.png.PNG" class="ring-img" alt="" />
+        <img src="assets/logo.png.PNG" class="logo-img" alt="ZOO" />
+        <img src="assets/shark-1.PNG" class="shark-sprite" id="shark-sprite" alt="" />
       </div>
-      <button class="btn-login" id="login-trigger">LOG IN</button>
+      <div class="btn-flame-wrap">
+        <img src="assets/flame-b.png.PNG" class="flame flame-left" alt="" />
+        <img src="assets/flame-a.PNG" class="flame flame-right" alt="" />
+        <button class="btn-login" id="login-trigger">LOG IN</button>
+      </div>
       <button class="guest-link" id="guest-btn">PROCEED<br />AS GUEST</button>
     </div>
 
@@ -394,37 +461,41 @@
       'assets/shark-4.PNG'  // chomp shut / snap
     ]
 
-    function playBiteSequence() {
-      // Step through frames 2, 3, 4 with a quick punchy scale-kick on each,
-      // landing on the "chomp shut" frame right before the form fades in.
-      const stepDelay = 150
-      sharkFrames.slice(1).forEach((frame, i) => {
-        setTimeout(() => {
-          sharkSprite.src = frame
-          sharkSprite.classList.remove('bite-kick')
-          // force reflow so the animation class can be re-triggered
-          void sharkSprite.offsetWidth
-          sharkSprite.classList.add('bite-kick')
-        }, stepDelay * (i + 1))
-      })
+    function kickFrame(src) {
+      sharkSprite.src = src
+      sharkSprite.classList.remove('bite-kick')
+      void sharkSprite.offsetWidth // force reflow so the animation can retrigger
+      sharkSprite.classList.add('bite-kick')
     }
 
     loginTrigger.addEventListener('click', () => {
       if (stage.classList.contains('launching')) return
       stage.classList.add('launching')
-      playBiteSequence()
+      // Timeline (~6.7s total):
+      //  0.0s  ring spins in, logo pulses, flames flank the button
+      //  1.5s  crossfade from logo to the calm shark frame
+      //  2.2s  mouth opening
+      //  3.6s  mouth wide open
+      //  5.0s  chomp shut (snap)
+      //  6.2s  everything fades
+      //  6.7s  login form appears
+      setTimeout(() => stage.classList.add('shark-active'), 1500)
+      setTimeout(() => kickFrame(sharkFrames[1]), 2200)
+      setTimeout(() => kickFrame(sharkFrames[2]), 3600)
+      setTimeout(() => kickFrame(sharkFrames[3]), 5000)
 
       setTimeout(() => {
         stage.classList.add('fading')
-      }, 1300)
+      }, 6200)
 
       setTimeout(() => {
         intro.classList.add('hidden')
         loginForm.classList.add('visible')
         document.getElementById('email').focus()
-        // Reset the sprite so it's back to the calm frame if the user hits Back
+        // Reset so it's back to the idle logo if the user hits Back later
         sharkSprite.src = sharkFrames[0]
-      }, 1700)
+        stage.classList.remove('shark-active')
+      }, 6700)
     })
 
     guestBtn.addEventListener('click', () => {
@@ -434,7 +505,7 @@
     backBtn.addEventListener('click', () => {
       loginForm.classList.remove('visible')
       intro.classList.remove('hidden')
-      stage.classList.remove('launching', 'fading')
+      stage.classList.remove('launching', 'fading', 'shark-active')
       sharkSprite.src = sharkFrames[0]
       sharkSprite.classList.remove('bite-kick')
       clearError()
