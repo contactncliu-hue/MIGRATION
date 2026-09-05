@@ -163,6 +163,11 @@
     box-shadow: 0 2px 0 #c98c0c;
   }
 
+  .btn-login:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
   .guest-link {
     position: relative;
     z-index: 5;
@@ -249,6 +254,8 @@
     font-size: 13px;
     font-weight: 600;
     display: none;
+    white-space: pre-wrap;
+    font-family: monospace;
   }
 
   .form-error.visible { display: block; }
@@ -289,6 +296,29 @@
 
   .back-link:hover { color: #666; }
 
+  /* Shown at the top of the stage if Supabase itself never loaded */
+  .load-error {
+    display: none;
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 480px;
+    background: #fff0f0;
+    color: #e03131;
+    border: 1px solid #ffd6d6;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: monospace;
+    white-space: pre-wrap;
+    z-index: 20;
+  }
+
+  .load-error.visible { display: block; }
+
   @media (max-width: 480px) {
     .logo-wrap { width: 240px; height: 170px; }
     .logo-img { width: 190px; }
@@ -307,6 +337,8 @@
 <body>
 
   <div class="stage" id="stage">
+
+    <div class="load-error" id="load-error"></div>
 
     <!-- Flame wisps -->
     <img src="assets/flame-b.png" class="flame flame-left" alt="" />
@@ -347,10 +379,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
-    const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
+    // ---------- Grab elements + bind buttons FIRST, unconditionally ----------
+    // This guarantees LOG IN / GUEST / BACK always respond, even if
+    // Supabase itself fails to load below.
     const stage = document.getElementById('stage')
     const intro = document.getElementById('intro')
     const loginForm = document.getElementById('login-form')
@@ -359,6 +390,7 @@
     const backBtn = document.getElementById('back-btn')
     const formError = document.getElementById('form-error')
     const submitBtn = document.getElementById('submit-btn')
+    const loadErrorEl = document.getElementById('load-error')
 
     function showError(message) {
       formError.textContent = message
@@ -369,17 +401,24 @@
       formError.classList.remove('visible')
     }
 
-    // Redirect immediately if already logged in
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) window.location.href = 'index.html'
-    })
+    function showLoadError(message) {
+      loadErrorEl.textContent = message
+      loadErrorEl.classList.add('visible')
+    }
+
+    function withTimeout(promise, ms, label) {
+      return Promise.race([
+        promise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error(label + ' timed out after ' + ms + 'ms — check your network or Supabase project status')), ms)
+        )
+      ])
+    }
 
     loginTrigger.addEventListener('click', () => {
       if (stage.classList.contains('launching')) return
       stage.classList.add('launching')
 
-      // Let the flames + ring play, then fade the intro out
-      // and the form in.
       setTimeout(() => {
         stage.classList.add('fading')
       }, 1300)
@@ -403,27 +442,66 @@
       loginForm.reset()
     })
 
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      clearError()
-
-      const email = document.getElementById('email').value.trim()
-      const password = document.getElementById('password').value
-
+    // ---------- Supabase init (guarded) ----------
+    if (!window.supabase) {
+      showLoadError(
+        'The Supabase library did not load from the CDN.\n' +
+        'This is usually caused by an ad blocker, content blocker, ' +
+        '"Prevent Cross-Site Tracking", or Lockdown Mode blocking cdn.jsdelivr.net.\n' +
+        'Login will not work until this loads — try disabling content ' +
+        'blockers for this site, or open it in a different browser.'
+      )
       submitBtn.disabled = true
-      submitBtn.textContent = 'LOGGING IN...'
+    } else {
+      const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
+      const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
+      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      // Redirect immediately if already logged in
+      withTimeout(supabaseClient.auth.getUser(), 8000, 'getUser')
+        .then(({ data: { user } }) => {
+          if (user) window.location.href = 'index.html'
+        })
+        .catch(err => {
+          console.error('getUser check failed:', err)
+          // Non-fatal: just means we couldn't pre-check; let them log in manually.
+        })
 
-      if (error) {
-        showError(error.message)
-        submitBtn.disabled = false
-        submitBtn.textContent = 'LOG IN'
-        return
-      }
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        clearError()
 
-      window.location.href = 'index.html'
-    })
+        const email = document.getElementById('email').value.trim()
+        const password = document.getElementById('password').value
+
+        submitBtn.disabled = true
+        submitBtn.textContent = 'LOGGING IN...'
+
+        try {
+          const { error } = await withTimeout(
+            supabaseClient.auth.signInWithPassword({ email, password }),
+            8000, 'signInWithPassword'
+          )
+
+          if (error) {
+            showError(error.message)
+            submitBtn.disabled = false
+            submitBtn.textContent = 'LOG IN'
+            return
+          }
+
+          window.location.href = 'index.html'
+        } catch (err) {
+          console.error('Login failed:', err)
+          showError(
+            (err && (err.message || err.error_description || err.toString())) ||
+            'Unknown error while logging in.'
+          )
+          submitBtn.disabled = false
+          submitBtn.textContent = 'LOG IN'
+        }
+      })
+    }
   </script>
 </body>
 </html>
