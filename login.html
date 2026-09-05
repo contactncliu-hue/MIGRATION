@@ -112,27 +112,27 @@
   }
 
   .flame-left {
-    left: -30%;
+    left: 0;
     bottom: 6%;
-    transform: translate(-10%, 20%) rotate(-4deg);
+    transform: translateX(-75%) translateY(20%) rotate(-4deg);
     transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .flame-right {
-    right: -30%;
+    right: 0;
     bottom: 6%;
-    transform: translate(10%, 20%) scaleX(-1) rotate(-4deg);
+    transform: translateX(75%) translateY(20%) scaleX(-1) rotate(-4deg);
     transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .stage.launching .flame-left {
     opacity: 1;
-    transform: translate(6%, -4%) rotate(-2deg);
+    transform: translateX(-25%) translateY(-4%) rotate(-2deg);
   }
 
   .stage.launching .flame-right {
     opacity: 1;
-    transform: translate(-6%, -4%) scaleX(-1) rotate(-2deg);
+    transform: translateX(25%) translateY(-4%) scaleX(-1) rotate(-2deg);
   }
 
   .stage.fading .flame,
