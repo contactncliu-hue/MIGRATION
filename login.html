@@ -82,9 +82,10 @@
   }
 
   /* Ring / spiral swirl behind the logo — slow, lazy spin.
-     Sits high and tight around the wordmark itself (matches reference:
-     the ring wraps the logo directly, well clear of the flames/button
-     below it — NOT dropped down near the button). */
+     The ring artwork itself is bottom-heavy (its flame spikes carry more
+     visual weight below center than above), so a literal 50/50 center
+     still reads as low. Nudged up slightly to compensate and read as
+     visually centered on the logo. */
   .ring-img {
     position: absolute;
     top: 50%;
@@ -93,15 +94,15 @@
     width: 640px;
     max-width: none;
     opacity: 0.55;
-    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    transform: translate(-50%, -58%) scale(1) rotate(0deg);
     transition: opacity 0.6s ease;
     pointer-events: none;
     animation: ringSpin 11s linear infinite, ringPulse 2.6s ease-in-out infinite;
   }
 
   @keyframes ringSpin {
-    from { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-    to   { transform: translate(-50%, -50%) scale(1) rotate(360deg); }
+    from { transform: translate(-50%, -58%) scale(1) rotate(0deg); }
+    to   { transform: translate(-50%, -58%) scale(1) rotate(360deg); }
   }
 
   @keyframes ringPulse {
@@ -177,9 +178,9 @@
      off-canvas at rest or its faded tail-end shows on screen */
   .flame-left {
     left: 0;
-    width: 72vw;
-    max-width: 1000px;
-    transform: translate(-118%, -50%) rotate(-3deg);
+    width: 82vw;
+    max-width: 1140px;
+    transform: translate(-132%, -50%) rotate(-3deg);
   }
 
   /* Right flame uses the SAME orientation as the left (no mirroring) —
@@ -192,10 +193,12 @@
 
   /* Launch: both flames sweep in wide and low to match the reference —
      held back well clear of center so they stay spread toward the
-     edges, not bunched together in the middle */
+     edges, not bunched together in the middle. Left is bigger, so it
+     stays further out than the right to avoid crowding center and to
+     keep its faded tail off-screen. */
   .stage.launching .flame-left {
     opacity: 1;
-    transform: translate(-30%, -44%) rotate(-3deg);
+    transform: translate(-42%, -44%) rotate(-3deg);
   }
 
   .stage.launching .flame-right {
@@ -595,27 +598,27 @@
     loginTrigger.addEventListener('click', () => {
       if (stage.classList.contains('launching')) return
       stage.classList.add('launching')
-      // Timeline (~3.8s total — faster than the original 4.6s, but eased
-      // back a bit from an earlier overly-rushed 3.2s version):
+      // Timeline (~4.0s total — nudged a couple hundred ms slower again
+      // after feeling slightly too fast):
       //  0.0s  logo pulses, flames begin their sweep in from the edges
-      //  0.75s shark fades in behind the logo, open-mouthed, logo still visible inside it
-      //  1.05s mouth opening further — shark grows slightly and rises, like it's lunging closer
-      //  1.35s mouth wide open — grows/rises again, closing the distance
-      //  1.85s chomp shut (snap) — shark glides back to resting size, and jumps in
+      //  0.9s  shark fades in behind the logo, open-mouthed, logo still visible inside it
+      //  1.2s  mouth opening further — shark grows slightly and rises, like it's lunging closer
+      //  1.5s  mouth wide open — grows/rises again, closing the distance
+      //  2.0s  chomp shut (snap) — shark glides back to resting size, and jumps in
       //        front of the logo so it visually clamps shut over it ("biting it off")
-      //  2.4s  everything fades
-      //  2.8s  login form appears
-      setTimeout(() => stage.classList.add('shark-active'), 750)
-      setTimeout(() => kickFrame(sharkFrames[1], 'frame-2'), 1050)
-      setTimeout(() => kickFrame(sharkFrames[2], 'frame-3'), 1350)
+      //  2.55s everything fades
+      //  2.95s login form appears
+      setTimeout(() => stage.classList.add('shark-active'), 900)
+      setTimeout(() => kickFrame(sharkFrames[1], 'frame-2'), 1200)
+      setTimeout(() => kickFrame(sharkFrames[2], 'frame-3'), 1500)
       setTimeout(() => {
         kickFrame(sharkFrames[3], null)
         stage.classList.add('chomp')
-      }, 1850)
+      }, 2000)
 
       setTimeout(() => {
         stage.classList.add('fading')
-      }, 2400)
+      }, 2550)
 
       setTimeout(() => {
         intro.classList.add('hidden')
@@ -625,7 +628,7 @@
         sharkSprite.src = sharkFrames[0]
         sharkSprite.classList.remove('frame-2', 'frame-3')
         stage.classList.remove('shark-active', 'chomp')
-      }, 2800)
+      }, 2950)
     })
 
     guestBtn.addEventListener('click', () => {
