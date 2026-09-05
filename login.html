@@ -59,16 +59,19 @@
     z-index: 5;
     width: 300px;
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease, visibility 0s linear 0.5s;
   }
 
   .stage.launching .logo-img {
     animation: logoPulse 1.4s ease-in-out 1;
   }
 
-  /* Once the shark takes over, fade the logo out */
+  /* Once the shark takes over, fully hide the logo — opacity AND visibility,
+     so there's no chance of it peeking through on any frame */
   .stage.shark-active .logo-img {
     opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, transform 0.5s ease, visibility 0s linear 0s;
   }
 
   @keyframes logoPulse {
@@ -81,24 +84,25 @@
   /* Ring / spiral swirl behind the logo */
   .ring-img {
     position: absolute;
+    top: 50%;
+    left: 50%;
     z-index: 2;
     width: 640px;
     max-width: none;
     opacity: 0;
-    transform: scale(0.5) rotate(0deg);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+    transition: opacity 0.6s ease;
     pointer-events: none;
   }
 
   .stage.launching .ring-img {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
-    animation: ringSpin 2.4s linear infinite, ringPulse 1.6s ease-in-out infinite;
+    animation: ringSpin 3.4s linear infinite, ringPulse 1.6s ease-in-out infinite;
   }
 
   @keyframes ringSpin {
-    from { transform: scale(1) rotate(0deg); }
-    to   { transform: scale(1) rotate(360deg); }
+    from { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) scale(1) rotate(360deg); }
   }
 
   @keyframes ringPulse {
@@ -109,13 +113,16 @@
   /* Shark bite sequence — overlays the same spot as the logo, hidden until triggered */
   .shark-sprite {
     position: absolute;
-    z-index: 6;
+    top: 50%;
+    left: 50%;
+    z-index: 10;
     width: 100%;
-    max-width: 400px;
+    max-width: 460px;
     height: auto;
     opacity: 0;
+    transform: translate(-50%, -50%);
     filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.10));
-    transition: opacity 0.4s ease, transform 0.14s ease-out;
+    transition: opacity 0.4s ease;
   }
 
   .stage.shark-active .shark-sprite {
@@ -128,9 +135,9 @@
   }
 
   @keyframes biteKick {
-    0%   { transform: scale(1); }
-    45%  { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0%   { transform: translate(-50%, -50%) scale(1); }
+    45%  { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
   }
 
   /* Flames flanking the LOG IN button */
@@ -153,22 +160,22 @@
 
   .flame-left {
     left: 0;
-    transform: translate(-85%, -50%) rotate(-4deg);
+    transform: translate(-100%, -50%) rotate(-4deg);
   }
 
   .flame-right {
     right: 0;
-    transform: translate(85%, -50%) scaleX(-1) rotate(-4deg);
+    transform: translate(100%, -50%) scaleX(-1) rotate(-4deg);
   }
 
   .stage.launching .flame-left {
     opacity: 1;
-    transform: translate(-46%, -55%) rotate(-2deg);
+    transform: translate(-68%, -55%) rotate(-2deg);
   }
 
   .stage.launching .flame-right {
     opacity: 1;
-    transform: translate(46%, -55%) scaleX(-1) rotate(-2deg);
+    transform: translate(68%, -55%) scaleX(-1) rotate(-2deg);
   }
 
   .stage.fading .flame,
@@ -360,7 +367,7 @@
     .logo-wrap { width: 280px; height: 200px; }
     .logo-img { width: 200px; }
     .ring-img { width: 440px; }
-    .shark-sprite { max-width: 280px; }
+    .shark-sprite { max-width: 320px; }
     .flame { width: 160px; }
     .login-form { width: 88%; }
   }
