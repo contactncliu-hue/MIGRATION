@@ -163,6 +163,7 @@
   .flame {
     position: fixed;
     top: 60vh;
+    top: 60dvh;
     z-index: 1;
     width: 60vw;
     min-width: 380px;
@@ -190,16 +191,16 @@
   }
 
   /* Launch: both flames sweep in wide and low to match the reference —
-     bigger than before, but held back from center (not tucked in near
-     the button) so they stay spread toward the edges like the reference */
+     held back well clear of center so they stay spread toward the
+     edges, not bunched together in the middle */
   .stage.launching .flame-left {
     opacity: 1;
-    transform: translate(-16%, -44%) rotate(-2deg);
+    transform: translate(-30%, -44%) rotate(-3deg);
   }
 
   .stage.launching .flame-right {
     opacity: 1;
-    transform: translate(11%, -44%) rotate(-2deg);
+    transform: translate(23%, -44%) rotate(-3deg);
   }
 
   .stage.fading .flame,
@@ -427,10 +428,10 @@
     .logo-img { width: 260px; }
     .ring-img { width: 440px; }
     .shark-sprite { max-width: 420px; }
-    .flame { width: 72vw; min-width: 260px; max-width: 460px; top: 60vh; }
+    .flame { width: 72vw; min-width: 260px; max-width: 460px; top: 60vh; top: 60dvh; }
     .flame-left { width: 84vw; max-width: 540px; transform: translate(-118%, -50%) rotate(-3deg); }
-    .stage.launching .flame-left { transform: translate(-16%, -44%) rotate(-2deg); }
-    .stage.launching .flame-right { transform: translate(11%, -44%) rotate(-2deg); }
+    .stage.launching .flame-left { transform: translate(-30%, -44%) rotate(-3deg); }
+    .stage.launching .flame-right { transform: translate(23%, -44%) rotate(-3deg); }
     .login-form { width: 88%; }
   }
 
