@@ -1,353 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZOO - Home</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; background: #f4f5fa; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZOO - Events</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Poppins', sans-serif;
+    display:flex;
+    min-height:100vh;
+    background:#f4f5fa;
+    overflow-x:hidden;
+  }
 
-    .sidebar {
-      width: 240px;
-      background: #fff;
-      border-right: 1px solid #eee;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 0;
+  /* ================= SIDEBAR (copied from the homepage) ================= */
+  .sidebar{
+    width:240px; min-width:240px; background:#fff; border-right:1px solid #eee;
+    display:flex; flex-direction:column; padding:24px 0;
+    transition:margin-left .35s ease, opacity .35s ease;
+  }
+  .sidebar .logo-img{ width:70px; margin:0 auto 20px auto; display:block; }
+  .user-block{ display:flex; align-items:center; gap:12px; padding:0 20px 20px 20px; border-bottom:1px solid #eee; margin-bottom:12px; }
+  .user-avatar{ width:40px; height:40px; border-radius:50%; background:#3B5BDB; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; flex-shrink:0; }
+  .user-info .user-name{ font-weight:700; font-size:14px; color:#1a1a2e; }
+  .user-info .user-role{ font-size:12px; color:#888; }
+  .nav-link{ display:flex; align-items:center; gap:10px; padding:14px 20px; color:#444; text-decoration:none; font-weight:600; font-size:14px; letter-spacing:.3px; }
+  .nav-link:hover{ background:#f4f5fa; }
+  .nav-link.active{ background:#3B5BDB; color:#fff; }
+  .sidebar-bottom{ margin-top:auto; padding:16px 20px 0 20px; border-top:1px solid #eee; display:flex; flex-direction:column; gap:10px; }
+  .sidebar-bottom label{ font-size:11px; font-weight:700; color:#999; letter-spacing:.5px; }
+  .lang-select{ padding:8px 10px; border-radius:8px; border:1px solid #ddd; font-size:14px; font-weight:600; }
+  .logout-btn{ background:none; border:1.5px solid #e03131; color:#e03131; padding:10px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; }
+  .logout-btn:hover{ background:#fff0f0; }
+
+  body.sidebar-hidden .sidebar{ margin-left:-240px; opacity:0; pointer-events:none; }
+
+  /* ================= MAIN ================= */
+  .main-content{ flex:1; position:relative; min-height:100vh; overflow:hidden; }
+
+  .menu-toggle{
+    position:fixed; top:24px; right:32px; z-index:60;
+    width:46px; height:46px; border-radius:12px; border:none; cursor:pointer;
+    background:transparent; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+  }
+  .menu-toggle span{ width:22px; height:3px; border-radius:2px; background:#3B5BDB; display:block; transition:transform .25s ease, opacity .25s ease; }
+  body.sidebar-hidden .menu-toggle span:nth-child(1){ transform:translateY(8px) rotate(45deg); }
+  body.sidebar-hidden .menu-toggle span:nth-child(2){ opacity:0; }
+  body.sidebar-hidden .menu-toggle span:nth-child(3){ transform:translateY(-8px) rotate(-45deg); }
+
+  .lineup-note{
+    text-align:center; font-weight:700; color:#2c3562; letter-spacing:.3px;
+    font-size:14px; padding:28px 20px 0 20px; position:relative; z-index:5;
+  }
+
+  /* ---------- carousel ---------- */
+  .carousel{
+    position:relative;
+    display:flex; align-items:flex-start; justify-content:center;
+    gap:0; height:calc(100vh - 70px); padding-top:10px;
+  }
+
+  .nav-arrow{
+    align-self:center; z-index:40;
+    width:44px; height:44px; border-radius:50%; border:none; cursor:pointer;
+    background:transparent; color:#3B5BDB; font-size:20px; font-weight:700;
+  }
+  .nav-arrow:hover{ color:#1a2a80; }
+
+  .portal{
+    position:relative;
+    width:300px;
+    height:640px;
+    flex-shrink:0;
+    transition:transform .55s cubic-bezier(.22,.68,0,1.01), opacity .5s ease, filter .5s ease;
+    cursor:pointer;
+  }
+  .portal.is-active{ transform:scale(1); z-index:20; }
+  .portal.is-prev{ transform:translateX(120px) scale(.74); z-index:10; filter:brightness(.85); }
+  .portal.is-next{ transform:translateX(-120px) scale(.74); z-index:10; filter:brightness(.85); }
+  .portal.is-hidden{ display:none; }
+
+  .portal-arch{
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:contain; object-position:top center;
+    pointer-events:none;
+  }
+  .portal-header{
+    position:absolute; left:50%; top:-8%;
+    width:150%; max-width:520px;
+    transform:translate(-50%, 40%);
+    transition:transform .55s cubic-bezier(.22,.68,0,1.01), opacity .45s ease;
+    opacity:0; pointer-events:none;
+    z-index:15;
+  }
+  .portal-header img{ width:100%; display:block; }
+
+  .portal-icons{
+    position:absolute; left:50%; top:34%;
+    width:78%;
+    transform:translate(-50%, 60px);
+    transition:transform .55s cubic-bezier(.22,.68,0,1.01), opacity .4s ease;
+    opacity:0;
+    z-index:30; /* icons stay above the bottom fade */
+  }
+  .portal-icons img{ width:100%; display:block; }
+
+  .portal.is-active .portal-header{ opacity:1; transform:translate(-50%, 0%); pointer-events:auto; }
+  .portal.is-active .portal-icons{ opacity:1; transform:translate(-50%, 0); }
+
+  /* ---------- bottom fade: above everything except icon layer ---------- */
+  .bottom-fade{
+    position:fixed; left:0; right:0; bottom:0; height:22vh;
+    background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.9) 60%, #f4f5fa 100%);
+    z-index:25; pointer-events:none;
+  }
+
+  /* ================= MOBILE ================= */
+  @media (max-width:760px){
+    .sidebar{ position:fixed; inset:0 auto 0 0; z-index:70; }
+    body.sidebar-hidden .sidebar{ margin-left:-240px; }
+
+    .carousel{
+      flex-direction:column; align-items:center; justify-content:flex-start;
+      height:auto; min-height:100vh; padding:70px 0 60px 0; gap:0;
     }
+    .nav-arrow{ position:fixed; bottom:22px; z-index:50; }
+    .nav-arrow.prev{ left:calc(50% - 64px); }
+    .nav-arrow.next{ left:calc(50% + 20px); }
 
-    .sidebar .logo-img {
-      width: 70px;
-      margin: 0 auto 20px auto;
-      display: block;
+    .portal{ width:78vw; max-width:320px; height:560px; position:absolute; top:70px; }
+    .portal.is-active{ transform:translateY(0) scale(1); }
+    .portal.is-prev{ transform:translateY(-46px) translateX(-14px) scale(.88); z-index:10; }
+    .portal.is-next{ transform:translateY(-46px) translateX(14px) scale(.88); z-index:9; }
+
+    /* soften the seam where a peeking card tucks behind the active one */
+    .portal.is-prev::after, .portal.is-next::after{
+      content:""; position:absolute; left:0; right:0; bottom:-2px; height:38%;
+      background:linear-gradient(to bottom, rgba(244,245,250,0), #f4f5fa 92%);
+      z-index:26;
     }
-
-    .user-block {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 20px 20px 20px;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 12px;
-    }
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #3B5BDB;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .user-info .user-name {
-      font-weight: 700;
-      font-size: 14px;
-      color: #1a1a2e;
-    }
-
-    .user-info .user-role {
-      font-size: 12px;
-      color: #888;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 20px;
-      color: #444;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      letter-spacing: 0.3px;
-    }
-
-    .nav-link:hover { background: #f4f5fa; }
-
-    .nav-link.active {
-      background: #3B5BDB;
-      color: white;
-    }
-
-    .sidebar-bottom {
-      margin-top: auto;
-      padding: 16px 20px 0 20px;
-      border-top: 1px solid #eee;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .sidebar-bottom label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #999;
-      letter-spacing: 0.5px;
-    }
-
-    .lang-select {
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .logout-btn {
-      background: none;
-      border: 1.5px solid #e03131;
-      color: #e03131;
-      padding: 10px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .logout-btn:hover { background: #fff0f0; }
-    .logout-btn:disabled { opacity: 0.5; cursor: default; }
-
-    .main-content {
-      flex: 1;
-      padding: 40px;
-    }
-
-    .main-content h1 {
-      font-size: 28px;
-      font-weight: 800;
-      color: #1a1a2e;
-      margin-bottom: 12px;
-    }
-
-    .main-content p {
-      color: #666;
-      font-size: 15px;
-    }
-
-    .banner {
-      display: none;
-      margin-bottom: 20px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: monospace;
-      white-space: pre-wrap;
-    }
-
-    .banner.visible { display: block; }
-
-    .banner.error {
-      background: #fff0f0;
-      color: #e03131;
-      border: 1px solid #ffd6d6;
-    }
-
-    .banner.warning {
-      background: #fff9db;
-      color: #997404;
-      border: 1px solid #ffe066;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
   <aside class="sidebar">
     <img src="https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/Copy%20of%20PPT%20Goodies%20for%20Good%20Deeds%20-%205.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvQ29weSBvZiBQUFQgR29vZGllcyBmb3IgR29vZCBEZWVkcyAtIDUucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODQ2MTY0NSwiZXhwIjoyNjUyNDYxNjQ1fQ.iEbfx8yPFJXiyPkVGuv10iow4tXT52m1DRS7cjlB5JLIdyhAlV_rWy00a8OUMR8rvL0AMnrr659uwex3ANlpXQ" alt="Logo" class="logo-img" />
-
     <div class="user-block">
       <div class="user-avatar" id="user-initial">?</div>
       <div class="user-info">
-        <div class="user-name" id="user-name">Loading...</div>
-        <div class="user-role" data-i18n="role_label">Role: <span id="user-role">MEMBER</span></div>
+        <div class="user-name" id="user-name">Member</div>
+        <div class="user-role">Role: <span id="user-role">MEMBER</span></div>
       </div>
     </div>
-
-    <a href="index.html" class="nav-link active" data-i18n="nav_home">HOMEPAGE</a>
-    <a href="transfer.html" class="nav-link" data-i18n="nav_transfer">TRANSFER</a>
-
+    <a href="index.html" class="nav-link">HOMEPAGE</a>
+    <a href="transfer.html" class="nav-link">TRANSFER</a>
+    <a href="events.html" class="nav-link active">EVENTS</a>
     <div class="sidebar-bottom">
-      <label data-i18n="lang_label">LANGUAGE</label>
-      <select class="lang-select" id="lang-select">
-        <option value="en">🇺🇸 English</option>
-        <option value="kr">🇰🇷 한국어</option>
-        <option value="cn">🇨🇳 中文</option>
-        <option value="br">🇧🇷 Português</option>
-        <option value="vn">🇻🇳 Tiếng Việt</option>
-        <option value="fr">🇫🇷 Français</option>
-      </select>
-      <button class="logout-btn" id="logout-btn" data-i18n="logout">LOG OUT</button>
+      <label>LANGUAGE</label>
+      <select class="lang-select"><option>🇺🇸 English</option></select>
+      <button class="logout-btn">LOG OUT</button>
     </div>
   </aside>
 
   <main class="main-content">
-    <div class="banner" id="banner"></div>
-    <h1 data-i18n="welcome_heading">Welcome Back</h1>
-    <p data-i18n="welcome_sub">Here's what's happening on your site.</p>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">
+      <span></span><span></span><span></span>
+    </button>
+
+    <p class="lineup-note">Dates can be subjected to change</p>
+
+    <div class="carousel" id="carousel">
+      <button class="nav-arrow prev" id="prevBtn" aria-label="Previous">&lt;</button>
+
+      <div class="portal" data-index="0">
+        <div class="portal-header"><img src="assets/header-purple.png" alt=""></div>
+        <img class="portal-arch" src="assets/arch-purple.png" alt="">
+        <div class="portal-icons"><img src="assets/icons-purple.png" alt=""></div>
+      </div>
+
+      <div class="portal" data-index="1">
+        <div class="portal-header"><img src="assets/header-red.png" alt=""></div>
+        <img class="portal-arch" src="assets/arch-red.png" alt="">
+        <div class="portal-icons"><img src="assets/icons-red.png" alt=""></div>
+      </div>
+
+      <div class="portal" data-index="2">
+        <div class="portal-header"><img src="assets/header-green.png" alt=""></div>
+        <img class="portal-arch" src="assets/arch-green.png" alt="">
+        <div class="portal-icons"><img src="assets/icons-green.png" alt=""></div>
+      </div>
+
+      <button class="nav-arrow next" id="nextBtn" aria-label="Next">&gt;</button>
+    </div>
+
+    <div class="bottom-fade"></div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // ---------- Banner / error surfacing ----------
-    const bannerEl = document.getElementById('banner')
+<script>
+  const portals   = Array.from(document.querySelectorAll('.portal'));
+  let active = 1; // start on the center (red) tab
 
-    function showBanner(message, type) {
-      bannerEl.textContent = message
-      bannerEl.className = 'banner visible ' + (type || 'error')
-    }
+  function render(){
+    const n = portals.length;
+    portals.forEach((el, i) => {
+      el.classList.remove('is-active','is-prev','is-next','is-hidden');
+      if (i === active) el.classList.add('is-active');
+      else if (i === (active - 1 + n) % n) el.classList.add('is-prev');
+      else if (i === (active + 1) % n) el.classList.add('is-next');
+      else el.classList.add('is-hidden');
+    });
+  }
 
-    function showFatalError(message) {
-      const nameEl = document.getElementById('user-name')
-      if (nameEl) nameEl.textContent = 'Error'
-      showBanner(String(message), 'error')
-      // Disable logout since there's no valid session context to trust
-      const logoutBtn = document.getElementById('logout-btn')
-      if (logoutBtn) logoutBtn.disabled = true
-    }
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    active = (active - 1 + portals.length) % portals.length; render();
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    active = (active + 1) % portals.length; render();
+  });
+  portals.forEach((el, i) => el.addEventListener('click', () => { active = i; render(); }));
 
-    // Race any promise against a timeout so nothing hangs forever silently
-    function withTimeout(promise, ms, label) {
-      return Promise.race([
-        promise,
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(label + ' timed out after ' + ms + 'ms — check your network or Supabase project status')), ms)
-        )
-      ])
-    }
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    document.body.classList.toggle('sidebar-hidden');
+  });
 
-    // ---------- Language / i18n (safe to run even if Supabase fails) ----------
-    const translations = {
-      en: {
-        nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", lang_label: "LANGUAGE",
-        logout: "LOG OUT", role_label: "Role: ",
-        welcome_heading: "Welcome Back", welcome_sub: "Here's what's happening on your site."
-      },
-      kr: {
-        nav_home: "홈페이지", nav_transfer: "송금", lang_label: "언어",
-        logout: "로그아웃", role_label: "역할: ",
-        welcome_heading: "다시 오신 것을 환영합니다", welcome_sub: "사이트에서 일어나고 있는 일입니다."
-      },
-      cn: {
-        nav_home: "主页", nav_transfer: "转账", lang_label: "语言",
-        logout: "登出", role_label: "角色: ",
-        welcome_heading: "欢迎回来", welcome_sub: "这是您网站上正在发生的事情。"
-      },
-      br: {
-        nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", lang_label: "IDIOMA",
-        logout: "SAIR", role_label: "Função: ",
-        welcome_heading: "Bem-vindo de volta", welcome_sub: "Aqui está o que está acontecendo no seu site."
-      },
-      vn: {
-        nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", lang_label: "NGÔN NGỮ",
-        logout: "ĐĂNG XUẤT", role_label: "Vai trò: ",
-        welcome_heading: "Chào mừng trở lại", welcome_sub: "Đây là những gì đang diễn ra trên trang của bạn."
-      },
-      fr: {
-        nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", lang_label: "LANGUE",
-        logout: "DÉCONNEXION", role_label: "Rôle : ",
-        welcome_heading: "Bon retour", welcome_sub: "Voici ce qui se passe sur votre site."
-      }
-    }
-
-    let currentLang = localStorage.getItem('lang') || 'en'
-    document.getElementById('lang-select').value = currentLang
-
-    function applyTranslations() {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n')
-        if (key === 'role_label') return
-        if (translations[currentLang][key]) el.textContent = translations[currentLang][key]
-      })
-      document.querySelector('[data-i18n="role_label"]').childNodes[0].textContent = translations[currentLang]['role_label']
-    }
-
-    document.getElementById('lang-select').addEventListener('change', (e) => {
-      currentLang = e.target.value
-      localStorage.setItem('lang', currentLang)
-      applyTranslations()
-    })
-
-    applyTranslations()
-
-    // ---------- Logout button: bind this FIRST, unconditionally ----------
-    // This way the button works even if Supabase fails to load — it will
-    // just show an error instead of doing nothing.
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-      if (!window.supabase) {
-        showFatalError('Cannot log out: the Supabase library never loaded, so there is no session to sign out of. Reload the page.')
-        return
-      }
-      try {
-        await withTimeout(supabaseClient.auth.signOut(), 8000, 'signOut')
-        window.location.href = "login.html"
-      } catch (err) {
-        console.error('signOut failed:', err)
-        showFatalError(
-          (err && (err.message || err.error_description || err.toString())) ||
-          'Unknown error while logging out.'
-        )
-      }
-    })
-
-    // ---------- Supabase init (guarded) ----------
-    if (!window.supabase) {
-      showFatalError(
-        'The Supabase library did not load from the CDN.\n' +
-        'This is usually caused by an ad blocker, content blocker, ' +
-        '"Prevent Cross-Site Tracking", or Lockdown Mode blocking cdn.jsdelivr.net.\n' +
-        'Try disabling content blockers for this site, or open it in a different browser.'
-      )
-    } else {
-      const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
-      const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-      var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-      async function loadUser() {
-        try {
-          const { data: { session }, error: sessionError } = await withTimeout(
-            supabaseClient.auth.getSession(), 8000, 'getSession'
-          )
-          if (sessionError) throw sessionError
-
-          const user = session?.user
-          if (!user) {
-            window.location.href = "login.html"
-            return
-          }
-
-          const { data: profile, error: profileError } = await withTimeout(
-            supabaseClient.from('profiles').select('display_name, role').eq('id', user.id).single(),
-            8000, 'profiles query'
-          )
-
-          if (profileError) throw profileError
-
-          if (profile) {
-            document.getElementById('user-name').textContent = profile.display_name
-            document.getElementById('user-role').textContent = profile.role.toUpperCase()
-            document.getElementById('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
-          } else {
-            showBanner('Logged in, but no matching row was found in the "profiles" table for this user. Check Table Editor → profiles.', 'warning')
-          }
-        } catch (err) {
-          console.error('loadUser failed:', err)
-          showFatalError(
-            (err && (err.message || err.error_description || err.toString())) ||
-            'Unknown error while checking your session.'
-          )
-        }
-      }
-      loadUser()
-    }
-  </script>
+  render();
+</script>
 </body>
 </html>
