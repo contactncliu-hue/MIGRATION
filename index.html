@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ZOO - Events</title>
+<title>ZOO - Homepage</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -14,7 +14,7 @@
     overflow-x:hidden;
   }
 
-  /* ================= SIDEBAR (copied from the homepage) ================= */
+  /* ================= SIDEBAR ================= */
   .sidebar{
     width:240px; min-width:240px; background:#fff; border-right:1px solid #eee;
     display:flex; flex-direction:column; padding:24px 0;
@@ -31,7 +31,7 @@
   .nav-link.active{ background:#3B5BDB; color:#fff; }
   .sidebar-bottom{ margin-top:auto; padding:16px 20px 0 20px; border-top:1px solid #eee; display:flex; flex-direction:column; gap:10px; }
   .sidebar-bottom label{ font-size:11px; font-weight:700; color:#999; letter-spacing:.5px; }
-  .lang-select{ padding:8px 10px; border-radius:8px; border:1px solid #ddd; font-size:14px; font-weight:600; }
+  .lang-select{ padding:8px 10px; border-radius:8px; border:1px solid #ddd; font-size:14px; font-weight:600; cursor:pointer; }
   .logout-btn{ background:none; border:1.5px solid #e03131; color:#e03131; padding:10px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; }
   .logout-btn:hover{ background:#fff0f0; }
   .logout-btn:disabled{ opacity:.6; cursor:default; }
@@ -95,10 +95,12 @@
   .portal.pos-center{ transform:translateX(-50%) scale(1); z-index:20; opacity:1; filter:none; }
   .portal.pos-left,
   .portal.pos-right{ transform-origin:bottom center; z-index:10; opacity:.85; filter:brightness(.85); }
-  /* Non-active cards: pushed down and clipped by .carousel's overflow so
-     only roughly the top half is visible, "stuck" to the bottom edge. */
-  .portal.pos-left{  transform:translate(calc(-50% - 480px), 150px) scale(.72); }
-  .portal.pos-right{ transform:translate(calc(-50% + 480px), 150px) scale(.72); }
+  /* Non-active cards: pushed down slightly and clipped by .carousel's
+     overflow so the bottom edge is trimmed, "stuck" to the floor -- but
+     pulled in closer than before so they're not clipped by the carousel's
+     own side edges too, which is what was making them nearly vanish. */
+  .portal.pos-left{  transform:translate(calc(-50% - 380px), 70px) scale(.74); }
+  .portal.pos-right{ transform:translate(calc(-50% + 380px), 70px) scale(.74); }
 
   .portal-arch{
     position:absolute; inset:0;
@@ -109,8 +111,8 @@
   /* header ornament: nudged slightly right so the star lines up visually
      centered on the arch (the artwork itself is a touch left-heavy). */
   .portal-header{
-    position:absolute; left:50%; top:-11%;
-    width:132%; max-width:690px;
+    position:absolute; left:50%; top:-6%;
+    width:136%; max-width:710px;
     transform:translate(-46%, 35%);
     transition:transform 1.6s cubic-bezier(.22,.68,0,1.01), opacity 1.3s ease;
     opacity:0; pointer-events:none;
@@ -121,12 +123,12 @@
   /* icons: shrunk down and raised above the bottom fade so the times are
      actually legible again. */
   .portal-icons{
-    position:absolute; left:50%; top:30%;
-    width:58%;
+    position:absolute; left:50%; top:36%;
+    width:46%;
     transform:translate(-50%, 60px);
     transition:transform 1.6s cubic-bezier(.22,.68,0,1.01), opacity 1.2s ease;
     opacity:0;
-    z-index:38; /* above the arch, the header, and the bottom fade */
+    z-index:50; /* above absolutely everything, including the nav arrows */
   }
   .portal-icons img{ width:100%; display:block; }
 
@@ -135,8 +137,8 @@
 
   /* ---------- bottom fade: sits above the arch, below the icons ---------- */
   .bottom-fade{
-    position:fixed; left:0; right:0; bottom:0; height:22vh;
-    background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.9) 60%, #f4f5fa 100%);
+    position:fixed; left:0; right:0; bottom:0; height:14vh;
+    background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.6) 75%, #f4f5fa 100%);
     z-index:25; pointer-events:none;
   }
 
@@ -155,20 +157,25 @@
     .carousel{ left:0; }
     body.sidebar-hidden .carousel{ left:0; }
 
-    .nav-arrow{ top:auto; bottom:26px; transform:none; width:46px; height:46px; font-size:22px; }
+    .nav-arrow{
+      top:auto; bottom:26px; transform:none; width:50px; height:50px; font-size:24px;
+      background:#fff; color:#3B5BDB; border:2px solid #3B5BDB;
+      box-shadow:0 4px 12px rgba(0,0,0,.2);
+    }
     .nav-arrow.prev{ left:16px; }
     .nav-arrow.next{ right:16px; }
 
     .portal{ left:50%; width:88vw; max-width:390px; height: calc(88vw / 0.7607); bottom:0; }
     .portal.pos-center{ transform:translateX(-50%) scale(1); }
-    .portal.pos-left{  transform:translate(calc(-50% - 14px), -46px) scale(.88); z-index:10; }
-    .portal.pos-right{ transform:translate(calc(-50% + 14px), -46px) scale(.88); z-index:9; }
+    .portal.pos-left{  transform:translate(calc(-50% - 10px), -40px) scale(.9); z-index:10; }
+    .portal.pos-right{ transform:translate(calc(-50% + 10px), -40px) scale(.9); z-index:9; }
 
-    /* soften the seam where a peeking card tucks behind the active one */
+    /* soften the seam where a peeking card tucks behind the active one --
+       stronger/taller fade so the straight artwork cutoff is fully hidden */
     .portal.pos-left::after, .portal.pos-right::after{
-      content:""; position:absolute; left:0; right:0; bottom:-2px; height:38%;
-      background:linear-gradient(to bottom, rgba(244,245,250,0), #f4f5fa 92%);
-      z-index:26;
+      content:""; position:absolute; left:0; right:0; bottom:-2px; height:46%;
+      background:linear-gradient(to bottom, rgba(244,245,250,0), #f4f5fa 96%);
+      z-index:26; pointer-events:none;
     }
   }
 </style>
@@ -183,16 +190,22 @@
       <div class="user-avatar" id="user-initial">?</div>
       <div class="user-info">
         <div class="user-name" id="user-name">Member</div>
-        <div class="user-role">Role: <span id="user-role">MEMBER</span></div>
+        <div class="user-role"><span data-i18n="roleLabel">Role:</span> <span id="user-role">MEMBER</span></div>
       </div>
     </div>
-    <a href="index.html" class="nav-link">HOMEPAGE</a>
-    <a href="transfer.html" class="nav-link">TRANSFER</a>
-    <a href="events.html" class="nav-link active">EVENTS</a>
+    <a href="index.html" class="nav-link active" data-i18n="homepage">HOMEPAGE</a>
+    <a href="transfer.html" class="nav-link" data-i18n="transfer">TRANSFER</a>
     <div class="sidebar-bottom">
-      <label>LANGUAGE</label>
-      <select class="lang-select"><option>🇺🇸 English</option></select>
-      <button class="logout-btn">LOG OUT</button>
+      <label data-i18n="language">LANGUAGE</label>
+      <select class="lang-select" id="langSelect">
+        <option value="en">🇺🇸 English</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="pt-BR">🇧🇷 Português (BR)</option>
+        <option value="vi">🇻🇳 Tiếng Việt</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="zh-CN">🇨🇳 中文（简体）</option>
+      </select>
+      <button class="logout-btn" id="logoutBtn" data-i18n="logout">LOG OUT</button>
     </div>
   </aside>
 
@@ -201,7 +214,7 @@
       <span></span><span></span><span></span>
     </button>
 
-    <p class="lineup-note">Dates can be subjected to change</p>
+    <p class="lineup-note" data-i18n="datesNote">Dates can be subjected to change</p>
 
     <div class="carousel" id="carousel">
       <button class="nav-arrow prev" id="prevBtn" aria-label="Previous">&lt;</button>
@@ -267,10 +280,39 @@
     document.body.classList.add('sidebar-hidden');
   });
 
+  // ---------- Language switcher: translates UI labels only, never data ----------
+  // (username, role value, and the event carousel artwork are left untouched)
+  const translations = {
+    en:   { homepage:'HOMEPAGE', transfer:'TRANSFER', events:'EVENTS', language:'LANGUAGE', logout:'LOG OUT', loggingOut:'LOGGING OUT...', roleLabel:'Role:', datesNote:'Dates can be subjected to change' },
+    fr:   { homepage:'ACCUEIL',  transfer:'TRANSFERT', events:'ÉVÉNEMENTS', language:'LANGUE', logout:'DÉCONNEXION', loggingOut:'DÉCONNEXION...', roleLabel:'Rôle :', datesNote:'Les dates sont susceptibles de changer' },
+    'pt-BR': { homepage:'PÁGINA INICIAL', transfer:'TRANSFERÊNCIA', events:'EVENTOS', language:'IDIOMA', logout:'SAIR', loggingOut:'SAINDO...', roleLabel:'Função:', datesNote:'As datas estão sujeitas a alterações' },
+    vi:   { homepage:'TRANG CHỦ', transfer:'CHUYỂN KHOẢN', events:'SỰ KIỆN', language:'NGÔN NGỮ', logout:'ĐĂNG XUẤT', loggingOut:'ĐANG ĐĂNG XUẤT...', roleLabel:'Vai trò:', datesNote:'Ngày có thể thay đổi' },
+    ko:   { homepage:'홈', transfer:'이체', events:'이벤트', language:'언어', logout:'로그아웃', loggingOut:'로그아웃 중...', roleLabel:'역할:', datesNote:'날짜는 변경될 수 있습니다' },
+    'zh-CN': { homepage:'主页', transfer:'转账', events:'活动', language:'语言', logout:'退出登录', loggingOut:'正在退出...', roleLabel:'角色：', datesNote:'日期可能会有变动' }
+  }
+
+  const langSelect = document.getElementById('langSelect')
+
+  function applyLanguage(lang){
+    const dict = translations[lang] || translations.en
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n')
+      if (dict[key]) el.textContent = dict[key]
+    })
+    try { localStorage.setItem('zoo_lang', lang) } catch (e) { /* storage unavailable, no-op */ }
+  }
+
+  let savedLang = 'en'
+  try { savedLang = localStorage.getItem('zoo_lang') || 'en' } catch (e) { /* no-op */ }
+  langSelect.value = translations[savedLang] ? savedLang : 'en'
+  applyLanguage(langSelect.value)
+
+  langSelect.addEventListener('change', () => applyLanguage(langSelect.value))
+
   // ---------- Supabase: populate member info + wire up log out ----------
   const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
   const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-  const logoutBtn = document.querySelector('.logout-btn')
+  const logoutBtn = document.getElementById('logoutBtn')
 
   let supabaseClient = null
   if (window.supabase) {
@@ -286,8 +328,9 @@
   }
 
   logoutBtn.addEventListener('click', async () => {
+    const dict = translations[langSelect.value] || translations.en
     logoutBtn.disabled = true
-    logoutBtn.textContent = 'LOGGING OUT...'
+    logoutBtn.textContent = dict.loggingOut
     try {
       if (supabaseClient) await supabaseClient.auth.signOut()
     } catch (err) {
