@@ -94,7 +94,7 @@
   }
   .portal.pos-center{ transform:translateX(-50%) scale(1); z-index:20; opacity:1; filter:none; }
   .portal.pos-left,
-  .portal.pos-right{ transform-origin:bottom center; z-index:10; opacity:.85; filter:brightness(.85); }
+  .portal.pos-right{ transform-origin:bottom center; z-index:10; opacity:1; filter:none; }
   /* Non-active cards: pushed down slightly and clipped by .carousel's
      overflow so the bottom edge is trimmed, "stuck" to the floor -- but
      pulled in closer than before so they're not clipped by the carousel's
@@ -123,7 +123,7 @@
   /* icons: shrunk down and raised above the bottom fade so the times are
      actually legible again. */
   .portal-icons{
-    position:absolute; left:50%; top:36%;
+    position:absolute; left:50%; bottom:16%;
     width:46%;
     transform:translate(-50%, 60px);
     transition:transform 1.6s cubic-bezier(.22,.68,0,1.01), opacity 1.2s ease;
@@ -157,6 +157,11 @@
     .carousel{ left:0; }
     body.sidebar-hidden .carousel{ left:0; }
 
+    .bottom-fade{
+      height:8vh;
+      background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.5) 80%, #f4f5fa 100%);
+    }
+
     .nav-arrow{
       top:auto; bottom:26px; transform:none; width:50px; height:50px; font-size:24px;
       background:#fff; color:#3B5BDB; border:2px solid #3B5BDB;
@@ -167,11 +172,17 @@
 
     .portal{ left:50%; width:88vw; max-width:390px; height: calc(88vw / 0.7607); bottom:0; }
     .portal.pos-center{ transform:translateX(-50%) scale(1); }
-    .portal.pos-left{  transform:translate(calc(-50% - 10px), -40px) scale(.9); z-index:10; }
-    .portal.pos-right{ transform:translate(calc(-50% + 10px), -40px) scale(.9); z-index:9; }
+
+    /* Unselected cards: hang from the TOP of the screen instead of the
+       bottom, offset far enough sideways that roughly half of each card
+       peeks out past the center card's edges -- matching the reference:
+       tall colored slivers at the left/right edges, never dimmed. */
+    .portal.pos-left, .portal.pos-right{ top:0; bottom:auto; }
+    .portal.pos-left{  transform:translate(calc(-50% - 150px), 0) scale(.8); z-index:10; }
+    .portal.pos-right{ transform:translate(calc(-50% + 150px), 0) scale(.8); z-index:9; }
 
     /* soften the seam where a peeking card tucks behind the active one --
-       stronger/taller fade so the straight artwork cutoff is fully hidden */
+       own fade at each card's own bottom so the cutoff isn't a hard edge */
     .portal.pos-left::after, .portal.pos-right::after{
       content:""; position:absolute; left:0; right:0; bottom:-2px; height:46%;
       background:linear-gradient(to bottom, rgba(244,245,250,0), #f4f5fa 96%);
