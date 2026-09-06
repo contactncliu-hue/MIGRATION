@@ -54,33 +54,36 @@
     font-size:14px; padding:28px 20px 0 20px; position:relative; z-index:5;
   }
 
-  /* ---------- carousel ---------- */
+  /* ---------- carousel : pinned to the real viewport (not a flow container) ---------- */
   .carousel{
-    position:relative;
-    width:100%;
-    height:calc(100vh - 70px);
+    position:fixed; top:0; left:240px; right:0; bottom:0;
+    z-index:1;
+    transition:left .35s ease;
   }
+  body.sidebar-hidden .carousel{ left:0; }
 
   .nav-arrow{
-    position:absolute; top:64%; transform:translateY(-50%);
+    position:absolute; top:70%; transform:translateY(-50%);
     z-index:40;
     width:56px; height:56px; border:none; cursor:pointer;
     background:transparent; color:#4b4b55; font-size:38px; font-weight:700; line-height:1;
   }
   .nav-arrow:hover{ color:#1f1f24; }
-  .nav-arrow.prev{ left:calc(50% - 620px); }
-  .nav-arrow.next{ left:calc(50% + 560px); }
+  .nav-arrow.prev{ left:calc(50% - 600px); }
+  .nav-arrow.next{ left:calc(50% + 600px); }
 
+  /* portal width:height matches the arch artwork's own ratio (1640:2156)
+     so object-fit:contain fills the box exactly -- nothing floats below it */
   .portal{
-    position:absolute; left:50%; bottom:-70px;
-    width:420px;
-    height:800px;
-    transition:transform .55s cubic-bezier(.22,.68,0,1.01), opacity .5s ease, filter .5s ease;
+    position:absolute; left:50%; bottom:0;
+    width:470px;
+    height:617px;
+    transition:transform 1.1s cubic-bezier(.22,.68,0,1.01), opacity .9s ease, filter .9s ease;
     cursor:pointer;
   }
   .portal.pos-center{ transform:translateX(-50%) scale(1); z-index:20; opacity:1; filter:none; }
-  .portal.pos-left{  transform:translateX(calc(-50% - 400px)) scale(.7); z-index:10; opacity:.8; filter:brightness(.82); }
-  .portal.pos-right{ transform:translateX(calc(-50% + 400px)) scale(.7); z-index:10; opacity:.8; filter:brightness(.82); }
+  .portal.pos-left{  transform:translateX(calc(-50% - 440px)) scale(.7); z-index:10; opacity:.8; filter:brightness(.82); }
+  .portal.pos-right{ transform:translateX(calc(-50% + 440px)) scale(.7); z-index:10; opacity:.8; filter:brightness(.82); }
 
   .portal-arch{
     position:absolute; inset:0;
@@ -88,11 +91,13 @@
     object-fit:contain; object-position:top center;
     pointer-events:none;
   }
+  /* header ornament: centered on the same axis as the arch, sized so
+     the star at its middle lines up with the arch's own centerline */
   .portal-header{
-    position:absolute; left:50%; top:-8%;
-    width:150%; max-width:520px;
-    transform:translate(-50%, 40%);
-    transition:transform .55s cubic-bezier(.22,.68,0,1.01), opacity .45s ease;
+    position:absolute; left:50%; top:-11%;
+    width:128%; max-width:660px;
+    transform:translate(-50%, 35%);
+    transition:transform 1.1s cubic-bezier(.22,.68,0,1.01), opacity .9s ease;
     opacity:0; pointer-events:none;
     z-index:15;
   }
@@ -102,7 +107,7 @@
     position:absolute; left:50%; top:34%;
     width:78%;
     transform:translate(-50%, 60px);
-    transition:transform .55s cubic-bezier(.22,.68,0,1.01), opacity .4s ease;
+    transition:transform 1.1s cubic-bezier(.22,.68,0,1.01), opacity .8s ease;
     opacity:0;
     z-index:30; /* icons stay above the bottom fade */
   }
@@ -123,14 +128,14 @@
     .sidebar{ position:fixed; inset:0 auto 0 0; z-index:70; }
     body.sidebar-hidden .sidebar{ margin-left:-240px; }
 
-    .carousel{
-      height:auto; min-height:100vh;
-    }
-    .nav-arrow{ position:fixed; top:auto; bottom:22px; transform:none; }
+    .carousel{ left:0; }
+    body.sidebar-hidden .carousel{ left:0; }
+
+    .nav-arrow{ top:auto; bottom:22px; transform:none; }
     .nav-arrow.prev{ left:calc(50% - 70px); }
     .nav-arrow.next{ left:calc(50% + 30px); }
 
-    .portal{ left:50%; width:82vw; max-width:360px; height:640px; bottom:-40px; }
+    .portal{ left:50%; width:82vw; max-width:360px; height: calc(82vw / 0.7607); bottom:0; }
     .portal.pos-center{ transform:translateX(-50%) scale(1); }
     .portal.pos-left{  transform:translate(calc(-50% - 14px), -46px) scale(.88); z-index:10; }
     .portal.pos-right{ transform:translate(calc(-50% + 14px), -46px) scale(.88); z-index:9; }
