@@ -329,12 +329,26 @@
   if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    supabaseClient.auth.getUser().then(({ data: { user } }) => {
+        supabaseClient.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
-      const meta = user.user_metadata || {}
-      const uname = meta.username || (user.email || 'Member').split('@')[0]
+
+      const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('display_name, role')
+        .eq('id', user.id)
+        .single()
+
+      if (error) {
+        console.error('profiles lookup failed:', error)
+      }
+
+      const uname = (profile && profile.display_name) || (user.email || 'Member').split('@')[0]
       document.getElementById('user-name').textContent = uname
       document.getElementById('user-initial').textContent = uname.charAt(0).toUpperCase()
+
+      const role = (profile && profile.role) ? profile.role.toUpperCase() : 'GUEST'
+      const roleEl = document.getElementById('user-role')
+      if (roleEl) roleEl.textContent = role
     }).catch(err => console.error('getUser failed:', err))
   }
 
