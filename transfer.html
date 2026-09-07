@@ -68,16 +68,6 @@
       pointer-events:none;
     }
     .header-ribbon img{ width:100%; display:block; }
-    .header-title{
-      position:absolute; left:50%; top:9%;
-      transform:translateX(-50%);
-      font-family:'Georgia', serif;
-      font-weight:800; font-size:30px; letter-spacing:1px;
-      background:linear-gradient(180deg,#2c5f6b 0%, #1c3f52 100%);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-      text-shadow:0 1px 0 rgba(255,255,255,.4);
-      white-space:nowrap;
-    }
 
     /* bottom fade: sits above the arch/ribbon, below the button */
     .bottom-fade{
@@ -175,7 +165,6 @@
 
     @media (max-width:760px){
       .arch-card{ width:88vw; }
-      .header-title{ font-size:24px; }
       .transfer-btn .btn-label{ font-size:15px; }
     }
   </style>
@@ -214,21 +203,20 @@
     <div class="transfer-stage">
 
       <div class="deco-bg">
-        <img src="assets/transfer-bg-deco.png" alt="" />
+        <img src="assets/transfer-bg-deco.PNG" alt="" />
       </div>
 
       <div class="arch-card">
-        <img class="arch-bg" src="assets/transfer-arch.png" alt="" />
+        <img class="arch-bg" src="assets/transfer-arch.PNG" alt="" />
 
         <div class="header-ribbon">
-          <img src="assets/transfer-header.png" alt="" />
-          <div class="header-title" data-i18n="transfer_heading">TRANSFER</div>
+          <img src="assets/transfer-header.PNG" alt="" />
         </div>
 
         <div class="bottom-fade"></div>
 
         <button class="transfer-btn" id="open-transfer-btn">
-          <img src="assets/transfer-button.png" alt="" />
+          <img src="assets/transfer-button.PNG" alt="" />
           <span class="btn-label" data-i18n="transfer_cta">TRANSFER NOW</span>
         </button>
       </div>
