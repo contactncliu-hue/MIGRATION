@@ -758,21 +758,9 @@
       }, 2950)
     })
 
-          guestBtn.addEventListener('click', async () => {
-        guestBtn.disabled = true
-        try {
-          const { error } = await withTimeout(supabaseClient.auth.signInAnonymously(), 8000, 'signInAnonymously')
-          if (error) {
-            console.error('Guest sign-in failed:', error)
-            guestBtn.disabled = false
-            return
-          }
-          window.location.href = 'index.html'
-        } catch (err) {
-          console.error('Guest sign-in failed:', err)
-          guestBtn.disabled = false
-        }
-      })
+    guestBtn.addEventListener('click', () => {
+      window.location.href = 'index.html'
+    })
 
     backBtn.addEventListener('click', () => {
       loginForm.classList.remove('visible')
@@ -787,8 +775,6 @@
     })
 
     // ---------- Supabase init (guarded) ----------
-      submitBtn.disabled = true
-      guestBtn.disabled = true   // ← add this line
     if (!window.supabase) {
       showLoadError(
         'The Supabase library did not load from the CDN.\n' +
@@ -804,17 +790,12 @@
       const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
       // Redirect immediately if already logged in
-      withTimeout(  supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      const user = session ? session.user : null
-      if (!user) {
-        window.location.href = 'login.html'
-        return
-      }
-      const meta = user.user_metadata || {}
-      const uname = meta.username || (meta.role === 'GUEST' ? 'Guest' : (user.email || 'Member').split('@')[0])
-      document.getElementById('user-name').textContent = uname
-      document.getElementById('user-initial').textContent = uname.charAt(0).toUpperCase()
-    }).catch(err => console.error('getSession failed:', err)
+      withTimeout(supabaseClient.auth.getUser(), 8000, 'getUser')
+        .then(({ data: { user } }) => {
+          if (user) window.location.href = 'index.html'
+        })
+        .catch(err => {
+          console.error('getUser check failed:', err)
           // Non-fatal: just means we couldn't pre-check; let them log in manually.
         })
 
