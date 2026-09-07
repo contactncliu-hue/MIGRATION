@@ -248,6 +248,7 @@
       font-size:11px; font-weight:700; text-align:center;
     }
     .status-admin span{ font-size:10px; color:#ffe3de; font-weight:600; }
+    .status-total{ font-size:12px; font-weight:800; text-align:right; letter-spacing:.3px; margin-top:4px; }
 
     /* assets/transfer-status-button.PNG -- moved OUT of the card and given
        the exact same font styling as .transfer-btn (per your request), just
@@ -284,7 +285,8 @@
     }
     .modal-overlay.visible{ display:flex; }
     .modal-box{
-      background:#fff; border-radius:18px; width:100%; max-width:400px;
+      background:#fff; border-radius:18px; width:100%; max-width:440px;
+      max-height:88vh; overflow-y:auto;
       padding:28px 26px; position:relative;
       box-shadow:0 20px 60px rgba(0,0,0,.25);
       animation: modalIn .35s cubic-bezier(.22,1,.36,1) forwards;
@@ -300,12 +302,12 @@
     .modal-sub{ font-size:13px; color:#888; margin-bottom:20px; }
     .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
     .field label{ font-size:12px; font-weight:700; color:#888; letter-spacing:.4px; }
-    .field input, .field textarea{
+    .field input, .field textarea, .field select{
       padding:12px 14px; border-radius:10px; border:1.5px solid #e3e3ec;
       font-size:14px; font-family:inherit; outline:none; transition:border-color .2s ease;
-      resize:vertical;
+      resize:vertical; background:#fff;
     }
-    .field input:focus, .field textarea:focus{ border-color:#3B5BDB; }
+    .field input:focus, .field textarea:focus, .field select:focus{ border-color:#3B5BDB; }
     .form-error{
       background:#fff0f0; color:#e03131; border:1px solid #ffd6d6;
       border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600;
@@ -326,6 +328,59 @@
     .submit-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 #c98c0c; }
     .submit-btn:disabled{ opacity:.7; cursor:default; }
 
+    /* ---------- Solo / Group toggle ---------- */
+    .transfer-type-toggle{
+      display:flex; border:1.5px solid #e3e3ec; border-radius:12px; overflow:hidden; margin-bottom:20px;
+    }
+    .type-btn{
+      flex:1; padding:13px 8px; border:none; background:#f4f5fa; color:#666;
+      font-weight:700; font-size:12.5px; letter-spacing:.2px; cursor:pointer;
+      transition:background .2s ease, color .2s ease;
+    }
+    .type-btn.active{ background:#fff; color:#f2a90f; }
+    .type-btn + .type-btn{ border-left:1.5px solid #e3e3ec; }
+
+    /* ---------- Alliance tag (group only) ---------- */
+    #group-alliance-field{ display:none; }
+
+    /* ---------- Member rows ---------- */
+    .member-row{
+      border:1.5px solid #eef0f7; border-radius:14px; padding:16px 16px 4px 16px;
+      margin-bottom:16px; background:#fafbff;
+    }
+    .member-row-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .member-row-header span{ font-size:11px; font-weight:800; color:#999; letter-spacing:.5px; }
+    .remove-member-btn{
+      background:none; border:1.5px solid #e03131; color:#e03131; border-radius:8px;
+      padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;
+    }
+    .remove-member-btn:hover{ background:#fff0f0; }
+
+    .field-row{ display:flex; gap:12px; }
+    .field-row .field{ flex:1; min-width:0; }
+
+    .faction-role-row{ align-items:flex-end; }
+    .faction-picker{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .faction-picker label{ font-size:12px; font-weight:700; color:#888; letter-spacing:.4px; }
+    .faction-btn{
+      width:44px; height:44px; border-radius:50%; border:2px solid #d8dae6; background:#e9eaf2;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      transition:background .2s ease, border-color .2s ease, transform .15s ease;
+    }
+    .faction-btn:active{ transform:scale(.92); }
+    .faction-btn .faction-letter{ font-weight:800; font-size:14px; color:#fff; }
+    .faction-btn[data-state="0"]{ background:#e9eaf2; border-color:#d8dae6; }
+    .faction-btn[data-state="1"]{ background:#3b82f6; border-color:#3b82f6; } /* F - blue */
+    .faction-btn[data-state="2"]{ background:#8b5cf6; border-color:#8b5cf6; } /* S - purple */
+    .faction-btn[data-state="3"]{ background:#f2a90f; border-color:#f2a90f; } /* R - orange */
+
+    .add-member-btn{
+      display:none; width:100%; border:1.5px dashed #d8dae6; background:transparent;
+      border-radius:12px; padding:12px; font-weight:700; font-size:13px; color:#666;
+      cursor:pointer; margin-bottom:18px; transition:border-color .2s ease, color .2s ease;
+    }
+    .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
+
     @media (max-width:760px){
       .transfer-btn .btn-label{ font-size:3.4vw; }
       .status-check-label{ font-size:3.4vw; }
@@ -333,6 +388,7 @@
       .status-card{ width:78%; top:6%; left:-70%; }
       .status-open .status-card{ left:11%; width:78%; max-width:none; } /* (100 - 78) / 2 */
       .status-row-name, .status-percent{ font-size:11px; }
+      .field-row{ flex-direction:column; gap:0; }
     }
   </style>
 </head>
@@ -353,6 +409,7 @@
 
     <a href="index.html" class="nav-link" data-i18n="nav_home">HOMEPAGE</a>
     <a href="transfer.html" class="nav-link active" data-i18n="nav_transfer">TRANSFER</a>
+    <a href="admin.html" class="nav-link" id="nav-admin-link" data-i18n="nav_admin" style="display:none;">ADMIN &amp; MANAGEMENT</a>
 
     <div class="sidebar-bottom">
       <label data-i18n="lang_label">LANGUAGE</label>
@@ -392,12 +449,13 @@
 
         <button class="transfer-btn" id="open-transfer-btn">
           <img src="assets/transfer-button.PNG" alt="" onerror="this.style.display='none'; this.closest('.transfer-btn').classList.add('img-failed')" />
-          <span class="btn-label" data-i18n="transfer_cta">TRANSFER NOW</span>
+          <span class="btn-label" data-i18n="transfer_cta">MIGRATION</span>
         </button>
 
         <!-- Moved out of .status-card: same font/color as the transfer button,
-             smaller, anchored to the same arch "slot" (top:62%), and only
-             visible once the card is open (see .status-open .status-check-btn). -->
+             smaller, anchored to the same vertical "slot" on the arch
+             (top:62%, same as .transfer-btn) so it visually replaces it once the
+             transfer button pans away. Only visible while the card is open. -->
         <button class="status-check-btn" id="status-check-btn" type="button">
           <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
           <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
@@ -425,26 +483,28 @@
     </div>
   </main>
 
-  <!-- ================= TRANSFER POPUP FORM ================= -->
+  <!-- ================= MIGRATION POPUP FORM ================= -->
   <div class="modal-overlay" id="transfer-modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" id="modal-box">
       <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
-      <h2 data-i18n="transfer_heading">Transfer</h2>
+      <h2 data-i18n="transfer_heading">Migration</h2>
       <p class="modal-sub" data-i18n="transfer_sub">Send items or funds to another member.</p>
 
+      <!-- Step 1: Solo / Group choice -->
+      <div class="transfer-type-toggle" id="transfer-type-toggle">
+        <button type="button" class="type-btn active" id="type-solo-btn" data-i18n="type_solo">Solo Transfer</button>
+        <button type="button" class="type-btn" id="type-group-btn" data-i18n="type_group">Group Transfer</button>
+      </div>
+
       <form id="transfer-form">
-        <div class="field">
-          <label data-i18n="field_recipient">Recipient username</label>
-          <input type="text" id="recipient" required />
+        <div class="field" id="group-alliance-field">
+          <label data-i18n="alliance_tag_label">Alliance Tag</label>
+          <input type="text" id="alliance-tag" placeholder="e.g. ONE" />
         </div>
-        <div class="field">
-          <label data-i18n="field_amount">Amount / item</label>
-          <input type="text" id="amount" required />
-        </div>
-        <div class="field">
-          <label data-i18n="field_note">Note (optional)</label>
-          <textarea id="note" rows="2"></textarea>
-        </div>
+
+        <div id="members-container"><!-- rows injected by renderMembers() --></div>
+
+        <button type="button" class="add-member-btn" id="add-member-btn" data-i18n="add_member">+ Add Member</button>
 
         <div class="form-error" id="transfer-error"></div>
         <div class="form-success" id="transfer-success"></div>
@@ -462,6 +522,9 @@
     function on(id, evt, fn) {
       var el = $(id)
       if (el) el.addEventListener(evt, fn)
+    }
+    function escapeAttr(str) {
+      return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
     }
 
     // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
@@ -506,64 +569,125 @@
     // ---------- Translations ----------
     var translations = {
       en: {
-        nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", lang_label: "LANGUAGE",
+        nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", nav_admin: "ADMIN & MANAGEMENT", lang_label: "LANGUAGE",
         logout: "LOG OUT", role_label: "Role: ",
-        transfer_heading: "TRANSFER", transfer_sub: "Send items or funds to another member.",
-        transfer_cta: "TRANSFER NOW",
-        field_recipient: "Recipient username", field_amount: "Amount / item", field_note: "Note (optional)",
+        transfer_heading: "Migration", transfer_sub: "Send items or funds to another member.",
+        transfer_cta: "MIGRATION",
+        type_solo: "Solo Transfer", type_group: "Group Transfer",
+        alliance_tag_label: "Alliance Tag",
+        field_uid: "UID", field_username: "Username",
+        field_prev_alliance: "Previous Alliance", field_prev_server: "Previous Server",
+        field_killcount: "Kill Count", field_faction: "Faction", field_role: "Role",
+        field_migration_score: "Migration Score (optional)",
+        add_member: "+ Add Member", remove_member: "Remove", member_label: "MEMBER #",
         submit_label: "SEND",
-        status_check_cta: "CHECK STATUS"
+        status_check_cta: "CHECK STATUS",
+        form_error_required: "Please fill in every field for every member (Migration Score is the only optional one).",
+        wing_red: "RED", wing_orange: "ORANGE", wing_purple: "PURPLE", wing_blue: "BLUE",
+        wing_total_label: "Total"
       },
       ko: {
-        nav_home: "홈페이지", nav_transfer: "송금", lang_label: "언어",
+        nav_home: "홈페이지", nav_transfer: "송금", nav_admin: "관리자 및 매니지먼트", lang_label: "언어",
         logout: "로그아웃", role_label: "역할: ",
-        transfer_heading: "송금", transfer_sub: "다른 멤버에게 아이템이나 자금을 보내세요.",
-        transfer_cta: "지금 송금하기",
-        field_recipient: "받는 사람 아이디", field_amount: "금액 / 아이템", field_note: "메모 (선택)",
+        transfer_heading: "이주", transfer_sub: "다른 멤버에게 아이템이나 자금을 보내세요.",
+        transfer_cta: "이주하기",
+        type_solo: "개인 이전", type_group: "그룹 이전",
+        alliance_tag_label: "연맹 태그",
+        field_uid: "UID", field_username: "사용자 이름",
+        field_prev_alliance: "이전 연맹", field_prev_server: "이전 서버",
+        field_killcount: "킬 수", field_faction: "진영", field_role: "역할",
+        field_migration_score: "이주 점수 (선택)",
+        add_member: "+ 멤버 추가", remove_member: "삭제", member_label: "멤버 #",
         submit_label: "보내기",
-        status_check_cta: "상태 확인"
+        status_check_cta: "상태 확인",
+        form_error_required: "이주 점수를 제외한 모든 항목을 입력해 주세요.",
+        wing_red: "레드", wing_orange: "오렌지", wing_purple: "퍼플", wing_blue: "블루",
+        wing_total_label: "합계"
       },
       'zh-CN': {
-        nav_home: "主页", nav_transfer: "转账", lang_label: "语言",
+        nav_home: "主页", nav_transfer: "转账", nav_admin: "管理与运营", lang_label: "语言",
         logout: "登出", role_label: "角色: ",
-        transfer_heading: "转账", transfer_sub: "向其他成员发送物品或资金。",
-        transfer_cta: "立即转账",
-        field_recipient: "收款用户名", field_amount: "金额 / 物品", field_note: "备注（可选）",
+        transfer_heading: "迁移", transfer_sub: "向其他成员发送物品或资金。",
+        transfer_cta: "迁移",
+        type_solo: "个人转移", type_group: "团队转移",
+        alliance_tag_label: "联盟标签",
+        field_uid: "UID", field_username: "用户名",
+        field_prev_alliance: "前联盟", field_prev_server: "前服务器",
+        field_killcount: "击杀数", field_faction: "阵营", field_role: "角色",
+        field_migration_score: "迁移分数（选填）",
+        add_member: "+ 添加成员", remove_member: "移除", member_label: "成员 #",
         submit_label: "发送",
-        status_check_cta: "查看状态"
+        status_check_cta: "查看状态",
+        form_error_required: "请填写除迁移分数以外的所有字段。",
+        wing_red: "红方", wing_orange: "橙方", wing_purple: "紫方", wing_blue: "蓝方",
+        wing_total_label: "总计"
       },
       'pt-BR': {
-        nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", lang_label: "IDIOMA",
+        nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", nav_admin: "ADMIN E GESTÃO", lang_label: "IDIOMA",
         logout: "SAIR", role_label: "Função: ",
-        transfer_heading: "TRANSFERÊNCIA", transfer_sub: "Envie itens ou fundos para outro membro.",
-        transfer_cta: "TRANSFERIR AGORA",
-        field_recipient: "Nome de usuário do destinatário", field_amount: "Valor / item", field_note: "Observação (opcional)",
+        transfer_heading: "Migração", transfer_sub: "Envie itens ou fundos para outro membro.",
+        transfer_cta: "MIGRAÇÃO",
+        type_solo: "Transferência individual", type_group: "Transferência em grupo",
+        alliance_tag_label: "Tag da aliança",
+        field_uid: "UID", field_username: "Nome de usuário",
+        field_prev_alliance: "Aliança anterior", field_prev_server: "Servidor anterior",
+        field_killcount: "Contagem de abates", field_faction: "Facção", field_role: "Função",
+        field_migration_score: "Pontuação de Migração (opcional)",
+        add_member: "+ Adicionar membro", remove_member: "Remover", member_label: "MEMBRO #",
         submit_label: "ENVIAR",
-        status_check_cta: "VER STATUS"
+        status_check_cta: "VER STATUS",
+        form_error_required: "Preencha todos os campos de todos os membros (a Pontuação de Migração é o único opcional).",
+        wing_red: "VERMELHO", wing_orange: "LARANJA", wing_purple: "ROXO", wing_blue: "AZUL",
+        wing_total_label: "Total"
       },
       vi: {
-        nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", lang_label: "NGÔN NGỮ",
+        nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", nav_admin: "QUẢN TRỊ & QUẢN LÝ", lang_label: "NGÔN NGỮ",
         logout: "ĐĂNG XUẤT", role_label: "Vai trò: ",
-        transfer_heading: "CHUYỂN KHOẢN", transfer_sub: "Gửi vật phẩm hoặc tiền cho thành viên khác.",
-        transfer_cta: "CHUYỂN NGAY",
-        field_recipient: "Tên người nhận", field_amount: "Số lượng / vật phẩm", field_note: "Ghi chú (không bắt buộc)",
+        transfer_heading: "Di chuyển", transfer_sub: "Gửi vật phẩm hoặc tiền cho thành viên khác.",
+        transfer_cta: "DI CHUYỂN",
+        type_solo: "Chuyển đơn", type_group: "Chuyển nhóm",
+        alliance_tag_label: "Tên liên minh",
+        field_uid: "UID", field_username: "Tên người dùng",
+        field_prev_alliance: "Liên minh trước", field_prev_server: "Máy chủ trước",
+        field_killcount: "Số lượt tiêu diệt", field_faction: "Phe", field_role: "Vai trò",
+        field_migration_score: "Điểm di chuyển (không bắt buộc)",
+        add_member: "+ Thêm thành viên", remove_member: "Xóa", member_label: "THÀNH VIÊN #",
         submit_label: "GỬI",
-        status_check_cta: "KIỂM TRA TRẠNG THÁI"
+        status_check_cta: "KIỂM TRA TRẠNG THÁI",
+        form_error_required: "Vui lòng điền đầy đủ tất cả các trường cho mỗi thành viên (chỉ Điểm di chuyển là không bắt buộc).",
+        wing_red: "ĐỎ", wing_orange: "CAM", wing_purple: "TÍM", wing_blue: "XANH DƯƠNG",
+        wing_total_label: "Tổng"
       },
       fr: {
-        nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", lang_label: "LANGUE",
+        nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", nav_admin: "ADMIN & GESTION", lang_label: "LANGUE",
         logout: "DÉCONNEXION", role_label: "Rôle : ",
-        transfer_heading: "TRANSFERT", transfer_sub: "Envoyez des objets ou des fonds à un autre membre.",
-        transfer_cta: "TRANSFÉRER",
-        field_recipient: "Nom d'utilisateur du destinataire", field_amount: "Montant / objet", field_note: "Note (facultatif)",
+        transfer_heading: "Migration", transfer_sub: "Envoyez des objets ou des fonds à un autre membre.",
+        transfer_cta: "MIGRATION",
+        type_solo: "Transfert individuel", type_group: "Transfert de groupe",
+        alliance_tag_label: "Tag d'alliance",
+        field_uid: "UID", field_username: "Nom d'utilisateur",
+        field_prev_alliance: "Alliance précédente", field_prev_server: "Serveur précédent",
+        field_killcount: "Nombre d'éliminations", field_faction: "Faction", field_role: "Rôle",
+        field_migration_score: "Score de migration (facultatif)",
+        add_member: "+ Ajouter un membre", remove_member: "Retirer", member_label: "MEMBRE #",
         submit_label: "ENVOYER",
-        status_check_cta: "VÉRIFIER LE STATUT"
+        status_check_cta: "VÉRIFIER LE STATUT",
+        form_error_required: "Merci de remplir tous les champs pour chaque membre (le score de migration est le seul facultatif).",
+        wing_red: "ROUGE", wing_orange: "ORANGE", wing_purple: "VIOLET", wing_blue: "BLEU",
+        wing_total_label: "Total"
       }
     }
 
     var currentLang = 'en'
     try { currentLang = localStorage.getItem('zoo_lang') || 'en' } catch (e) { console.error('localStorage read failed', e) }
     if ($('lang-select')) $('lang-select').value = currentLang
+
+    // t(key, fallback) -- used by the dynamically-rendered member rows below,
+    // since those get rebuilt from scratch (innerHTML) rather than sitting
+    // still with data-i18n attributes for applyTranslations() to find.
+    function t(key, fallback) {
+      return (translations[currentLang] && translations[currentLang][key]) || fallback
+    }
 
     function applyTranslations() {
       try {
@@ -583,83 +707,114 @@
       currentLang = e.target.value
       try { localStorage.setItem('zoo_lang', currentLang) } catch (err) { console.error('localStorage write failed', err) }
       applyTranslations()
+      // Re-render any dynamic modal content so it picks up the new language too.
+      try { renderMembers() } catch (err) { console.error('re-render on lang change failed', err) }
     })
 
     applyTranslations()
 
     // =====================================================================
-    // ---------- Status card: rows, percentage bars, admin editing ----------
+    // ---------- Status card: RED/ORANGE/PURPLE/BLUE percentage bars ----------
     // =====================================================================
-    // Each row lines up with one of the 4 armchair icons already baked into
-    // assets/transfer-status-card.PNG -- we only render the bar + percentage
-    // (and, for admins, the input), not the icon itself.
-    // "value" is now a direct 0-100 admin-facing number, shown next to each
-    // bar as "value/100" -- simpler than the old 0-10-scaled-to-percent model.
+    // Each row is one of the four team colors. "value" is the 0-100
+    // admin/management-facing percentage, shown next to the bar as
+    // "value/100". The bar itself is always drawn in the row's own team
+    // color now (not a red/yellow/green health color) so RED always looks
+    // red, BLUE always looks blue, etc.
     // icon: the individual armchair PNGs you uploaded to Supabase Storage,
     // one per wing -- each is a real <img> in its row (rendered below) so it
     // lines up with its own bar instead of relying on baked-in card art.
     var statusRows = [
-      { key: 'wing-a', name: 'Wing A', value: 20, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
-      { key: 'wing-b', name: 'Wing B', value: 60, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
-      { key: 'wing-c', name: 'Wing C', value: 50, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
+      { key: 'RED', labelKey: 'wing_red', value: 20, color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
+      { key: 'ORANGE', labelKey: 'wing_orange', value: 60, color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
+      { key: 'PURPLE', labelKey: 'wing_purple', value: 50, color: '#8b5cf6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
       // NOTE: the Purple and Blue links you sent point to the exact same
       // file (IMG_7772.png, same token) -- using it for both for now so
       // nothing breaks. Send the real Blue icon URL and I'll swap it in.
-      { key: 'wing-d', name: 'Wing D', value: 90, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
+      { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
     ]
 
-    // 0-54 -> slightly dark red, 55-74 -> yellow, 75-100 -> pastel mossy green
-    function barColorForPercent(pct) {
-      if (pct <= 54) return '#c1442e'
-      if (pct <= 74) return '#f0c53d'
-      return '#a3b18a'
+    // Percentages are editable by ADMIN and MANAGEMENT -- not just ADMIN.
+    // Role assignment itself stays admin-only (enforced separately in admin.html).
+    function isPrivileged() {
+      var role = (window.zooUserRole || '').toUpperCase()
+      return role === 'ADMIN' || role === 'MANAGEMENT'
     }
 
-    function isAdmin() {
-      var role = (window.zooUserRole || '').toUpperCase()
-      return role === 'ADMIN'
+    // The nav link is just a convenience -- the real gate is server-side
+    // RLS on admin.html's own queries, so hiding this link is only about
+    // not showing a dead-end link to people who can't use it, not security.
+    function updateAdminNavVisibility() {
+      var link = $('nav-admin-link')
+      if (link) link.style.display = isPrivileged() ? 'flex' : 'none'
+    }
+
+    var wingSaveTimer = null
+    function scheduleWingSave(row) {
+      // Debounced auto-save: fires ~600ms after the admin/management user
+      // stops typing, instead of hitting Supabase on every keystroke.
+      clearTimeout(wingSaveTimer)
+      wingSaveTimer = setTimeout(function () {
+        if (!supabase) return
+        supabase.from('wing_status')
+          .upsert({ color: row.key, percentage: row.value, updated_by: window.zooUserId || null })
+          .then(function (res) {
+            if (res && res.error) console.error('wing_status save failed', res.error)
+          })
+      }, 600)
     }
 
     function renderStatusRows() {
       try {
         var container = $('status-rows')
         if (!container) return
-        var admin = isAdmin()
+        var privileged = isPrivileged()
+        var total = statusRows.reduce(function (sum, r) { return sum + (Math.max(0, Math.min(100, r.value)) || 0) }, 0)
 
-        container.innerHTML = statusRows.map(function (row, i) {
+        var rowsHtml = statusRows.map(function (row, i) {
           var pct = Math.max(0, Math.min(100, row.value))
-          var color = barColorForPercent(pct)
-          var adminBlock = admin
+          var name = t(row.labelKey, row.key)
+          var adminBlock = privileged
             ? '<div class="status-admin">' +
                 '<input type="number" min="0" max="100" step="1" value="' + row.value + '" ' +
-                  'class="status-admin-input" data-row="' + i + '" aria-label="' + row.name + ' value out of 100" />' +
-                '<span>/100 (admin)</span>' +
+                  'class="status-admin-input" data-row="' + i + '" aria-label="' + name + ' value out of 100" />' +
+                '<span>/100</span>' +
               '</div>'
             : ''
 
           return (
             '<div class="status-row" data-row="' + i + '">' +
-              (row.icon ? '<img class="status-row-icon" src="' + row.icon + '" alt="' + row.name + ' icon" onerror="this.style.display=\'none\'" />' : '') +
+              (row.icon ? '<img class="status-row-icon" src="' + row.icon + '" alt="' + name + ' icon" onerror="this.style.display=\'none\'" />' : '') +
               '<div class="status-row-body">' +
                 '<div class="status-row-top">' +
-                  '<span class="status-row-name">' + row.name + '</span>' +
+                  '<span class="status-row-name">' + name + '</span>' +
                   '<span class="status-percent">' + pct + '/100</span>' +
                 '</div>' +
-                '<div class="status-bar-track"><div class="status-bar-fill" style="width:' + pct + '%; background:' + color + ';"></div></div>' +
+                '<div class="status-bar-track"><div class="status-bar-fill" style="width:' + pct + '%; background:' + row.color + ';"></div></div>' +
                 adminBlock +
               '</div>' +
             '</div>'
           )
         }).join('')
 
-        // Wire up admin inputs (only present at all when isAdmin() was true above)
+        // Automatic running total -- only shown to admin/management, since
+        // it's only actionable for the people who can actually edit the
+        // percentages. Flags green at exactly 100, amber otherwise.
+        var totalHtml = privileged
+          ? '<div class="status-total" style="color:' + (total === 100 ? '#a3f0b0' : '#ffd9a0') + '">' +
+              t('wing_total_label', 'Total') + ': ' + total + '/100' +
+            '</div>'
+          : ''
+
+        container.innerHTML = rowsHtml + totalHtml
+
+        // Wire up admin/management inputs (only present when privileged)
         container.querySelectorAll('.status-admin-input').forEach(function (input) {
           input.addEventListener('input', function () {
             var idx = parseInt(input.getAttribute('data-row'), 10)
             var val = Math.max(0, Math.min(100, parseInt(input.value, 10) || 0))
             statusRows[idx].value = val
-            // TODO: once wired to Supabase, persist this the same way the
-            // transfer form will -- e.g. supabase.from('wing_status').upsert(...)
+            scheduleWingSave(statusRows[idx])
             renderStatusRows()
           })
         })
@@ -755,17 +910,20 @@
         // 'profiles' row doesn't exist yet or a table query fails --
         // that dependency on 'profiles' alone was why this got stuck on
         // "Loading..." forever whenever that lookup came back empty.
+        window.zooUserId = user.id
         var meta = user.user_metadata || {}
         var uname = meta.username || (user.email || 'Member').split('@')[0]
-        var role = (meta.role || 'MEMBER')
+        var role = (meta.role || 'GUEST')
         window.zooUserRole = role
         if ($('user-name')) $('user-name').textContent = uname
         if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
         if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
+        updateAdminNavVisibility()
         renderStatusRows()
 
-        // Optional enhancement: if a 'profiles' row exists with a nicer
-        // display_name/role, upgrade to it -- but never block on it.
+        // The 'profiles' table is the real source of truth for role
+        // (auth user_metadata is just a starting hint) -- upgrade to it,
+        // but never block the page on this lookup.
         try {
           var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
           var profile = profRes && profRes.data
@@ -774,6 +932,7 @@
             if (profile.role && $('user-role')) $('user-role').textContent = String(profile.role).toUpperCase()
             if (profile.display_name && $('user-initial')) $('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
             if (profile.role) window.zooUserRole = profile.role
+            updateAdminNavVisibility()
             renderStatusRows()
           }
         } catch (profErr) {
@@ -795,7 +954,203 @@
       window.location.href = "login.html"
     })
 
-    // ---------- Transfer popup form ----------
+    // =====================================================================
+    // ---------- Migration popup: Solo / Group + member rows ----------
+    // =====================================================================
+    // transferType: 'solo' | 'group'
+    // members: array of { uid, username, prevAlliance, prevServer, killcount, faction, role, migrationScore }
+    //   faction: 0 = unset/grey, 1 = F (blue), 2 = S (purple), 3 = R (orange) -- cycles on click
+    //   role: '' or 'i1'..'i10' (dropdown only, no other options)
+    //   migrationScore: the ONLY optional field -- everything else is required before submit.
+    var transferType = 'solo'
+    var members = []
+
+    function createEmptyMember() {
+      return { uid: '', username: '', prevAlliance: '', prevServer: '', killcount: '', faction: 0, role: '', migrationScore: '' }
+    }
+
+    function factionLetter(state) {
+      if (state === 1) return 'F'
+      if (state === 2) return 'S'
+      if (state === 3) return 'R'
+      return ''
+    }
+
+    function roleOptionsHtml(selected) {
+      var out = '<option value="">--</option>'
+      for (var i = 1; i <= 10; i++) {
+        var val = 'i' + i
+        out += '<option value="' + val + '"' + (selected === val ? ' selected' : '') + '>' + val + '</option>'
+      }
+      return out
+    }
+
+    function updateTypeToggleUI() {
+      var soloBtn = $('type-solo-btn')
+      var groupBtn = $('type-group-btn')
+      var allianceField = $('group-alliance-field')
+      var addBtn = $('add-member-btn')
+      if (soloBtn) soloBtn.classList.toggle('active', transferType === 'solo')
+      if (groupBtn) groupBtn.classList.toggle('active', transferType === 'group')
+      if (allianceField) allianceField.style.display = (transferType === 'group') ? 'flex' : 'none'
+      if (addBtn) addBtn.style.display = (transferType === 'group') ? 'block' : 'none'
+    }
+
+    function renderMembers() {
+      try {
+        var container = $('members-container')
+        if (!container) return
+        var showHeader = transferType === 'group'
+        var canRemove = transferType === 'group' && members.length > 1
+
+        container.innerHTML = members.map(function (m, idx) {
+          var removeBtn = canRemove
+            ? '<button type="button" class="remove-member-btn" data-action="remove" data-idx="' + idx + '">' + t('remove_member', 'Remove') + '</button>'
+            : ''
+          var header = showHeader
+            ? '<div class="member-row-header"><span>' + t('member_label', 'MEMBER #') + (idx + 1) + '</span>' + removeBtn + '</div>'
+            : ''
+
+          return (
+            '<div class="member-row" data-idx="' + idx + '">' +
+              header +
+              '<div class="field">' +
+                '<label>' + t('field_uid', 'UID') + '</label>' +
+                '<input type="text" class="member-field" data-field="uid" data-idx="' + idx + '" inputmode="numeric" maxlength="13" placeholder="e.g. 1234567890123" value="' + escapeAttr(m.uid) + '" />' +
+              '</div>' +
+              '<div class="field">' +
+                '<label>' + t('field_username', 'Username') + '</label>' +
+                '<input type="text" class="member-field" data-field="username" data-idx="' + idx + '" value="' + escapeAttr(m.username) + '" />' +
+              '</div>' +
+              '<div class="field-row">' +
+                '<div class="field">' +
+                  '<label>' + t('field_prev_alliance', 'Previous Alliance') + '</label>' +
+                  '<input type="text" class="member-field" data-field="prevAlliance" data-idx="' + idx + '" value="' + escapeAttr(m.prevAlliance) + '" />' +
+                '</div>' +
+                '<div class="field">' +
+                  '<label>' + t('field_prev_server', 'Previous Server') + '</label>' +
+                  '<input type="text" class="member-field" data-field="prevServer" data-idx="' + idx + '" placeholder="e.g. S1" value="' + escapeAttr(m.prevServer) + '" />' +
+                '</div>' +
+              '</div>' +
+              '<div class="field">' +
+                '<label>' + t('field_killcount', 'Kill Count') + '</label>' +
+                '<input type="text" class="member-field killcount-field" data-field="killcount" data-idx="' + idx + '" inputmode="numeric" placeholder="e.g. 13" value="' + escapeAttr(m.killcount ? (m.killcount + 'M') : '') + '" />' +
+              '</div>' +
+              '<div class="field-row faction-role-row">' +
+                '<div class="faction-picker">' +
+                  '<label>' + t('field_faction', 'Faction') + '</label>' +
+                  '<button type="button" class="faction-btn" data-action="faction" data-idx="' + idx + '" data-state="' + (m.faction || 0) + '">' +
+                    '<span class="faction-letter">' + factionLetter(m.faction || 0) + '</span>' +
+                  '</button>' +
+                '</div>' +
+                '<div class="field">' +
+                  '<label>' + t('field_role', 'Role') + '</label>' +
+                  '<select class="member-field role-select" data-field="role" data-idx="' + idx + '">' +
+                    roleOptionsHtml(m.role) +
+                  '</select>' +
+                '</div>' +
+              '</div>' +
+              '<div class="field">' +
+                '<label>' + t('field_migration_score', 'Migration Score (optional)') + '</label>' +
+                '<input type="text" class="member-field" data-field="migrationScore" data-idx="' + idx + '" inputmode="numeric" value="' + escapeAttr(m.migrationScore) + '" />' +
+              '</div>' +
+            '</div>'
+          )
+        }).join('')
+
+        var addBtn = $('add-member-btn')
+        if (addBtn) addBtn.textContent = t('add_member', '+ Add Member')
+
+        updateTypeToggleUI()
+      } catch (e) { console.error('renderMembers failed', e) }
+    }
+
+    function resetTransferState() {
+      transferType = 'solo'
+      members = [createEmptyMember()]
+      if ($('alliance-tag')) $('alliance-tag').value = ''
+      updateTypeToggleUI()
+      renderMembers()
+    }
+
+    on('type-solo-btn', 'click', function () {
+      if (transferType === 'solo') return
+      transferType = 'solo'
+      members = [members[0] || createEmptyMember()]
+      updateTypeToggleUI()
+      renderMembers()
+    })
+    on('type-group-btn', 'click', function () {
+      if (transferType === 'group') return
+      transferType = 'group'
+      if (members.length < 1) members = [createEmptyMember()]
+      updateTypeToggleUI()
+      renderMembers()
+    })
+
+    on('add-member-btn', 'click', function () {
+      members.push(createEmptyMember())
+      renderMembers()
+    })
+
+    // Event delegation on the members container -- rows get rebuilt via
+    // innerHTML on every render, so listeners are bound once here instead
+    // of being re-attached (and leaking) after each render.
+    try {
+      var membersContainer = $('members-container')
+      if (membersContainer) {
+        membersContainer.addEventListener('input', function (e) {
+          var target = e.target
+          if (!target || !target.classList) return
+
+          if (target.classList.contains('killcount-field')) {
+            var kIdx = parseInt(target.getAttribute('data-idx'), 10)
+            var digits = target.value.replace(/[^0-9]/g, '')
+            members[kIdx].killcount = digits
+            target.value = digits ? (digits + 'M') : ''
+            return
+          }
+
+          if (target.classList.contains('member-field')) {
+            var field = target.getAttribute('data-field')
+            var idx = parseInt(target.getAttribute('data-idx'), 10)
+            if (field === 'uid') {
+              var uidVal = target.value.replace(/[^0-9]/g, '').slice(0, 13)
+              target.value = uidVal
+              members[idx].uid = uidVal
+              return
+            }
+            members[idx][field] = target.value
+          }
+        })
+
+        membersContainer.addEventListener('change', function (e) {
+          var target = e.target
+          if (target && target.classList && target.classList.contains('role-select')) {
+            var idx = parseInt(target.getAttribute('data-idx'), 10)
+            members[idx].role = target.value
+          }
+        })
+
+        membersContainer.addEventListener('click', function (e) {
+          var factionBtn = e.target.closest && e.target.closest('.faction-btn')
+          if (factionBtn) {
+            var fIdx = parseInt(factionBtn.getAttribute('data-idx'), 10)
+            members[fIdx].faction = ((members[fIdx].faction || 0) + 1) % 4
+            renderMembers()
+            return
+          }
+          var removeBtn = e.target.closest && e.target.closest('[data-action="remove"]')
+          if (removeBtn) {
+            var rIdx = parseInt(removeBtn.getAttribute('data-idx'), 10)
+            members.splice(rIdx, 1)
+            renderMembers()
+          }
+        })
+      }
+    } catch (e) { console.error('members container listeners failed', e) }
+
+    // ---------- Migration popup open/close ----------
     try {
       var overlay = $('transfer-modal-overlay')
       var form = $('transfer-form')
@@ -804,10 +1159,10 @@
       var submitBtn = $('transfer-submit-btn')
 
       function openModal(){
+        resetTransferState()
         if (overlay) overlay.classList.add('visible')
         if (errorEl) errorEl.classList.remove('visible')
         if (successEl) successEl.classList.remove('visible')
-        if (form) form.reset()
         if (submitBtn) submitBtn.disabled = false
       }
       function closeModal(){ if (overlay) overlay.classList.remove('visible') }
@@ -815,19 +1170,68 @@
       on('open-transfer-btn', 'click', openModal)
       on('modal-close-btn', 'click', closeModal)
       if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal() })
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal() })
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay && overlay.classList.contains('visible')) closeModal() })
 
       if (form) {
         form.addEventListener('submit', async function (e) {
           e.preventDefault()
           if (errorEl) errorEl.classList.remove('visible')
           if (successEl) successEl.classList.remove('visible')
-          if (submitBtn) submitBtn.disabled = true
 
+          // Every field is required except Migration Score. For group
+          // transfers the Alliance Tag is also required.
+          var missing = members.some(function (m) {
+            return !m.uid || !m.username || !m.prevAlliance || !m.prevServer ||
+                   !m.killcount || !(m.faction > 0) || !m.role
+          })
+          var allianceTagVal = (transferType === 'group' && $('alliance-tag')) ? $('alliance-tag').value.trim() : ''
+          if (transferType === 'group' && !allianceTagVal) missing = true
+
+          if (missing) {
+            if (errorEl) {
+              errorEl.textContent = t('form_error_required', 'Please fill in every field for every member (Migration Score is the only optional one).')
+              errorEl.classList.add('visible')
+            }
+            return
+          }
+
+          if (submitBtn) submitBtn.disabled = true
           try {
-            await new Promise(function (res) { setTimeout(res, 500) })
+            var memberPayload = members.map(function (m) {
+              return {
+                uid: m.uid,
+                username: m.username,
+                previous_alliance: m.prevAlliance,
+                previous_server: m.prevServer,
+                kill_count: m.killcount ? (m.killcount + 'M') : '',
+                faction: factionLetter(m.faction || 0),
+                role: m.role,
+                migration_score: m.migrationScore ? Number(m.migrationScore) : null
+              }
+            })
+
+            // Persist to Supabase: one row in migration_requests (type +
+            // alliance tag), then one row per member in migration_members.
+            // See the provided schema.sql for the matching table/RLS setup.
+            if (supabase) {
+              var reqRes = await supabase.from('migration_requests').insert({
+                type: transferType,
+                alliance_tag: allianceTagVal || null
+              }).select().single()
+
+              if (reqRes.error) throw reqRes.error
+
+              var requestId = reqRes.data.id
+              var membersRes = await supabase.from('migration_members').insert(
+                memberPayload.map(function (m) { return Object.assign({ request_id: requestId }, m) })
+              )
+              if (membersRes.error) throw membersRes.error
+            } else {
+              console.log('Supabase not available -- migration request not persisted:', { type: transferType, allianceTag: allianceTagVal, members: memberPayload })
+            }
+
             if (successEl) {
-              successEl.textContent = 'Transfer request sent!'
+              successEl.textContent = 'Migration request sent!'
               successEl.classList.add('visible')
             }
             setTimeout(closeModal, 1200)
@@ -836,11 +1240,14 @@
               errorEl.textContent = (err && err.message) || 'Something went wrong.'
               errorEl.classList.add('visible')
             }
+          } finally {
             if (submitBtn) submitBtn.disabled = false
           }
         })
       }
-    } catch (e) { console.error('transfer modal init failed', e) }
+
+      resetTransferState()
+    } catch (e) { console.error('migration modal init failed', e) }
   </script>
 </body>
 </html>
