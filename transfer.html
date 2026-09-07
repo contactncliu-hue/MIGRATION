@@ -109,8 +109,15 @@
     }
     .deco-bg img{ width:100%; height:100%; display:block; object-fit:fill; }
 
+    /* Arch/scroll is now anchored to the BOTTOM of the scene instead of a
+       "top" percentage. With "top", the arch's vertical position drifted
+       depending on the scene's overall height (viewport ratio), which is
+       why it kept landing too low. Anchoring from the bottom "magnetizes"
+       the base of the arch to the bottom edge of the scene every time,
+       regardless of viewport size, matching the reference art where the
+       scroll's base sits right at the bottom of the frame. */
     .arch-card{
-      position:absolute; left:32%; top:22%; width:36%;
+      position:absolute; left:32%; bottom:0; width:36%;
       z-index:5;
     }
     .arch-bg{ width:100%; display:block; pointer-events:none; }
