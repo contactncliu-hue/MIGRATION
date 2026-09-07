@@ -170,15 +170,17 @@
     }
 
     /* When the status card is open, the header ribbon and the transfer
-       button step out of the way -- the status card takes over that same
-       visual "slot" in the scene instead of stacking on top of it. */
+       button pan slowly DOWN out of the way (instead of a quick fade/lift)
+       so the transition itself is visible -- the status card takes over
+       that same visual "slot" in the scene once they've cleared it. */
     .status-open .header-ribbon,
     .status-open .transfer-btn{
       opacity:0 !important;
-      transform:translate(-50%, -16px) !important;
+      transform:translate(-50%, 60px) !important;
       pointer-events:none;
+      transition:transform 1.4s cubic-bezier(.22,.68,0,1.01), opacity 1s ease;
     }
-    .status-open .transfer-btn{ transform:translateX(-50%) translateY(-16px) scale(.96) !important; }
+    .status-open .transfer-btn{ transform:translateX(-50%) translateY(60px) scale(.96) !important; }
 
     /* Fallback color ONLY kicks in if the real image actually fails to
        load (see the 'img-failed' class added by onerror below) -- it no
@@ -191,19 +193,20 @@
     /* ================= STATUS CARD =================
        ONE element, ONE asset (assets/transfer-status-card.PNG) for both
        states -- it's the same card, just slid off to the left by default
-       (only a sliver shows, like your reference) and slid to center when
-       clicked. No separate "tab" graphic needed.
+       (only a sliver shows, like your reference) and slid to center + made
+       LARGER when clicked. No separate "tab" graphic needed.
        IMPORTANT: this lives outside .scene (see the HTML comment above it)
        so these percentages are relative to the real viewport-sized
        .transfer-stage, not the oversized/clipped .scene canvas. */
     .status-card{
       position:absolute; top:8%; width:36%; max-width:560px;
-      left:-28%; /* only ~8% of the card's own width peeks past the real screen edge */
+      left:-30%; /* only a sliver of the card's own edge peeks past the real screen edge */
       z-index:36;
       cursor:pointer;
-      transition:left .5s cubic-bezier(.22,.68,0,1.01);
+      transition:left .6s cubic-bezier(.22,.68,0,1.01), width .6s cubic-bezier(.22,.68,0,1.01), max-width .6s cubic-bezier(.22,.68,0,1.01), top .6s cubic-bezier(.22,.68,0,1.01);
     }
-    .status-open .status-card{ left:32%; cursor:default; } /* (100% - 36%) / 2 = centered */
+    /* Bigger + centered once opened. (100% - 52%) / 2 = 24% for centering. */
+    .status-open .status-card{ left:24%; width:52%; max-width:820px; top:9%; cursor:default; }
     .status-card-bg{ width:100%; display:block; pointer-events:none; }
 
     .status-card-close{
@@ -211,16 +214,23 @@
       width:30px; height:30px; border-radius:50%;
       border:none; background:rgba(255,255,255,.18); color:#fff;
       font-size:18px; line-height:1; cursor:pointer;
+      opacity:0; pointer-events:none; transition:opacity .25s ease;
     }
     .status-card-close:hover{ background:rgba(255,255,255,.3); }
+    .status-open .status-card-close{ opacity:1; pointer-events:auto; transition:opacity .35s ease .35s; }
 
     /* Positioned to sit over the 4 armchair icons already baked into your
        PNG art -- adjust the top/bottom/left insets below to match wherever
-       your icons actually land once you drop the real file in. */
+       your icons actually land once you drop the real file in.
+       Hidden (opacity 0, not just visually covered) whenever the card is
+       collapsed, so none of this text/bars can peek out of the sliver --
+       that's what was showing through in the "before" screenshot. */
     .status-rows{
       position:absolute; left:34%; right:9%; top:14%; bottom:12%;
       display:flex; flex-direction:column; justify-content:space-between;
+      opacity:0; pointer-events:none; transition:opacity .25s ease;
     }
+    .status-open .status-rows{ opacity:1; pointer-events:auto; transition:opacity .4s ease .35s; }
     .status-row{ display:flex; align-items:center; gap:10px; }
     .status-row-body{ flex:1; min-width:0; }
     .status-row-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
@@ -238,19 +248,31 @@
     }
     .status-admin span{ font-size:10px; color:#ffe3de; font-weight:600; }
 
-    /* assets/transfer-status-button.PNG -- same overlay-label trick as
-       .transfer-btn above (real art underneath, live text on top). */
+    /* assets/transfer-status-button.PNG -- moved OUT of the card and given
+       the exact same font styling as .transfer-btn (per your request), just
+       smaller, and anchored to the same vertical "slot" on the arch
+       (top:62%, same as .transfer-btn) so it visually replaces it once the
+       transfer button pans away. Only visible while the card is open. */
     .status-check-btn{
-      position:relative; display:block; width:100%; margin-top:8%;
+      position:absolute; left:50%; top:62%; width:16%;
+      z-index:32;
       border:none; cursor:pointer; padding:0; background:transparent;
-      transition:filter .15s ease, transform .1s ease;
+      opacity:0; pointer-events:none;
+      transform:translateX(-50%) translateY(24px) scale(.94);
+      transition:filter .2s ease, opacity 1s cubic-bezier(.22,.68,0,1.01) .5s, transform 1s cubic-bezier(.22,.68,0,1.01) .5s;
+    }
+    .status-open .status-check-btn{
+      opacity:1; pointer-events:auto;
+      transform:translateX(-50%) translateY(0) scale(1);
     }
     .status-check-btn img{ width:100%; display:block; }
-    .status-check-btn:hover{ filter:brightness(1.05); }
-    .status-check-btn:active{ transform:translateY(1px); filter:brightness(.96); }
+    .status-check-btn:hover{ filter:brightness(1.06); }
+    .status-check-btn:active{ filter:brightness(.94); }
     .status-check-label{
       position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      font-weight:800; font-size:1.1vw; letter-spacing:.4px; color:#2f3d33;
+      font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
+      color:#fffaf0;
+      text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
     }
 
     /* ================= MODAL ================= */
@@ -305,8 +327,10 @@
 
     @media (max-width:760px){
       .transfer-btn .btn-label{ font-size:3.4vw; }
+      .status-check-label{ font-size:3.4vw; }
+      .status-check-btn{ width:34%; }
       .status-card{ width:78%; top:6%; left:-70%; }
-      .status-open .status-card{ left:11%; } /* (100 - 78) / 2 */
+      .status-open .status-card{ left:11%; width:78%; max-width:none; } /* (100 - 78) / 2 */
       .status-row-name, .status-percent{ font-size:11px; }
     }
   </style>
@@ -369,6 +393,14 @@
           <img src="assets/transfer-button.PNG" alt="" onerror="this.style.display='none'; this.closest('.transfer-btn').classList.add('img-failed')" />
           <span class="btn-label" data-i18n="transfer_cta">TRANSFER NOW</span>
         </button>
+
+        <!-- Moved out of .status-card: same font/color as the transfer button,
+             smaller, anchored to the same arch "slot" (top:62%), and only
+             visible once the card is open (see .status-open .status-check-btn). -->
+        <button class="status-check-btn" id="status-check-btn" type="button">
+          <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
+          <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
+        </button>
       </div>
 
       <!-- Status card: lives OUTSIDE .scene on purpose. .scene is an oversized
@@ -378,21 +410,15 @@
            the visible edge of the browser window. This card needs to peek
            from the ACTUAL left edge of the screen, so it's positioned
            relative to .transfer-stage (the real, viewport-sized box) instead.
-           Sits mostly off-canvas by default (just a sliver showing, per your
-           reference), and slides to centered -- replacing the header ribbon +
-           transfer button -- when clicked. Same asset
+           Sits mostly off-canvas by default (just a sliver showing, with all
+           inner content hidden -- see .status-rows opacity rules above), and
+           grows + centers when clicked. Same asset
            (assets/transfer-status-card.PNG) in both states. -->
       <div class="status-card" id="status-card" aria-hidden="true">
         <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
         <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
 
         <div class="status-rows" id="status-rows"><!-- rows injected by renderStatusRows() --></div>
-
-        <!-- assets/transfer-status-button.PNG -- the pastel pill button -->
-        <button class="status-check-btn" id="status-check-btn" type="button">
-          <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
-          <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
-        </button>
       </div>
 
     </div>
@@ -658,8 +684,9 @@
       })
       on('status-card-close', 'click', closeStatusCard)
 
-      // The "CHECK STATUS" pill button inside the card is a real, clickable
-      // action -- it re-pulls the latest values and re-renders the bars.
+      // The "CHECK STATUS" pill button (now anchored to the arch, outside the
+      // card) is a real, clickable action -- it re-pulls the latest values
+      // and re-renders the bars.
       // (Swap the body of this for a real Supabase fetch once that table exists.)
       on('status-check-btn', 'click', function () {
         var btn = $('status-check-btn')
