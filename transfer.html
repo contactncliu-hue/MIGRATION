@@ -4,6 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZOO - Transfer</title>
+
+  <!-- ===== VISIBLE ERROR CATCHER (loads first, before anything else) =====
+       On iPad there's no console access, so any JS error that happens
+       anywhere on this page will now show up as a red banner at the top
+       of the screen instead of silently killing everything. -->
+  <script>
+    (function () {
+      function showError(text) {
+        var box = document.createElement('div')
+        box.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#e03131;color:#fff;' +
+          'padding:12px 16px;font-size:13px;font-family:monospace;z-index:999999;' +
+          'white-space:pre-wrap;word-break:break-word;box-shadow:0 2px 8px rgba(0,0,0,.3);'
+        box.textContent = text
+        var closeBtn = document.createElement('span')
+        closeBtn.textContent = ' ✕'
+        closeBtn.style.cssText = 'float:right;cursor:pointer;font-weight:bold;'
+        closeBtn.onclick = function () { box.remove() }
+        box.appendChild(closeBtn)
+        if (document.body) document.body.appendChild(box)
+        else window.addEventListener('DOMContentLoaded', function () { document.body.appendChild(box) })
+      }
+      window.addEventListener('error', function (e) {
+        showError('JS ERROR: ' + e.message + '\n(' + (e.filename || '') + ':' + e.lineno + ':' + e.colno + ')')
+      })
+      window.addEventListener('unhandledrejection', function (e) {
+        var reason = e.reason && e.reason.message ? e.reason.message : String(e.reason)
+        showError('PROMISE ERROR: ' + reason)
+      })
+    })()
+  </script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; background: #f4f5fa; overflow-x:hidden; }
@@ -51,12 +82,9 @@
       position:relative;
       width:100%; min-height:100vh;
       display:flex; align-items:center; justify-content:center;
-      /* very light yellow-orange, through a soft green, to white */
       background:linear-gradient(160deg, #fff6e0 0%, #fdf3da 22%, #eef4e4 55%, #ffffff 100%);
     }
 
-    /* background decoration: stars + gold streak + mountain, spread across
-       the full stage as a backdrop rather than crammed into one corner */
     .deco-bg{
       position:absolute; inset:0; z-index:1;
       opacity:0;
@@ -70,7 +98,6 @@
       object-fit:cover; object-position:center right;
     }
 
-    /* the arch card itself */
     .arch-card{
       position:relative;
       width:480px; max-width:80vw;
@@ -81,7 +108,6 @@
     .stage-ready .arch-card{ opacity:1; transform:scale(1); }
     .arch-bg{ width:100%; display:block; pointer-events:none; }
 
-    /* header ornament + draping ribbon, overlaid above/through the arch */
     .header-ribbon{
       position:absolute; left:50%; top:-9%;
       width:148%; max-width:720px;
@@ -94,14 +120,12 @@
     .stage-ready .header-ribbon{ opacity:1; transform:translateX(-50%) scale(1); }
     .header-ribbon img{ width:100%; display:block; }
 
-    /* bottom fade: sits above the arch/ribbon, below the button */
     .bottom-fade{
       position:absolute; left:0; right:0; bottom:0; height:24%;
       background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.85) 65%, #f4f5fa 100%);
       z-index:20; pointer-events:none;
     }
 
-    /* the clickable transfer button -- topmost layer, pops in last */
     .transfer-btn{
       position:absolute; left:50%; top:53%;
       width:64%;
@@ -122,6 +146,10 @@
       font-weight:800; font-size:17px; letter-spacing:1px;
       color:#2c3562;
     }
+
+    /* Fallback so the button/card stack is still usable if images 404 */
+    .arch-card { background:#fff8ea; border-radius:24px; min-height:340px; }
+    .transfer-btn { background:#f2a90f; border-radius:14px; min-height:52px; }
 
     /* ================= MODAL ================= */
     .modal-overlay{
@@ -184,7 +212,7 @@
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
   <aside class="sidebar">
-    <img src="assets/logo.png.PNG" alt="Logo" class="logo-img" />
+    <img src="assets/logo.png.PNG" alt="Logo" class="logo-img" onerror="this.style.display='none'" />
 
     <div class="user-block">
       <div class="user-avatar" id="user-initial">?</div>
@@ -219,20 +247,20 @@
     <div class="transfer-stage">
 
       <div class="deco-bg">
-        <img src="assets/transfer-bg-deco.PNG" alt="" />
+        <img src="assets/transfer-bg-deco.PNG" alt="" onerror="this.style.display='none'" />
       </div>
 
       <div class="arch-card">
-        <img class="arch-bg" src="assets/transfer-arch.PNG" alt="" />
+        <img class="arch-bg" src="assets/transfer-arch.PNG" alt="" onerror="this.style.display='none'" />
 
         <div class="header-ribbon">
-          <img src="assets/transfer-header.PNG" alt="" />
+          <img src="assets/transfer-header.PNG" alt="" onerror="this.style.display='none'" />
         </div>
 
         <div class="bottom-fade"></div>
 
         <button class="transfer-btn" id="open-transfer-btn">
-          <img src="assets/transfer-button.PNG" alt="" />
+          <img src="assets/transfer-button.PNG" alt="" onerror="this.style.display='none'" />
           <span class="btn-label" data-i18n="transfer_cta">TRANSFER NOW</span>
         </button>
       </div>
@@ -271,31 +299,39 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
-    // Runs first and independently of everything below -- this must never
-    // be blocked by a Supabase/network failure.
-    function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
-    if (isMobile()) document.body.classList.add('sidebar-hidden')
+    // Small safe helper: never throws if an element is missing, and never
+    // lets one missing/failing element stop the rest of the script.
+    function $(id) { return document.getElementById(id) }
+    function on(id, evt, fn) {
+      var el = $(id)
+      if (el) el.addEventListener(evt, fn)
+    }
 
-    document.getElementById('menu-toggle').addEventListener('click', () => {
-      document.body.classList.toggle('sidebar-hidden')
-    })
-    document.getElementById('sidebar-backdrop').addEventListener('click', () => {
-      document.body.classList.add('sidebar-hidden')
-    })
+    // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
+    try {
+      function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
+      if (isMobile()) document.body.classList.add('sidebar-hidden')
+
+      on('menu-toggle', 'click', function () {
+        document.body.classList.toggle('sidebar-hidden')
+      })
+      on('sidebar-backdrop', 'click', function () {
+        document.body.classList.add('sidebar-hidden')
+      })
+    } catch (e) { console.error('sidebar init failed', e) }
 
     // ---------- Hero entrance reveal ----------
-    // Also independent -- this is why images were stuck invisible before:
-    // a crash earlier in the script meant this line never ran, so the
-    // .stage-ready class (which flips everything from opacity:0) never
-    // got added, even though the images themselves loaded fine.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.querySelector('.transfer-stage').classList.add('stage-ready')
+    try {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          var stage = document.querySelector('.transfer-stage')
+          if (stage) stage.classList.add('stage-ready')
+        })
       })
-    })
+    } catch (e) { console.error('stage reveal failed', e) }
 
-    const translations = {
+    // ---------- Translations ----------
+    var translations = {
       en: {
         nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", lang_label: "LANGUAGE",
         logout: "LOG OUT", role_label: "Role: ",
@@ -346,60 +382,67 @@
       }
     }
 
-    let currentLang = localStorage.getItem('zoo_lang') || 'en'
-    document.getElementById('lang-select').value = currentLang
+    var currentLang = 'en'
+    try { currentLang = localStorage.getItem('zoo_lang') || 'en' } catch (e) { console.error('localStorage read failed', e) }
+    if ($('lang-select')) $('lang-select').value = currentLang
 
     function applyTranslations() {
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n')
-        if (key === 'role_label') return
-        if (translations[currentLang][key]) el.textContent = translations[currentLang][key]
-      })
-      document.querySelector('[data-i18n="role_label"]').childNodes[0].textContent = translations[currentLang]['role_label']
+      try {
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+          var key = el.getAttribute('data-i18n')
+          if (key === 'role_label') return
+          if (translations[currentLang] && translations[currentLang][key]) el.textContent = translations[currentLang][key]
+        })
+        var roleEl = document.querySelector('[data-i18n="role_label"]')
+        if (roleEl && roleEl.childNodes[0] && translations[currentLang]) {
+          roleEl.childNodes[0].textContent = translations[currentLang]['role_label']
+        }
+      } catch (e) { console.error('applyTranslations failed', e) }
     }
 
-    document.getElementById('lang-select').addEventListener('change', (e) => {
+    on('lang-select', 'change', function (e) {
       currentLang = e.target.value
-      localStorage.setItem('zoo_lang', currentLang)
+      try { localStorage.setItem('zoo_lang', currentLang) } catch (err) { console.error('localStorage write failed', err) }
       applyTranslations()
     })
 
     applyTranslations()
 
-    // ---------- Supabase (guarded -- a blocked/slow CDN must not break
-    // the sidebar, images, or translations above, which is what was
-    // happening before) ----------
-    const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
-    const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-    let supabase = null
-    if (window.supabase) {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    } else {
-      console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
-    }
+    // ---------- Supabase ----------
+    var SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
+    var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
+    var supabase = null
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      } else {
+        console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
+      }
+    } catch (e) { console.error('supabase init failed', e) }
 
     async function loadUser() {
-      if (!supabase) return
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        window.location.href = "login.html"
-        return
-      }
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('display_name, role')
-        .eq('id', user.id)
-        .single()
-
-      if (profile) {
-        document.getElementById('user-name').textContent = profile.display_name
-        document.getElementById('user-role').textContent = profile.role.toUpperCase()
-        document.getElementById('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
+      try {
+        if (!supabase) return
+        var res = await supabase.auth.getUser()
+        var user = res && res.data ? res.data.user : null
+        if (!user) {
+          window.location.href = "login.html"
+          return
+        }
+        var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
+        var profile = profRes && profRes.data
+        if (profile) {
+          if ($('user-name')) $('user-name').textContent = profile.display_name
+          if ($('user-role')) $('user-role').textContent = (profile.role || '').toUpperCase()
+          if ($('user-initial')) $('user-initial').textContent = (profile.display_name || '?').charAt(0).toUpperCase()
+        }
+      } catch (e) {
+        console.error('loadUser failed', e)
       }
     }
     loadUser()
 
-    document.getElementById('logout-btn').addEventListener('click', async () => {
+    on('logout-btn', 'click', async function () {
       try {
         if (supabase) await supabase.auth.signOut()
       } catch (err) {
@@ -409,53 +452,51 @@
     })
 
     // ---------- Transfer popup form ----------
-    const overlay = document.getElementById('transfer-modal-overlay')
-    const openBtn = document.getElementById('open-transfer-btn')
-    const closeBtn = document.getElementById('modal-close-btn')
-    const form = document.getElementById('transfer-form')
-    const errorEl = document.getElementById('transfer-error')
-    const successEl = document.getElementById('transfer-success')
-    const submitBtn = document.getElementById('transfer-submit-btn')
+    try {
+      var overlay = $('transfer-modal-overlay')
+      var form = $('transfer-form')
+      var errorEl = $('transfer-error')
+      var successEl = $('transfer-success')
+      var submitBtn = $('transfer-submit-btn')
 
-    function openModal(){
-      overlay.classList.add('visible')
-      errorEl.classList.remove('visible')
-      successEl.classList.remove('visible')
-      form.reset()
-      submitBtn.disabled = false
-    }
-    function closeModal(){ overlay.classList.remove('visible') }
-
-    openBtn.addEventListener('click', openModal)
-    closeBtn.addEventListener('click', closeModal)
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal() })
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal() })
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      errorEl.classList.remove('visible')
-      successEl.classList.remove('visible')
-      submitBtn.disabled = true
-
-      const recipient = document.getElementById('recipient').value.trim()
-      const amount = document.getElementById('amount').value.trim()
-      const note = document.getElementById('note').value.trim()
-
-      // TODO: wire this up to your actual transfers table/endpoint, e.g.:
-      // const { error } = await supabase.from('transfers').insert({ recipient, amount, note })
-      // if (error) { errorEl.textContent = error.message; errorEl.classList.add('visible'); submitBtn.disabled = false; return }
-
-      try {
-        await new Promise(res => setTimeout(res, 500)) // placeholder for the real request
-        successEl.textContent = 'Transfer request sent!'
-        successEl.classList.add('visible')
-        setTimeout(closeModal, 1200)
-      } catch (err) {
-        errorEl.textContent = err.message || 'Something went wrong.'
-        errorEl.classList.add('visible')
-        submitBtn.disabled = false
+      function openModal(){
+        if (overlay) overlay.classList.add('visible')
+        if (errorEl) errorEl.classList.remove('visible')
+        if (successEl) successEl.classList.remove('visible')
+        if (form) form.reset()
+        if (submitBtn) submitBtn.disabled = false
       }
-    })
+      function closeModal(){ if (overlay) overlay.classList.remove('visible') }
+
+      on('open-transfer-btn', 'click', openModal)
+      on('modal-close-btn', 'click', closeModal)
+      if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal() })
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal() })
+
+      if (form) {
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault()
+          if (errorEl) errorEl.classList.remove('visible')
+          if (successEl) successEl.classList.remove('visible')
+          if (submitBtn) submitBtn.disabled = true
+
+          try {
+            await new Promise(function (res) { setTimeout(res, 500) })
+            if (successEl) {
+              successEl.textContent = 'Transfer request sent!'
+              successEl.classList.add('visible')
+            }
+            setTimeout(closeModal, 1200)
+          } catch (err) {
+            if (errorEl) {
+              errorEl.textContent = (err && err.message) || 'Something went wrong.'
+              errorEl.classList.add('visible')
+            }
+            if (submitBtn) submitBtn.disabled = false
+          }
+        })
+      }
+    } catch (e) { console.error('transfer modal init failed', e) }
   </script>
 </body>
 </html>
