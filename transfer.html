@@ -841,10 +841,15 @@
           return
         }
 
-        window.zooUserId = user.id
+                window.zooUserId = user.id
         var meta = user.user_metadata || {}
-        var uname = meta.username || (user.email || 'Member').split('@')[0]
-        var role = (meta.role || 'GUEST')
+
+        var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
+        if (profRes.error) console.error('profiles lookup failed', profRes.error)
+        var profile = profRes && profRes.data
+
+        var uname = (profile && profile.display_name) || meta.username || (user.email || 'Member').split('@')[0]
+        var role = (profile && profile.role) || 'GUEST'
         window.zooUserRole = role
         if ($('user-name')) $('user-name').textContent = uname
         if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
