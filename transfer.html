@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZOO - Transfer</title>
 
-  <!-- ===== VISIBLE ERROR CATCHER (loads first, before anything else) =====
-       On iPad there's no console access, so any JS error that happens
-       anywhere on this page will now show up as a red banner at the top
-       of the screen instead of silently killing everything. -->
+  <!-- ===== VISIBLE ERROR CATCHER (loads first, before anything else) ===== -->
   <script>
     (function () {
       function showError(text) {
@@ -338,7 +335,7 @@
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
       .status-card{ width:78%; top:6%; left:-70%; }
-      .status-open .status-card{ left:11%; width:78%; max-width:none; } /* (100 - 78) / 2 */
+      .status-open .status-card{ left:11%; width:78%; max-width:none; }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
     }
@@ -414,7 +411,7 @@
         <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
         <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
 
-        <div class="status-rows" id="status-rows"><!-- rows injected by renderStatusRows() --></div>
+        <div class="status-rows" id="status-rows"></div>
       </div>
 
     </div>
@@ -439,7 +436,7 @@
           <input type="text" id="alliance-tag" placeholder="e.g. ONE" />
         </div>
 
-        <div id="members-container"><!-- rows injected by renderMembers() --></div>
+        <div id="members-container"></div>
 
         <button type="button" class="add-member-btn" id="add-member-btn" data-i18n="add_member">+ Add Member</button>
 
@@ -453,8 +450,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Small safe helper: never throws if an element is missing, and never
-    // lets one missing/failing element stop the rest of the script.
     function $(id) { return document.getElementById(id) }
     function on(id, evt, fn) {
       var el = $(id)
@@ -464,7 +459,7 @@
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
     }
 
-    // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
+    // ---------- Sidebar toggle ----------
     try {
       function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
       if (isMobile()) document.body.classList.add('sidebar-hidden')
@@ -658,8 +653,6 @@
       { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
     ]
 
-    // Only one admin role now -- role assignment itself stays server-side
-    // (RLS / admin.html), this is purely UI gating.
     function isPrivileged() {
       var role = (window.zooUserRole || '').toUpperCase()
       return role === 'ADMIN'
@@ -793,7 +786,7 @@
           supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
           return true
         } else {
-          console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
+          console.error('Supabase failed to load from the CDN.')
           if (window.showAppError) window.showAppError('SUPABASE CDN FAILED TO LOAD')
           return false
         }
@@ -805,13 +798,6 @@
     }
     initSupabase()
 
-    // Role now comes from the 'profiles' table (RLS-protected, kept in
-    // sync by the Admin & Management page / admin-only trigger) instead
-    // of auth user_metadata, which is set once at signup and never
-    // updates when someone's role changes later. TEMPORARY debug banners
-    // are included below so we can see exactly what's happening on a
-    // device with no console access -- remove the window.showAppError
-    // lines once this is confirmed working.
     async function loadUser() {
       try {
         if (!supabase) initSupabase()
@@ -830,14 +816,7 @@
         var res = await supabase.auth.getUser()
         var user = res && res.data ? res.data.user : null
 
-        // ---- TEMP DEBUG: confirm whether a session exists at all ----
-        if (window.showAppError) {
-          window.showAppError('AUTH CHECK: user = ' + (user ? user.email : 'NULL') + (res.error ? ' | ERROR: ' + res.error.message : ''))
-        }
-
         if (!user) {
-          // No session -- browse and submit as a guest instead of bouncing
-          // to login.html.
           window.zooUserId = null
           window.zooUserRole = 'GUEST'
           if ($('user-name')) $('user-name').textContent = 'Guest'
@@ -852,13 +831,6 @@
         var meta = user.user_metadata || {}
 
         var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
-
-        // ---- TEMP DEBUG: show exactly what the profiles query returned ----
-        if (window.showAppError) {
-          window.showAppError(profRes.error
-            ? 'PROFILE ERROR: ' + profRes.error.message
-            : 'PROFILE RAW: ' + JSON.stringify(profRes.data))
-        }
         if (profRes.error) console.error('profiles lookup failed', profRes.error)
 
         var profile = profRes && profRes.data
@@ -873,7 +845,6 @@
         renderStatusRows()
       } catch (e) {
         console.error('loadUser failed', e)
-        if (window.showAppError) window.showAppError('loadUser CRASHED: ' + e.message)
         window.zooUserRole = 'GUEST'
         if ($('user-name')) $('user-name').textContent = 'Guest'
         if ($('user-role')) $('user-role').textContent = 'GUEST'
@@ -1121,11 +1092,6 @@
             return
           }
 
-          // Guests can submit without an account -- this only needs a
-          // working Supabase client, not a session. Make sure your
-          // Supabase RLS policies on migration_requests / migration_members
-          // grant INSERT to the anon role, or these inserts will fail with
-          // a permission error even though the client connected fine.
           if (!supabase) {
             initSupabase()
           }
