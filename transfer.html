@@ -658,6 +658,22 @@
       { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
     ]
 
+    // NEW: pull current percentages from Supabase before rendering, so
+    // every device/admin session shows the same numbers instead of the
+    // hardcoded defaults above (which were previously never overwritten
+    // on load -- only written TO, never read FROM).
+    async function loadWingStatus() {
+      try {
+        if (!supabase) return
+        var res = await supabase.from('wing_status').select('color, percentage')
+        if (res.error) { console.error('wing_status load failed', res.error); return }
+        (res.data || []).forEach(function (dbRow) {
+          var row = statusRows.find(function (r) { return r.key === dbRow.color })
+          if (row) row.value = dbRow.percentage
+        })
+      } catch (e) { console.error('loadWingStatus failed', e) }
+    }
+
     // Only one admin role now -- role assignment itself stays server-side
     // (RLS / admin.html), this is purely UI gating.
     function isPrivileged() {
@@ -746,7 +762,9 @@
       function openStatusCard() {
         document.querySelector('.transfer-stage').classList.add('status-open')
         if (statusCard) statusCard.setAttribute('aria-hidden', 'false')
-        renderStatusRows()
+        // NEW: refresh from Supabase every time the card is opened, not
+        // just on first page load.
+        loadWingStatus().then(renderStatusRows)
       }
       function closeStatusCard() {
         document.querySelector('.transfer-stage').classList.remove('status-open')
@@ -769,10 +787,10 @@
       on('status-check-btn', 'click', function () {
         var btn = $('status-check-btn')
         if (btn) { btn.disabled = true; btn.style.opacity = '.7' }
-        setTimeout(function () {
+        loadWingStatus().then(function () {
           renderStatusRows()
           if (btn) { btn.disabled = false; btn.style.opacity = '1' }
-        }, 400)
+        })
       })
 
       document.addEventListener('keydown', function (e) {
@@ -787,13 +805,24 @@
     var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
     var supabase = null
 
-    function initSupabase() {
+    // NEW: retry a few times if the CDN hiccups instead of giving up
+    // after a single failed check. Each retry waits 500ms and, if it
+    // succeeds, re-runs loadUser() so the page catches up.
+    function initSupabase(retriesLeft) {
+      retriesLeft = retriesLeft === undefined ? 3 : retriesLeft
       try {
         if (window.supabase) {
           supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
           return true
+        } else if (retriesLeft > 0) {
+          setTimeout(function () {
+            if (initSupabase(retriesLeft - 1)) {
+              loadUser()
+            }
+          }, 500)
+          return false
         } else {
-          console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
+          console.error('Supabase failed to load from the CDN after retries -- login check and logout will not fully work until this loads.')
           if (window.showAppError) window.showAppError('SUPABASE CDN FAILED TO LOAD')
           return false
         }
@@ -823,6 +852,7 @@
           if ($('user-role')) $('user-role').textContent = 'GUEST'
           if ($('user-initial')) $('user-initial').textContent = 'G'
           updateAdminNavVisibility()
+          await loadWingStatus()
           renderStatusRows()
           return
         }
@@ -844,6 +874,7 @@
           if ($('user-role')) $('user-role').textContent = 'GUEST'
           if ($('user-initial')) $('user-initial').textContent = 'G'
           updateAdminNavVisibility()
+          await loadWingStatus()
           renderStatusRows()
           return
         }
@@ -870,6 +901,7 @@
         if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
         if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
         updateAdminNavVisibility()
+        await loadWingStatus()
         renderStatusRows()
       } catch (e) {
         console.error('loadUser failed', e)
@@ -1121,11 +1153,10 @@
             return
           }
 
-          // Guests can submit without an account -- this only needs a
-          // working Supabase client, not a session. Make sure your
-          // Supabase RLS policies on migration_requests / migration_members
-          // grant INSERT to the anon role, or these inserts will fail with
-          // a permission error even though the client connected fine.
+          // Guests can submit without an account by design -- this only
+          // needs a working Supabase client, not a session. The matching
+          // RLS policies granting INSERT to the anon role are required in
+          // Supabase (see migration_requests / migration_members policies).
           if (!supabase) {
             initSupabase()
           }
