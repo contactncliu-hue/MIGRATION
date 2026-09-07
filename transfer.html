@@ -29,8 +29,7 @@
     .menu-toggle{
       position:fixed; top:24px; right:32px; z-index:80;
       width:46px; height:46px; border-radius:12px; border:none; cursor:pointer;
-      background:rgba(255,255,255,.85); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
-      box-shadow:0 2px 8px rgba(0,0,0,.08);
+      background:transparent; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
     }
     .menu-toggle span{ width:22px; height:3px; border-radius:2px; background:#3B5BDB; display:block; transition:transform .25s ease, opacity .25s ease; }
     body.sidebar-hidden .menu-toggle span:nth-child(1){ transform:translateY(8px) rotate(45deg); }
@@ -272,9 +271,29 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
-    const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
+    // Runs first and independently of everything below -- this must never
+    // be blocked by a Supabase/network failure.
+    function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
+    if (isMobile()) document.body.classList.add('sidebar-hidden')
+
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+      document.body.classList.toggle('sidebar-hidden')
+    })
+    document.getElementById('sidebar-backdrop').addEventListener('click', () => {
+      document.body.classList.add('sidebar-hidden')
+    })
+
+    // ---------- Hero entrance reveal ----------
+    // Also independent -- this is why images were stuck invisible before:
+    // a crash earlier in the script meant this line never ran, so the
+    // .stage-ready class (which flips everything from opacity:0) never
+    // got added, even though the images themselves loaded fine.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.querySelector('.transfer-stage').classList.add('stage-ready')
+      })
+    })
 
     const translations = {
       en: {
@@ -347,27 +366,20 @@
 
     applyTranslations()
 
-    // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
-    function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
-    if (isMobile()) document.body.classList.add('sidebar-hidden')
-
-    document.getElementById('menu-toggle').addEventListener('click', () => {
-      document.body.classList.toggle('sidebar-hidden')
-    })
-    document.getElementById('sidebar-backdrop').addEventListener('click', () => {
-      document.body.classList.add('sidebar-hidden')
-    })
-
-    // ---------- Hero entrance reveal (transition-based, not animation
-    // fill-mode -- fill-mode:forwards can silently revert on some mobile
-    // Safari builds, which is why things were vanishing after ~1s) ----------
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.querySelector('.transfer-stage').classList.add('stage-ready')
-      })
-    })
+    // ---------- Supabase (guarded -- a blocked/slow CDN must not break
+    // the sidebar, images, or translations above, which is what was
+    // happening before) ----------
+    const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
+    const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
+    let supabase = null
+    if (window.supabase) {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    } else {
+      console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
+    }
 
     async function loadUser() {
+      if (!supabase) return
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         window.location.href = "login.html"
@@ -388,7 +400,11 @@
     loadUser()
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
-      await supabase.auth.signOut()
+      try {
+        if (supabase) await supabase.auth.signOut()
+      } catch (err) {
+        console.error('Sign out failed:', err)
+      }
       window.location.href = "login.html"
     })
 
