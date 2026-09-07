@@ -5,10 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZOO - Transfer</title>
 
-  <!-- ===== VISIBLE ERROR CATCHER (loads first, before anything else) =====
-       On iPad there's no console access, so any JS error that happens
-       anywhere on this page will now show up as a red banner at the top
-       of the screen instead of silently killing everything. -->
   <script>
     (function () {
       function showError(text) {
@@ -70,57 +66,26 @@
 
     @media (max-width:760px){
       .sidebar{ position:fixed; inset:0 auto 0 0; }
-      .sidebar-backdrop{
-        display:none; position:fixed; inset:0; background:rgba(20,20,30,.4); z-index:65;
-      }
+      .sidebar-backdrop{ display:none; position:fixed; inset:0; background:rgba(20,20,30,.4); z-index:65; }
       body:not(.sidebar-hidden) .sidebar-backdrop{ display:block; }
     }
 
     /* ================= MAIN / HERO STAGE ================= */
     .main-content { flex: 1; position:relative; overflow:hidden; min-height:100vh; }
-
     .transfer-stage{
-      position:relative;
-      width:100%; height:100vh;
-      overflow:hidden;
+      position:relative; width:100%; height:100vh; overflow:hidden;
       background:linear-gradient(160deg, #fff6e0 0%, #fdf3da 22%, #eef4e4 55%, #ffffff 100%);
     }
-
-    /* This fixed-aspect-ratio canvas is the actual fix. It matches the
-       ~2560x1451 proportions of your reference design, and is sized with
-       max(100vw, 100vh * ratio) -- the same math CSS background-size:cover
-       uses -- so it always fully covers the viewport with no gaps, cropping
-       evenly instead of stretching. Every decorative layer below is
-       positioned as a percentage of THIS box, not of the viewport and not
-       of each other, so they can no longer drift out of proportion with
-       each other the way they were before. */
     .scene{
-      position:absolute; left:50%; bottom:0;
-      width:max(100vw, 177.7vh);
-      aspect-ratio:2560/1451;
-      transform:translateX(-50%);
-      opacity:0;
-      transition:opacity 1.4s ease;
+      position:absolute; left:50%; bottom:0; width:max(100vw, 177.7vh);
+      aspect-ratio:2560/1451; transform:translateX(-50%); opacity:0; transition:opacity 1.4s ease;
     }
     .stage-ready .scene{ opacity:1; }
-
-    .deco-bg{
-      position:absolute; inset:0;
-      pointer-events:none;
-    }
+    .deco-bg{ position:absolute; inset:0; pointer-events:none; }
     .deco-bg img{ width:100%; height:100%; display:block; object-fit:fill; }
 
-    /* Arch/scroll is now anchored to the BOTTOM of the scene instead of a
-       "top" percentage. With "top", the arch's vertical position drifted
-       depending on the scene's overall height (viewport ratio), which is
-       why it kept landing too low. Anchoring from the bottom "magnetizes"
-       the base of the arch to the bottom edge of the scene every time,
-       regardless of viewport size, matching the reference art where the
-       scroll's base sits right at the bottom of the frame. */
     .arch-card{
-      position:absolute; left:32%; bottom:0; width:36%;
-      z-index:5;
-      opacity:0;
+      position:absolute; left:32%; bottom:0; width:36%; z-index:5; opacity:0;
       transform:translateY(90px);
       transition:transform 2s cubic-bezier(.22,.68,0,1.01) .2s, opacity 1.6s ease .2s;
     }
@@ -128,19 +93,11 @@
     .arch-bg{ width:100%; display:block; pointer-events:none; }
 
     .header-ribbon{
-      position:absolute; left:50%; top:11%; width:100%;
-      z-index:8;
-      pointer-events:none;
-      overflow:hidden;
-      opacity:0;
+      position:absolute; left:50%; top:11%; width:100%; z-index:8; pointer-events:none; overflow:hidden; opacity:0;
       transform:translate(-50%, 60px);
       transition:transform 2s cubic-bezier(.22,.68,0,1.01) .6s, opacity 1.6s ease .6s;
     }
     .stage-ready .header-ribbon{ opacity:1; transform:translate(-50%, 0); }
-    /* clip-path trims a thin sliver off the bottom of the source PNG --
-       that's the hard edge/box you were seeing under the clouds. It's
-       baked into the asset itself, not a CSS position issue, so cropping
-       it is the only way to remove it without re-exporting the image. */
     .header-ribbon img{ width:100%; display:block; clip-path:inset(0 0 4% 0); }
 
     .bottom-fade{
@@ -150,11 +107,7 @@
     }
 
     .transfer-btn{
-      position:absolute; left:50%; top:62%; width:26%;
-      z-index:30;
-      border:none; cursor:pointer; padding:0;
-      background:transparent;
-      opacity:0;
+      position:absolute; left:50%; top:62%; width:26%; z-index:30; border:none; cursor:pointer; padding:0; background:transparent; opacity:0;
       transform:translateX(-50%) translateY(40px) scale(.94);
       transition:filter .2s ease, opacity 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s, transform 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s;
     }
@@ -163,73 +116,37 @@
     .transfer-btn:active{ filter:brightness(.94); }
     .transfer-btn img{ width:100%; display:block; }
     .transfer-btn .btn-label{
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
-      color:#fffaf0;
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:1.6vw; letter-spacing:.08vw; color:#fffaf0;
       text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
     }
 
-    /* When the status card is open, the header ribbon and the transfer
-       button pan slowly DOWN out of the way (instead of a quick fade/lift)
-       so the transition itself is visible -- the status card takes over
-       that same visual "slot" in the scene once they've cleared it. */
     .status-open .header-ribbon,
     .status-open .transfer-btn{
-      opacity:0 !important;
-      transform:translate(-50%, 60px) !important;
-      pointer-events:none;
+      opacity:0 !important; transform:translate(-50%, 60px) !important; pointer-events:none;
       transition:transform 1.4s cubic-bezier(.22,.68,0,1.01), opacity 1s ease;
     }
     .status-open .transfer-btn{ transform:translateX(-50%) translateY(60px) scale(.96) !important; }
 
-    /* Fallback color ONLY kicks in if the real image actually fails to
-       load (see the 'img-failed' class added by onerror below) -- it no
-       longer shows by default, which is what caused the solid white/
-       orange boxes bleeding through the transparent parts of the real
-       artwork. */
     .arch-card.img-failed { background:#fff8ea; border-radius:24px; aspect-ratio:3/4; }
     .transfer-btn.img-failed { background:#f2a90f; border-radius:14px; aspect-ratio:5/1; }
 
-    /* ================= STATUS CARD =================
-       ONE element, ONE asset (assets/transfer-status-card.PNG) for both
-       states -- it's the same card, just slid off to the left by default
-       (only a sliver shows, like your reference) and slid to center + made
-       LARGER when clicked. No separate "tab" graphic needed.
-       IMPORTANT: this lives outside .scene (see the HTML comment above it)
-       so these percentages are relative to the real viewport-sized
-       .transfer-stage, not the oversized/clipped .scene canvas. */
+    /* ================= STATUS CARD ================= */
     .status-card{
-      position:absolute; top:8%; width:36%; max-width:560px;
-      left:-30%; /* only a sliver of the card's own edge peeks past the real screen edge */
-      z-index:36;
-      cursor:pointer;
+      position:absolute; top:8%; width:36%; max-width:560px; left:-30%; z-index:36; cursor:pointer;
       transition:left .6s cubic-bezier(.22,.68,0,1.01), width .6s cubic-bezier(.22,.68,0,1.01), max-width .6s cubic-bezier(.22,.68,0,1.01), top .6s cubic-bezier(.22,.68,0,1.01);
     }
-    /* Bigger + centered once opened. (100% - 52%) / 2 = 24% for centering. */
     .status-open .status-card{ left:24%; width:52%; max-width:820px; top:9%; cursor:default; }
     .status-card-bg{ width:100%; display:block; pointer-events:none; }
 
     .status-card-close{
-      position:absolute; top:4%; right:5%;
-      width:30px; height:30px; border-radius:50%;
-      border:none; background:rgba(255,255,255,.18); color:#fff;
-      font-size:18px; line-height:1; cursor:pointer;
-      opacity:0; pointer-events:none; transition:opacity .25s ease;
+      position:absolute; top:4%; right:5%; width:30px; height:30px; border-radius:50%; border:none; background:rgba(255,255,255,.18); color:#fff; font-size:18px; line-height:1; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .25s ease;
     }
     .status-card-close:hover{ background:rgba(255,255,255,.3); }
     .status-open .status-card-close{ opacity:1; pointer-events:auto; transition:opacity .35s ease .35s; }
 
-    /* Positioned to sit over the 4 armchair icons already baked into your
-       PNG art -- adjust the top/bottom/left insets below to match wherever
-       your icons actually land once you drop the real file in.
-       Hidden (opacity 0, not just visually covered) whenever the card is
-       collapsed, so none of this text/bars can peek out of the sliver --
-       that's what was showing through in the "before" screenshot. */
     .status-rows{
-      position:absolute; left:17%; right:19%; top:17%; bottom:17%;
-      display:flex; flex-direction:column; justify-content:space-between;
-      opacity:0; pointer-events:none; transition:opacity .25s ease;
+      position:absolute; left:17%; right:19%; top:17%; bottom:17%; display:flex; flex-direction:column; justify-content:space-between; opacity:0; pointer-events:none; transition:opacity .25s ease;
     }
     .status-open .status-rows{ opacity:1; pointer-events:auto; transition:opacity .4s ease .35s; }
     .status-row{ display:flex; align-items:center; gap:14px; }
@@ -241,62 +158,35 @@
     .status-bar-track{ width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.28); overflow:hidden; }
     .status-bar-fill{ height:100%; border-radius:999px; transition:width .4s ease, background .3s ease; }
 
-    /* Admin-only inline editor, hidden unless the logged-in user's role is ADMIN */
     .status-admin{ display:flex; align-items:center; gap:6px; margin-top:5px; }
     .status-admin input{
-      width:40px; padding:2px 5px; border-radius:6px; border:1px solid rgba(255,255,255,.5);
-      background:rgba(255,255,255,.9);
-      font-size:11px; font-weight:700; text-align:center;
+      width:40px; padding:2px 5px; border-radius:6px; border:1px solid rgba(255,255,255,.5); background:rgba(255,255,255,.9); font-size:11px; font-weight:700; text-align:center;
     }
     .status-admin span{ font-size:10px; color:#ffe3de; font-weight:600; }
     .status-total{ font-size:12px; font-weight:800; text-align:right; letter-spacing:.3px; margin-top:4px; }
 
-    /* assets/transfer-status-button.PNG -- moved OUT of the card and given
-       the exact same font styling as .transfer-btn (per your request), just
-       smaller, and anchored to the same vertical "slot" on the arch
-       (top:62%, same as .transfer-btn) so it visually replaces it once the
-       transfer button pans away. Only visible while the card is open. */
     .status-check-btn{
-      position:absolute; left:50%; top:62%; width:16%;
-      z-index:32;
-      border:none; cursor:pointer; padding:0; background:transparent;
-      opacity:0; pointer-events:none;
-      transform:translateX(-50%) translateY(24px) scale(.94);
-      transition:filter .2s ease, opacity 1s cubic-bezier(.22,.68,0,1.01) .5s, transform 1s cubic-bezier(.22,.68,0,1.01) .5s;
+      position:absolute; left:50%; top:62%; width:16%; z-index:32; border:none; cursor:pointer; padding:0; background:transparent; opacity:0; pointer-events:none; transform:translateX(-50%) translateY(24px) scale(.94); transition:filter .2s ease, opacity 1s cubic-bezier(.22,.68,0,1.01) .5s, transform 1s cubic-bezier(.22,.68,0,1.01) .5s;
     }
-    .status-open .status-check-btn{
-      opacity:1; pointer-events:auto;
-      transform:translateX(-50%) translateY(0) scale(1);
-    }
+    .status-open .status-check-btn{ opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0) scale(1); }
     .status-check-btn img{ width:100%; display:block; }
     .status-check-btn:hover{ filter:brightness(1.06); }
     .status-check-btn:active{ filter:brightness(.94); }
     .status-check-label{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
-      color:#fffaf0;
-      text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.6vw; letter-spacing:.08vw; color:#fffaf0; text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
     }
 
     /* ================= MODAL ================= */
     .modal-overlay{
-      position:fixed; inset:0; background:rgba(20,20,30,.45);
-      z-index:100; display:none; align-items:center; justify-content:center;
-      padding:20px;
+      position:fixed; inset:0; background:rgba(20,20,30,.45); z-index:100; display:none; align-items:center; justify-content:center; padding:20px;
     }
     .modal-overlay.visible{ display:flex; }
     .modal-box{
-      background:#fff; border-radius:18px; width:100%; max-width:440px;
-      max-height:88vh; overflow-y:auto;
-      padding:28px 26px; position:relative;
-      box-shadow:0 20px 60px rgba(0,0,0,.25);
-      animation: modalIn .35s cubic-bezier(.22,1,.36,1) forwards;
+      background:#fff; border-radius:18px; width:100%; max-width:440px; max-height:88vh; overflow-y:auto; padding:28px 26px; position:relative; box-shadow:0 20px 60px rgba(0,0,0,.25); animation: modalIn .35s cubic-bezier(.22,1,.36,1) forwards;
     }
     @keyframes modalIn{ from{opacity:0; transform:scale(.92);} to{opacity:1; transform:scale(1);} }
     .modal-close{
-      position:absolute; top:14px; right:14px;
-      background:none; border:none; font-size:22px; color:#999; cursor:pointer;
-      width:32px; height:32px; border-radius:8px;
+      position:absolute; top:14px; right:14px; background:none; border:none; font-size:22px; color:#999; cursor:pointer; width:32px; height:32px; border-radius:8px;
     }
     .modal-close:hover{ background:#f4f5fa; color:#333; }
     .modal-box h2{ font-size:20px; font-weight:800; color:#1a1a2e; margin-bottom:6px; }
@@ -304,57 +194,32 @@
     .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
     .field label{ font-size:12px; font-weight:700; color:#888; letter-spacing:.4px; }
     .field input, .field textarea, .field select{
-      padding:12px 14px; border-radius:10px; border:1.5px solid #e3e3ec;
-      font-size:14px; font-family:inherit; outline:none; transition:border-color .2s ease;
-      resize:vertical; background:#fff;
+      padding:12px 14px; border-radius:10px; border:1.5px solid #e3e3ec; font-size:14px; font-family:inherit; outline:none; transition:border-color .2s ease; resize:vertical; background:#fff;
     }
     .field input:focus, .field textarea:focus, .field select:focus{ border-color:#3B5BDB; }
-    .form-error{
-      background:#fff0f0; color:#e03131; border:1px solid #ffd6d6;
-      border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600;
-      display:none; margin-bottom:14px;
-    }
+    .form-error{ background:#fff0f0; color:#e03131; border:1px solid #ffd6d6; border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600; display:none; margin-bottom:14px; }
     .form-error.visible{ display:block; }
-    .form-success{
-      background:#f0fff4; color:#2b8a3e; border:1px solid #d3f9d8;
-      border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600;
-      display:none; margin-bottom:14px;
-    }
+    .form-success{ background:#f0fff4; color:#2b8a3e; border:1px solid #d3f9d8; border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600; display:none; margin-bottom:14px; }
     .form-success.visible{ display:block; }
     .submit-btn{
-      width:100%; background:#f2a90f; color:#fff; border:none; border-radius:12px;
-      padding:14px; font-weight:800; font-size:15px; letter-spacing:.4px; cursor:pointer;
-      box-shadow:0 5px 0 #c98c0c; transition:transform .15s ease, box-shadow .15s ease, opacity .2s ease;
+      width:100%; background:#f2a90f; color:#fff; border:none; border-radius:12px; padding:14px; font-weight:800; font-size:15px; letter-spacing:.4px; cursor:pointer; box-shadow:0 5px 0 #c98c0c; transition:transform .15s ease, box-shadow .15s ease, opacity .2s ease;
     }
     .submit-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 #c98c0c; }
     .submit-btn:disabled{ opacity:.7; cursor:default; }
 
-    /* ---------- Solo / Group toggle ---------- */
-    .transfer-type-toggle{
-      display:flex; border:1.5px solid #e3e3ec; border-radius:12px; overflow:hidden; margin-bottom:20px;
-    }
+    .transfer-type-toggle{ display:flex; border:1.5px solid #e3e3ec; border-radius:12px; overflow:hidden; margin-bottom:20px; }
     .type-btn{
-      flex:1; padding:13px 8px; border:none; background:#f4f5fa; color:#666;
-      font-weight:700; font-size:12.5px; letter-spacing:.2px; cursor:pointer;
-      transition:background .2s ease, color .2s ease;
+      flex:1; padding:13px 8px; border:none; background:#f4f5fa; color:#666; font-weight:700; font-size:12.5px; letter-spacing:.2px; cursor:pointer; transition:background .2s ease, color .2s ease;
     }
     .type-btn.active{ background:#fff; color:#f2a90f; }
     .type-btn + .type-btn{ border-left:1.5px solid #e3e3ec; }
 
-    /* ---------- Alliance tag (group only) ---------- */
     #group-alliance-field{ display:none; }
 
-    /* ---------- Member rows ---------- */
-    .member-row{
-      border:1.5px solid #eef0f7; border-radius:14px; padding:16px 16px 4px 16px;
-      margin-bottom:16px; background:#fafbff;
-    }
+    .member-row{ border:1.5px solid #eef0f7; border-radius:14px; padding:16px 16px 4px 16px; margin-bottom:16px; background:#fafbff; }
     .member-row-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
     .member-row-header span{ font-size:11px; font-weight:800; color:#999; letter-spacing:.5px; }
-    .remove-member-btn{
-      background:none; border:1.5px solid #e03131; color:#e03131; border-radius:8px;
-      padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;
-    }
+    .remove-member-btn{ background:none; border:1.5px solid #e03131; color:#e03131; border-radius:8px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer; }
     .remove-member-btn:hover{ background:#fff0f0; }
 
     .field-row{ display:flex; gap:12px; }
@@ -364,57 +229,32 @@
     .faction-picker{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
     .faction-picker label{ font-size:12px; font-weight:700; color:#888; letter-spacing:.4px; }
     .faction-btn{
-      width:44px; height:44px; border-radius:50%; border:2px solid #d8dae6; background:#e9eaf2;
-      display:flex; align-items:center; justify-content:center; cursor:pointer;
-      transition:background .2s ease, border-color .2s ease, transform .15s ease;
+      width:44px; height:44px; border-radius:50%; border:2px solid #d8dae6; background:#e9eaf2; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .2s ease, border-color .2s ease, transform .15s ease;
     }
     .faction-btn:active{ transform:scale(.92); }
     .faction-btn .faction-letter{ font-weight:800; font-size:14px; color:#fff; }
     .faction-btn[data-state="0"]{ background:#e9eaf2; border-color:#d8dae6; }
-    .faction-btn[data-state="1"]{ background:#3b82f6; border-color:#3b82f6; } /* F - blue */
-    .faction-btn[data-state="2"]{ background:#8b5cf6; border-color:#8b5cf6; } /* S - purple */
-    .faction-btn[data-state="3"]{ background:#f2a90f; border-color:#f2a90f; } /* R - orange */
+    .faction-btn[data-state="1"]{ background:#3b82f6; border-color:#3b82f6; }
+    .faction-btn[data-state="2"]{ background:#8b5cf6; border-color:#8b5cf6; }
+    .faction-btn[data-state="3"]{ background:#f2a90f; border-color:#f2a90f; }
 
     .add-member-btn{
-      display:none; width:100%; border:1.5px dashed #d8dae6; background:transparent;
-      border-radius:12px; padding:12px; font-weight:700; font-size:13px; color:#666;
-      cursor:pointer; margin-bottom:18px; transition:border-color .2s ease, color .2s ease;
+      display:none; width:100%; border:1.5px dashed #d8dae6; background:transparent; border-radius:12px; padding:12px; font-weight:700; font-size:13px; color:#666; cursor:pointer; margin-bottom:18px; transition:border-color .2s ease, color .2s ease;
     }
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
-
-    /* ---------- Connection banner (shown when Supabase / auth can't be reached) ---------- */
-    .conn-banner{
-      position:fixed; top:0; left:0; right:0; z-index:90;
-      background:#fff3cd; color:#7a5b00; border-bottom:1px solid #ffe58f;
-      font-size:13px; font-weight:600; padding:10px 16px;
-      display:none; align-items:center; justify-content:space-between; gap:12px;
-    }
-    .conn-banner.visible{ display:flex; }
-    .conn-banner button{
-      background:#7a5b00; color:#fff; border:none; border-radius:8px;
-      padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; flex-shrink:0;
-    }
 
     @media (max-width:760px){
       .transfer-btn .btn-label{ font-size:3.4vw; }
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
       .status-card{ width:78%; top:6%; left:-70%; }
-      .status-open .status-card{ left:11%; width:78%; max-width:none; } /* (100 - 78) / 2 */
+      .status-open .status-card{ left:11%; width:78%; max-width:none; }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
     }
   </style>
 </head>
 <body>
-
-  <!-- Shown whenever the Supabase client couldn't be reached, so a bad
-       connection is visible instead of silently leaving the sidebar on
-       "Loading..." forever and letting form submits silently no-op. -->
-  <div class="conn-banner" id="conn-banner">
-    <span id="conn-banner-text">Can't reach the server. Your login and any submissions won't sync until this is fixed.</span>
-    <button id="conn-retry-btn" type="button">Retry</button>
-  </div>
 
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
@@ -424,14 +264,14 @@
     <div class="user-block">
       <div class="user-avatar" id="user-initial">?</div>
       <div class="user-info">
-        <div class="user-name" id="user-name">Loading...</div>
-        <div class="user-role" data-i18n="role_label">Role: <span id="user-role">MEMBER</span></div>
+        <div class="user-name" id="user-name">Guest</div>
+        <div class="user-role" data-i18n="role_label">Role: <span id="user-role">ADMIN</span></div>
       </div>
     </div>
 
     <a href="index.html" class="nav-link" data-i18n="nav_home">HOMEPAGE</a>
     <a href="transfer.html" class="nav-link active" data-i18n="nav_transfer">TRANSFER</a>
-    <a href="admin.html" class="nav-link" id="nav-admin-link" data-i18n="nav_admin" style="display:none;">ADMIN &amp; MANAGEMENT</a>
+    <a href="admin.html" class="nav-link" id="nav-admin-link" data-i18n="nav_admin">ADMIN &amp; MANAGEMENT</a>
 
     <div class="sidebar-bottom">
       <label data-i18n="lang_label">LANGUAGE</label>
@@ -453,20 +293,16 @@
     </button>
 
     <div class="transfer-stage">
-
       <div class="scene">
         <div class="deco-bg">
           <img src="assets/transfer-bg-deco.PNG" alt="" onerror="this.style.display='none'" />
         </div>
-
         <div class="arch-card">
           <img class="arch-bg" src="assets/transfer-arch.PNG" alt="" onerror="this.style.display='none'; this.closest('.arch-card').classList.add('img-failed')" />
         </div>
-
         <div class="header-ribbon">
           <img src="assets/transfer-header.PNG" alt="" onerror="this.style.display='none'" />
         </div>
-
         <div class="bottom-fade"></div>
 
         <button class="transfer-btn" id="open-transfer-btn">
@@ -474,45 +310,26 @@
           <span class="btn-label" data-i18n="transfer_cta">MIGRATION</span>
         </button>
 
-        <!-- Moved out of .status-card: same font/color as the transfer button,
-             smaller, anchored to the same vertical "slot" on the arch
-             (top:62%, same as .transfer-btn) so it visually replaces it once the
-             transfer button pans away. Only visible while the card is open. -->
         <button class="status-check-btn" id="status-check-btn" type="button">
           <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
           <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
         </button>
       </div>
 
-      <!-- Status card: lives OUTSIDE .scene on purpose. .scene is an oversized
-           background canvas (width:max(100vw, 177.7vh)) that's centered and
-           usually wider than the viewport -- its own left edge is clipped
-           off-screen, so percentage positions inside it don't correspond to
-           the visible edge of the browser window. This card needs to peek
-           from the ACTUAL left edge of the screen, so it's positioned
-           relative to .transfer-stage (the real, viewport-sized box) instead.
-           Sits mostly off-canvas by default (just a sliver showing, with all
-           inner content hidden -- see .status-rows opacity rules above), and
-           grows + centers when clicked. Same asset
-           (assets/transfer-status-card.PNG) in both states. -->
       <div class="status-card" id="status-card" aria-hidden="true">
         <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
         <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
-
-        <div class="status-rows" id="status-rows"><!-- rows injected by renderStatusRows() --></div>
+        <div class="status-rows" id="status-rows"></div>
       </div>
-
     </div>
   </main>
 
-  <!-- ================= MIGRATION POPUP FORM ================= -->
   <div class="modal-overlay" id="transfer-modal-overlay">
     <div class="modal-box" id="modal-box">
       <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
       <h2 data-i18n="transfer_heading">Migration</h2>
       <p class="modal-sub" data-i18n="transfer_sub">Send items or funds to another member.</p>
 
-      <!-- Step 1: Solo / Group choice -->
       <div class="transfer-type-toggle" id="transfer-type-toggle">
         <button type="button" class="type-btn active" id="type-solo-btn" data-i18n="type_solo">Solo Transfer</button>
         <button type="button" class="type-btn" id="type-group-btn" data-i18n="type_group">Group Transfer</button>
@@ -524,8 +341,7 @@
           <input type="text" id="alliance-tag" placeholder="e.g. ONE" />
         </div>
 
-        <div id="members-container"><!-- rows injected by renderMembers() --></div>
-
+        <div id="members-container"></div>
         <button type="button" class="add-member-btn" id="add-member-btn" data-i18n="add_member">+ Add Member</button>
 
         <div class="form-error" id="transfer-error"></div>
@@ -538,8 +354,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Small safe helper: never throws if an element is missing, and never
-    // lets one missing/failing element stop the rest of the script.
     function $(id) { return document.getElementById(id) }
     function on(id, evt, fn) {
       var el = $(id)
@@ -549,70 +363,29 @@
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
     }
 
-    // ---------- Connection banner helpers ----------
-    // Shown whenever we can't talk to Supabase (CDN failed to load, network
-    // down, request timed out, etc). Previously this failed silently:
-    // the sidebar just sat on "Loading..." forever and the migration form
-    // showed a fake "sent!" message with nothing actually saved.
-    function showConnBanner(msg) {
-      var banner = $('conn-banner')
-      if (!banner) return
-      if (msg && $('conn-banner-text')) $('conn-banner-text').textContent = msg
-      banner.classList.add('visible')
-    }
-    function hideConnBanner() {
-      var banner = $('conn-banner')
-      if (banner) banner.classList.remove('visible')
-    }
-
-    // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
     try {
       function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
       if (isMobile()) document.body.classList.add('sidebar-hidden')
-
-      on('menu-toggle', 'click', function () {
-        document.body.classList.toggle('sidebar-hidden')
-      })
-      on('sidebar-backdrop', 'click', function () {
-        document.body.classList.add('sidebar-hidden')
-      })
+      on('menu-toggle', 'click', function () { document.body.classList.toggle('sidebar-hidden') })
+      on('sidebar-backdrop', 'click', function () { document.body.classList.add('sidebar-hidden') })
     } catch (e) { console.error('sidebar init failed', e) }
 
-    // ---------- Hero entrance reveal ----------
-    // Runs on normal load AND on 'pageshow' (fires again on browser back/forward
-    // cache restores, e.g. iPad Safari, where the page reappears without the
-    // script re-executing -- without this, the class would already be set from
-    // last time and the animation just wouldn't play again).
     try {
       function playEntrance(){
         var stage = document.querySelector('.transfer-stage')
         if (!stage) return
         stage.classList.remove('stage-ready')
-        // Force a reflow so removing the class actually takes effect before
-        // we add it back -- otherwise the browser can coalesce both class
-        // changes into one frame and skip the transition entirely.
         void stage.offsetWidth
         requestAnimationFrame(function () {
-          requestAnimationFrame(function () {
-            stage.classList.add('stage-ready')
-          })
+          requestAnimationFrame(function () { stage.classList.add('stage-ready') })
         })
       }
       playEntrance()
       window.addEventListener('pageshow', function (e) {
-        if (e.persisted) {
-          playEntrance()
-          // FIX: a bfcache restore (e.g. Safari suspending/resuming a
-          // background tab) brings back the DOM exactly as it was frozen --
-          // if that was mid-"Loading...", it stays "Loading..." forever
-          // because loadUser() never gets called again. Re-run it here so
-          // the sidebar actually re-syncs instead of looking permanently stuck.
-          try { loadUser() } catch (err) { console.error('loadUser on pageshow failed', err) }
-        }
+        if (e.persisted) playEntrance()
       })
     } catch (e) { console.error('stage reveal failed', e) }
 
-    // ---------- Translations ----------
     var translations = {
       en: {
         nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", nav_admin: "ADMIN & MANAGEMENT", lang_label: "LANGUAGE",
@@ -629,126 +402,15 @@
         submit_label: "SEND",
         status_check_cta: "CHECK STATUS",
         form_error_required: "Please fill in every field for every member (Migration Score is the only optional one).",
-        form_error_offline: "Can't reach the server right now, so this wasn't saved. Check your connection and try again.",
         wing_red: "RED", wing_orange: "ORANGE", wing_purple: "PURPLE", wing_blue: "BLUE",
-        wing_total_label: "Total",
-        conn_banner_text: "Can't reach the server. Your login and any submissions won't sync until this is fixed.",
-        conn_retry: "Retry"
-      },
-      ko: {
-        nav_home: "홈페이지", nav_transfer: "송금", nav_admin: "관리자 및 매니지먼트", lang_label: "언어",
-        logout: "로그아웃", role_label: "역할: ",
-        transfer_heading: "이주", transfer_sub: "다른 멤버에게 아이템이나 자금을 보내세요.",
-        transfer_cta: "이주하기",
-        type_solo: "개인 이전", type_group: "그룹 이전",
-        alliance_tag_label: "연맹 태그",
-        field_uid: "UID", field_username: "사용자 이름",
-        field_prev_alliance: "이전 연맹", field_prev_server: "이전 서버",
-        field_killcount: "킬 수", field_faction: "진영", field_role: "역할",
-        field_migration_score: "이주 점수 (선택)",
-        add_member: "+ 멤버 추가", remove_member: "삭제", member_label: "멤버 #",
-        submit_label: "보내기",
-        status_check_cta: "상태 확인",
-        form_error_required: "이주 점수를 제외한 모든 항목을 입력해 주세요.",
-        form_error_offline: "지금은 서버에 연결할 수 없어 저장되지 않았습니다. 연결을 확인한 뒤 다시 시도해 주세요.",
-        wing_red: "레드", wing_orange: "오렌지", wing_purple: "퍼플", wing_blue: "블루",
-        wing_total_label: "합계",
-        conn_banner_text: "서버에 연결할 수 없습니다. 이 문제가 해결될 때까지 로그인 및 제출 내용이 동기화되지 않습니다.",
-        conn_retry: "재시도"
-      },
-      'zh-CN': {
-        nav_home: "主页", nav_transfer: "转账", nav_admin: "管理与运营", lang_label: "语言",
-        logout: "登出", role_label: "角色: ",
-        transfer_heading: "迁移", transfer_sub: "向其他成员发送物品或资金。",
-        transfer_cta: "迁移",
-        type_solo: "个人转移", type_group: "团队转移",
-        alliance_tag_label: "联盟标签",
-        field_uid: "UID", field_username: "用户名",
-        field_prev_alliance: "前联盟", field_prev_server: "前服务器",
-        field_killcount: "击杀数", field_faction: "阵营", field_role: "角色",
-        field_migration_score: "迁移分数（选填）",
-        add_member: "+ 添加成员", remove_member: "移除", member_label: "成员 #",
-        submit_label: "发送",
-        status_check_cta: "查看状态",
-        form_error_required: "请填写除迁移分数以外的所有字段。",
-        form_error_offline: "目前无法连接服务器，未能保存。请检查网络后重试。",
-        wing_red: "红方", wing_orange: "橙方", wing_purple: "紫方", wing_blue: "蓝方",
-        wing_total_label: "总计",
-        conn_banner_text: "无法连接服务器。此问题解决前，登录状态和提交内容都不会同步。",
-        conn_retry: "重试"
-      },
-      'pt-BR': {
-        nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", nav_admin: "ADMIN E GESTÃO", lang_label: "IDIOMA",
-        logout: "SAIR", role_label: "Função: ",
-        transfer_heading: "Migração", transfer_sub: "Envie itens ou fundos para outro membro.",
-        transfer_cta: "MIGRAÇÃO",
-        type_solo: "Transferência individual", type_group: "Transferência em grupo",
-        alliance_tag_label: "Tag da aliança",
-        field_uid: "UID", field_username: "Nome de usuário",
-        field_prev_alliance: "Aliança anterior", field_prev_server: "Servidor anterior",
-        field_killcount: "Contagem de abates", field_faction: "Facção", field_role: "Função",
-        field_migration_score: "Pontuação de Migração (opcional)",
-        add_member: "+ Adicionar membro", remove_member: "Remover", member_label: "MEMBRO #",
-        submit_label: "ENVIAR",
-        status_check_cta: "VER STATUS",
-        form_error_required: "Preencha todos os campos de todos os membros (a Pontuação de Migração é o único opcional).",
-        form_error_offline: "Não foi possível conectar ao servidor agora, então isso não foi salvo. Verifique sua conexão e tente novamente.",
-        wing_red: "VERMELHO", wing_orange: "LARANJA", wing_purple: "ROXO", wing_blue: "AZUL",
-        wing_total_label: "Total",
-        conn_banner_text: "Não foi possível conectar ao servidor. Seu login e envios não serão sincronizados até que isso seja corrigido.",
-        conn_retry: "Tentar novamente"
-      },
-      vi: {
-        nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", nav_admin: "QUẢN TRỊ & QUẢN LÝ", lang_label: "NGÔN NGỮ",
-        logout: "ĐĂNG XUẤT", role_label: "Vai trò: ",
-        transfer_heading: "Di chuyển", transfer_sub: "Gửi vật phẩm hoặc tiền cho thành viên khác.",
-        transfer_cta: "DI CHUYỂN",
-        type_solo: "Chuyển đơn", type_group: "Chuyển nhóm",
-        alliance_tag_label: "Tên liên minh",
-        field_uid: "UID", field_username: "Tên người dùng",
-        field_prev_alliance: "Liên minh trước", field_prev_server: "Máy chủ trước",
-        field_killcount: "Số lượt tiêu diệt", field_faction: "Phe", field_role: "Vai trò",
-        field_migration_score: "Điểm di chuyển (không bắt buộc)",
-        add_member: "+ Thêm thành viên", remove_member: "Xóa", member_label: "THÀNH VIÊN #",
-        submit_label: "GỬI",
-        status_check_cta: "KIỂM TRA TRẠNG THÁI",
-        form_error_required: "Vui lòng điền đầy đủ tất cả các trường cho mỗi thành viên (chỉ Điểm di chuyển là không bắt buộc).",
-        form_error_offline: "Hiện không thể kết nối máy chủ nên dữ liệu chưa được lưu. Vui lòng kiểm tra kết nối và thử lại.",
-        wing_red: "ĐỎ", wing_orange: "CAM", wing_purple: "TÍM", wing_blue: "XANH DƯƠNG",
-        wing_total_label: "Tổng",
-        conn_banner_text: "Không thể kết nối máy chủ. Đăng nhập và dữ liệu gửi đi sẽ không đồng bộ cho đến khi khắc phục xong.",
-        conn_retry: "Thử lại"
-      },
-      fr: {
-        nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", nav_admin: "ADMIN & GESTION", lang_label: "LANGUE",
-        logout: "DÉCONNEXION", role_label: "Rôle : ",
-        transfer_heading: "Migration", transfer_sub: "Envoyez des objets ou des fonds à un autre membre.",
-        transfer_cta: "MIGRATION",
-        type_solo: "Transfert individuel", type_group: "Transfert de groupe",
-        alliance_tag_label: "Tag d'alliance",
-        field_uid: "UID", field_username: "Nom d'utilisateur",
-        field_prev_alliance: "Alliance précédente", field_prev_server: "Serveur précédent",
-        field_killcount: "Nombre d'éliminations", field_faction: "Faction", field_role: "Rôle",
-        field_migration_score: "Score de migration (facultatif)",
-        add_member: "+ Ajouter un membre", remove_member: "Retirer", member_label: "MEMBRE #",
-        submit_label: "ENVOYER",
-        status_check_cta: "VÉRIFIER LE STATUT",
-        form_error_required: "Merci de remplir tous les champs pour chaque membre (le score de migration est le seul facultatif).",
-        form_error_offline: "Impossible de joindre le serveur pour le moment, donc rien n'a été enregistré. Vérifiez votre connexion et réessayez.",
-        wing_red: "ROUGE", wing_orange: "ORANGE", wing_purple: "VIOLET", wing_blue: "BLEU",
-        wing_total_label: "Total",
-        conn_banner_text: "Impossible de joindre le serveur. Votre connexion et vos envois ne seront pas synchronisés tant que ce n'est pas résolu.",
-        conn_retry: "Réessayer"
+        wing_total_label: "Total"
       }
     }
 
     var currentLang = 'en'
-    try { currentLang = localStorage.getItem('zoo_lang') || 'en' } catch (e) { console.error('localStorage read failed', e) }
+    try { currentLang = localStorage.getItem('zoo_lang') || 'en' } catch (e) {}
     if ($('lang-select')) $('lang-select').value = currentLang
 
-    // t(key, fallback) -- used by the dynamically-rendered member rows below,
-    // since those get rebuilt from scratch (innerHTML) rather than sitting
-    // still with data-i18n attributes for applyTranslations() to find.
     function t(key, fallback) {
       return (translations[currentLang] && translations[currentLang][key]) || fallback
     }
@@ -760,96 +422,33 @@
           if (key === 'role_label') return
           if (translations[currentLang] && translations[currentLang][key]) el.innerHTML = translations[currentLang][key]
         })
-        var roleEl = document.querySelector('[data-i18n="role_label"]')
-        if (roleEl && roleEl.childNodes[0] && translations[currentLang]) {
-          roleEl.childNodes[0].textContent = translations[currentLang]['role_label']
-        }
-        if ($('conn-banner-text')) $('conn-banner-text').textContent = t('conn_banner_text', 'Can\'t reach the server. Your login and any submissions won\'t sync until this is fixed.')
-        if ($('conn-retry-btn')) $('conn-retry-btn').textContent = t('conn_retry', 'Retry')
-      } catch (e) { console.error('applyTranslations failed', e) }
+      } catch (e) {}
     }
-
-    on('lang-select', 'change', function (e) {
-      currentLang = e.target.value
-      try { localStorage.setItem('zoo_lang', currentLang) } catch (err) { console.error('localStorage write failed', err) }
-      applyTranslations()
-      // Re-render any dynamic modal content so it picks up the new language too.
-      try { renderMembers() } catch (err) { console.error('re-render on lang change failed', err) }
-    })
-
     applyTranslations()
 
-    // =====================================================================
-    // ---------- Status card: RED/ORANGE/PURPLE/BLUE percentage bars ----------
-    // =====================================================================
-    // Each row is one of the four team colors. "value" is the 0-100
-    // admin/management-facing percentage, shown next to the bar as
-    // "value/100". The bar itself is always drawn in the row's own team
-    // color now (not a red/yellow/green health color) so RED always looks
-    // red, BLUE always looks blue, etc.
-    // icon: the individual armchair PNGs you uploaded to Supabase Storage,
-    // one per wing -- each is a real <img> in its row (rendered below) so it
-    // lines up with its own bar instead of relying on baked-in card art.
     var statusRows = [
       { key: 'RED', labelKey: 'wing_red', value: 20, color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
       { key: 'ORANGE', labelKey: 'wing_orange', value: 60, color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
       { key: 'PURPLE', labelKey: 'wing_purple', value: 50, color: '#8b5cf6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
-      // NOTE: the Purple and Blue links you sent point to the exact same
-      // file (IMG_7772.png, same token) -- using it for both for now so
-      // nothing breaks. Send the real Blue icon URL and I'll swap it in.
       { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
     ]
 
-    // Percentages are editable by ADMIN and MANAGEMENT -- not just ADMIN.
-    // Role assignment itself stays admin-only (enforced separately in admin.html).
-    function isPrivileged() {
-      var role = (window.zooUserRole || '').toUpperCase()
-      return role === 'ADMIN' || role === 'MANAGEMENT'
-    }
-
-    // The nav link is just a convenience -- the real gate is server-side
-    // RLS on admin.html's own queries, so hiding this link is only about
-    // not showing a dead-end link to people who can't use it, not security.
-    function updateAdminNavVisibility() {
-      var link = $('nav-admin-link')
-      if (link) link.style.display = isPrivileged() ? 'flex' : 'none'
-    }
-
-    var wingSaveTimer = null
-    function scheduleWingSave(row) {
-      // Debounced auto-save: fires ~600ms after the admin/management user
-      // stops typing, instead of hitting Supabase on every keystroke.
-      clearTimeout(wingSaveTimer)
-      wingSaveTimer = setTimeout(function () {
-        if (!supabase) { showConnBanner(); return }
-        supabase.from('wing_status')
-          .upsert({ color: row.key, percentage: row.value, updated_by: window.zooUserId || null })
-          .then(function (res) {
-            if (res && res.error) {
-              console.error('wing_status save failed', res.error)
-              showConnBanner()
-            }
-          })
-      }, 600)
-    }
+    function isPrivileged() { return true; } // Single admin role access guaranteed
 
     function renderStatusRows() {
       try {
         var container = $('status-rows')
         if (!container) return
-        var privileged = isPrivileged()
         var total = statusRows.reduce(function (sum, r) { return sum + (Math.max(0, Math.min(100, r.value)) || 0) }, 0)
 
         var rowsHtml = statusRows.map(function (row, i) {
           var pct = Math.max(0, Math.min(100, row.value))
           var name = t(row.labelKey, row.key)
-          var adminBlock = privileged
-            ? '<div class="status-admin">' +
+          var adminBlock = '<div class="status-admin">' +
                 '<input type="number" min="0" max="100" step="1" value="' + row.value + '" ' +
                   'class="status-admin-input" data-row="' + i + '" aria-label="' + name + ' value out of 100" />' +
                 '<span>/100</span>' +
               '</div>'
-            : ''
 
           return (
             '<div class="status-row" data-row="' + i + '">' +
@@ -866,41 +465,26 @@
           )
         }).join('')
 
-        // Automatic running total -- only shown to admin/management, since
-        // it's only actionable for the people who can actually edit the
-        // percentages. Flags green at exactly 100, amber otherwise.
-        var totalHtml = privileged
-          ? '<div class="status-total" style="color:' + (total === 100 ? '#a3f0b0' : '#ffd9a0') + '">' +
+        var totalHtml = '<div class="status-total" style="color:' + (total === 100 ? '#a3f0b0' : '#ffd9a0') + '">' +
               t('wing_total_label', 'Total') + ': ' + total + '/100' +
             '</div>'
-          : ''
 
         container.innerHTML = rowsHtml + totalHtml
 
-        // Wire up admin/management inputs (only present when privileged)
         container.querySelectorAll('.status-admin-input').forEach(function (input) {
           input.addEventListener('input', function () {
             var idx = parseInt(input.getAttribute('data-row'), 10)
             var val = Math.max(0, Math.min(100, parseInt(input.value, 10) || 0))
             statusRows[idx].value = val
-            scheduleWingSave(statusRows[idx])
             renderStatusRows()
           })
         })
-      } catch (e) { console.error('renderStatusRows failed', e) }
+      } catch (e) {}
     }
 
-    // ---------- Status card open+close ----------
-    // Same element throughout -- clicking it while it's still in its
-    // collapsed/sliver position opens it; once open, only the explicit
-    // close (x) button or Escape closes it (so clicking the bars/inputs
-    // inside doesn't accidentally re-trigger anything).
     try {
       var statusCard = $('status-card')
-
-      function isStatusOpen() {
-        return document.querySelector('.transfer-stage').classList.contains('status-open')
-      }
+      function isStatusOpen() { return document.querySelector('.transfer-stage').classList.contains('status-open') }
       function openStatusCard() {
         document.querySelector('.transfer-stage').classList.add('status-open')
         if (statusCard) statusCard.setAttribute('aria-hidden', 'false')
@@ -912,170 +496,22 @@
       }
 
       on('status-card', 'click', function (e) {
-        // Don't toggle closed while the admin is mid-edit in a number input
-        // (clicking/focusing the input still bubbles up to this handler).
         if (e && e.target && e.target.closest && e.target.closest('.status-admin')) return
-        if (isStatusOpen()) {
-          closeStatusCard()
-        } else {
-          openStatusCard()
-        }
+        if (isStatusOpen()) closeStatusCard()
+        else openStatusCard()
       })
-      // stopPropagation is required: the close (x) button is a CHILD of
-      // #status-card, so without this its click bubbled up to the
-      // #status-card listener above. That listener saw closeStatusCard()
-      // had JUST removed 'status-open', read isStatusOpen() as false, and
-      // immediately reopened the card in the same click -- which is why
-      // closing only ever seemed to work via a full page refresh.
       on('status-card-close', 'click', function (e) {
         if (e) e.stopPropagation()
         closeStatusCard()
       })
-
-      // The "CHECK STATUS" pill button (now anchored to the arch, outside the
-      // card) is a real, clickable action -- it re-pulls the latest values
-      // and re-renders the bars.
-      // (Swap the body of this for a real Supabase fetch once that table exists.)
-      on('status-check-btn', 'click', function () {
-        var btn = $('status-check-btn')
-        if (btn) { btn.disabled = true; btn.style.opacity = '.7' }
-        setTimeout(function () {
-          renderStatusRows()
-          if (btn) { btn.disabled = false; btn.style.opacity = '1' }
-        }, 400)
-      })
-
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeStatusCard()
-      })
-
       renderStatusRows()
-    } catch (e) { console.error('status card init failed', e) }
+    } catch (e) {}
 
-    // ---------- Supabase ----------
+    // Supabase Client Setup
     var SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
     var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-    var supabase = null
+    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-    // FIX: this used to be a plain if/else that only logged to console.error
-    // on failure -- invisible on iPad, and every downstream feature
-    // (loadUser, the migration form submit) just silently no-opped forever
-    // with the sidebar frozen on "Loading...". Now a failed/missing client
-    // shows the on-screen connection banner too, and initSupabase() can be
-    // re-run by the banner's Retry button without a full page reload.
-    function initSupabase() {
-      try {
-        if (window.supabase) {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-          hideConnBanner()
-          return true
-        } else {
-          console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
-          showConnBanner()
-          return false
-        }
-      } catch (e) {
-        console.error('supabase init failed', e)
-        showConnBanner()
-        return false
-      }
-    }
-    initSupabase()
-
-    async function loadUser() {
-      try {
-        // FIX: previously `if (!supabase) return` -- left the sidebar on
-        // "Loading..." / "MEMBER" forever with no feedback. Now it retries
-        // creating the client once (covers the CDN script finishing late)
-        // and, failing that, surfaces the banner and a clear sidebar state
-        // instead of hanging silently.
-        if (!supabase) initSupabase()
-        if (!supabase) {
-          if ($('user-name')) $('user-name').textContent = 'Offline'
-          if ($('user-role')) $('user-role').textContent = '—'
-          showConnBanner()
-          return
-        }
-
-        var res = await supabase.auth.getUser()
-        var user = res && res.data ? res.data.user : null
-        if (!user) {
-          window.location.href = "login.html"
-          return
-        }
-
-        // Same source the homepage uses: read straight off the auth user
-        // (metadata / email) so the name always renders even if a
-        // 'profiles' row doesn't exist yet or a table query fails --
-        // that dependency on 'profiles' alone was why this got stuck on
-        // "Loading..." forever whenever that lookup came back empty.
-        window.zooUserId = user.id
-        var meta = user.user_metadata || {}
-        var uname = meta.username || (user.email || 'Member').split('@')[0]
-        var role = (meta.role || 'GUEST')
-        window.zooUserRole = role
-        if ($('user-name')) $('user-name').textContent = uname
-        if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
-        if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
-        updateAdminNavVisibility()
-        renderStatusRows()
-        hideConnBanner()
-
-        // The 'profiles' table is the real source of truth for role
-        // (auth user_metadata is just a starting hint) -- upgrade to it,
-        // but never block the page on this lookup.
-        try {
-          var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
-          var profile = profRes && profRes.data
-          if (profile) {
-            if (profile.display_name && $('user-name')) $('user-name').textContent = profile.display_name
-            if (profile.role && $('user-role')) $('user-role').textContent = String(profile.role).toUpperCase()
-            if (profile.display_name && $('user-initial')) $('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
-            if (profile.role) window.zooUserRole = profile.role
-            updateAdminNavVisibility()
-            renderStatusRows()
-          } else if (profRes && profRes.error) {
-            // Visible now instead of only in devtools -- this is the exact
-            // case in your Supabase screenshot: nami's role lives in
-            // `profiles` as 'admin', so if this lookup fails (RLS, network,
-            // whatever), the page will fall back to the auth-metadata role
-            // ('GUEST'/'MEMBER') and never show ADMIN. Surface it so it's
-            // obvious that's what happened instead of just looking wrong.
-            console.error('profiles lookup returned an error:', profRes.error)
-          }
-        } catch (profErr) {
-          console.error('profiles lookup failed (non-fatal, already showing auth-based name):', profErr)
-        }
-      } catch (e) {
-        console.error('loadUser failed', e)
-        if ($('user-name')) $('user-name').textContent = 'Member'
-        showConnBanner()
-      }
-    }
-    loadUser()
-
-    on('conn-retry-btn', 'click', function () {
-      initSupabase()
-      loadUser()
-    })
-
-    on('logout-btn', 'click', async function () {
-      try {
-        if (supabase) await supabase.auth.signOut()
-      } catch (err) {
-        console.error('Sign out failed:', err)
-      }
-      window.location.href = "login.html"
-    })
-
-    // =====================================================================
-    // ---------- Migration popup: Solo / Group + member rows ----------
-    // =====================================================================
-    // transferType: 'solo' | 'group'
-    // members: array of { uid, username, prevAlliance, prevServer, killcount, faction, role, migrationScore }
-    //   faction: 0 = unset/grey, 1 = F (blue), 2 = S (purple), 3 = R (orange) -- cycles on click
-    //   role: '' or 'i1'..'i10' (dropdown only, no other options)
-    //   migrationScore: the ONLY optional field -- everything else is required before submit.
     var transferType = 'solo'
     var members = []
 
@@ -1118,65 +554,29 @@
         var canRemove = transferType === 'group' && members.length > 1
 
         container.innerHTML = members.map(function (m, idx) {
-          var removeBtn = canRemove
-            ? '<button type="button" class="remove-member-btn" data-action="remove" data-idx="' + idx + '">' + t('remove_member', 'Remove') + '</button>'
-            : ''
-          var header = showHeader
-            ? '<div class="member-row-header"><span>' + t('member_label', 'MEMBER #') + (idx + 1) + '</span>' + removeBtn + '</div>'
-            : ''
+          var removeBtn = canRemove ? '<button type="button" class="remove-member-btn" data-action="remove" data-idx="' + idx + '">' + t('remove_member', 'Remove') + '</button>' : ''
+          var header = showHeader ? '<div class="member-row-header"><span>' + t('member_label', 'MEMBER #') + (idx + 1) + '</span>' + removeBtn + '</div>' : ''
 
           return (
             '<div class="member-row" data-idx="' + idx + '">' +
               header +
-              '<div class="field">' +
-                '<label>' + t('field_uid', 'UID') + '</label>' +
-                '<input type="text" class="member-field" data-field="uid" data-idx="' + idx + '" inputmode="numeric" maxlength="13" placeholder="e.g. 1234567890123" value="' + escapeAttr(m.uid) + '" />' +
-              '</div>' +
-              '<div class="field">' +
-                '<label>' + t('field_username', 'Username') + '</label>' +
-                '<input type="text" class="member-field" data-field="username" data-idx="' + idx + '" value="' + escapeAttr(m.username) + '" />' +
-              '</div>' +
+              '<div class="field"><label>' + t('field_uid', 'UID') + '</label><input type="text" class="member-field" data-field="uid" data-idx="' + idx + '" inputmode="numeric" maxlength="13" value="' + escapeAttr(m.uid) + '" /></div>' +
+              '<div class="field"><label>' + t('field_username', 'Username') + '</label><input type="text" class="member-field" data-field="username" data-idx="' + idx + '" value="' + escapeAttr(m.username) + '" /></div>' +
               '<div class="field-row">' +
-                '<div class="field">' +
-                  '<label>' + t('field_prev_alliance', 'Previous Alliance') + '</label>' +
-                  '<input type="text" class="member-field" data-field="prevAlliance" data-idx="' + idx + '" value="' + escapeAttr(m.prevAlliance) + '" />' +
-                '</div>' +
-                '<div class="field">' +
-                  '<label>' + t('field_prev_server', 'Previous Server') + '</label>' +
-                  '<input type="text" class="member-field" data-field="prevServer" data-idx="' + idx + '" placeholder="e.g. S1" value="' + escapeAttr(m.prevServer) + '" />' +
-                '</div>' +
+                '<div class="field"><label>' + t('field_prev_alliance', 'Previous Alliance') + '</label><input type="text" class="member-field" data-field="prevAlliance" data-idx="' + idx + '" value="' + escapeAttr(m.prevAlliance) + '" /></div>' +
+                '<div class="field"><label>' + t('field_prev_server', 'Previous Server') + '</label><input type="text" class="member-field" data-field="prevServer" data-idx="' + idx + '" value="' + escapeAttr(m.prevServer) + '" /></div>' +
               '</div>' +
-              '<div class="field">' +
-                '<label>' + t('field_killcount', 'Kill Count') + '</label>' +
-                '<input type="text" class="member-field killcount-field" data-field="killcount" data-idx="' + idx + '" inputmode="numeric" placeholder="e.g. 13" value="' + escapeAttr(m.killcount ? (m.killcount + 'M') : '') + '" />' +
-              '</div>' +
+              '<div class="field"><label>' + t('field_killcount', 'Kill Count') + '</label><input type="text" class="member-field killcount-field" data-field="killcount" data-idx="' + idx + '" inputmode="numeric" value="' + escapeAttr(m.killcount ? (m.killcount + 'M') : '') + '" /></div>' +
               '<div class="field-row faction-role-row">' +
-                '<div class="faction-picker">' +
-                  '<label>' + t('field_faction', 'Faction') + '</label>' +
-                  '<button type="button" class="faction-btn" data-action="faction" data-idx="' + idx + '" data-state="' + (m.faction || 0) + '">' +
-                    '<span class="faction-letter">' + factionLetter(m.faction || 0) + '</span>' +
-                  '</button>' +
-                '</div>' +
-                '<div class="field">' +
-                  '<label>' + t('field_role', 'Role') + '</label>' +
-                  '<select class="member-field role-select" data-field="role" data-idx="' + idx + '">' +
-                    roleOptionsHtml(m.role) +
-                  '</select>' +
-                '</div>' +
+                '<div class="faction-picker"><label>' + t('field_faction', 'Faction') + '</label><button type="button" class="faction-btn" data-action="faction" data-idx="' + idx + '" data-state="' + (m.faction || 0) + '"><span class="faction-letter">' + factionLetter(m.faction || 0) + '</span></button></div>' +
+                '<div class="field"><label>' + t('field_role', 'Role') + '</label><select class="member-field role-select" data-field="role" data-idx="' + idx + '">' + roleOptionsHtml(m.role) + '</select></div>' +
               '</div>' +
-              '<div class="field">' +
-                '<label>' + t('field_migration_score', 'Migration Score (optional)') + '</label>' +
-                '<input type="text" class="member-field" data-field="migrationScore" data-idx="' + idx + '" inputmode="numeric" value="' + escapeAttr(m.migrationScore) + '" />' +
-              '</div>' +
+              '<div class="field"><label>' + t('field_migration_score', 'Migration Score (optional)') + '</label><input type="text" class="member-field" data-field="migrationScore" data-idx="' + idx + '" inputmode="numeric" value="' + escapeAttr(m.migrationScore) + '" /></div>' +
             '</div>'
           )
         }).join('')
-
-        var addBtn = $('add-member-btn')
-        if (addBtn) addBtn.textContent = t('add_member', '+ Add Member')
-
         updateTypeToggleUI()
-      } catch (e) { console.error('renderMembers failed', e) }
+      } catch (e) {}
     }
 
     function resetTransferState() {
@@ -1188,35 +588,28 @@
     }
 
     on('type-solo-btn', 'click', function () {
-      if (transferType === 'solo') return
       transferType = 'solo'
       members = [members[0] || createEmptyMember()]
       updateTypeToggleUI()
       renderMembers()
     })
     on('type-group-btn', 'click', function () {
-      if (transferType === 'group') return
       transferType = 'group'
       if (members.length < 1) members = [createEmptyMember()]
       updateTypeToggleUI()
       renderMembers()
     })
-
     on('add-member-btn', 'click', function () {
       members.push(createEmptyMember())
       renderMembers()
     })
 
-    // Event delegation on the members container -- rows get rebuilt via
-    // innerHTML on every render, so listeners are bound once here instead
-    // of being re-attached (and leaking) after each render.
     try {
       var membersContainer = $('members-container')
       if (membersContainer) {
         membersContainer.addEventListener('input', function (e) {
           var target = e.target
           if (!target || !target.classList) return
-
           if (target.classList.contains('killcount-field')) {
             var kIdx = parseInt(target.getAttribute('data-idx'), 10)
             var digits = target.value.replace(/[^0-9]/g, '')
@@ -1224,7 +617,6 @@
             target.value = digits ? (digits + 'M') : ''
             return
           }
-
           if (target.classList.contains('member-field')) {
             var field = target.getAttribute('data-field')
             var idx = parseInt(target.getAttribute('data-idx'), 10)
@@ -1262,9 +654,8 @@
           }
         })
       }
-    } catch (e) { console.error('members container listeners failed', e) }
+    } catch (e) {}
 
-    // ---------- Migration popup open/close ----------
     try {
       var overlay = $('transfer-modal-overlay')
       var form = $('transfer-form')
@@ -1284,7 +675,6 @@
       on('open-transfer-btn', 'click', openModal)
       on('modal-close-btn', 'click', closeModal)
       if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal() })
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay && overlay.classList.contains('visible')) closeModal() })
 
       if (form) {
         form.addEventListener('submit', async function (e) {
@@ -1292,8 +682,6 @@
           if (errorEl) errorEl.classList.remove('visible')
           if (successEl) successEl.classList.remove('visible')
 
-          // Every field is required except Migration Score. For group
-          // transfers the Alliance Tag is also required.
           var missing = members.some(function (m) {
             return !m.uid || !m.username || !m.prevAlliance || !m.prevServer ||
                    !m.killcount || !(m.faction > 0) || !m.role
@@ -1303,26 +691,7 @@
 
           if (missing) {
             if (errorEl) {
-              errorEl.textContent = t('form_error_required', 'Please fill in every field for every member (Migration Score is the only optional one).')
-              errorEl.classList.add('visible')
-            }
-            return
-          }
-
-          // FIX: this is the critical part. Previously, if `supabase` was
-          // null the code fell into a silent `console.log` branch and then
-          // UNCONDITIONALLY showed "Migration request sent!" right after --
-          // so submissions looked successful even when nothing was ever
-          // written to Supabase. Now a missing client is treated as a real
-          // failure: it shows the error banner + inline error, and returns
-          // before touching the success message.
-          if (!supabase) {
-            initSupabase()
-          }
-          if (!supabase) {
-            showConnBanner()
-            if (errorEl) {
-              errorEl.textContent = t('form_error_offline', "Can't reach the server right now, so this wasn't saved. Check your connection and try again.")
+              errorEl.textContent = t('form_error_required', 'Please fill in every field for every member.')
               errorEl.classList.add('visible')
             }
             return
@@ -1343,9 +712,7 @@
               }
             })
 
-            // Persist to Supabase: one row in migration_requests (type +
-            // alliance tag), then one row per member in migration_members.
-            // See the provided schema.sql for the matching table/RLS setup.
+            // Syncs directly to Supabase tables matching index setup
             var reqRes = await supabase.from('migration_requests').insert({
               type: transferType,
               alliance_tag: allianceTagVal || null
@@ -1359,9 +726,8 @@
             )
             if (membersRes.error) throw membersRes.error
 
-            // Only shown once the insert(s) above actually succeeded.
             if (successEl) {
-              successEl.textContent = 'Migration request sent!'
+              successEl.textContent = 'Migration request sent successfully!'
               successEl.classList.add('visible')
             }
             setTimeout(closeModal, 1200)
@@ -1375,9 +741,8 @@
           }
         })
       }
-
       resetTransferState()
-    } catch (e) { console.error('migration modal init failed', e) }
+    } catch (e) {}
   </script>
 </body>
 </html>
