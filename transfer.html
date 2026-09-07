@@ -490,16 +490,8 @@
     }
 
     // ---------- Connection banner helpers ----------
-    function showConnBanner(msg) {
-      var banner = $('conn-banner')
-      if (!banner) return
-      if (msg && $('conn-banner-text')) $('conn-banner-text').textContent = msg
-      banner.classList.add('visible')
-    }
-    function hideConnBanner() {
-      var banner = $('conn-banner')
-      if (banner) banner.classList.remove('visible')
-    }
+        function showConnBanner(msg) { /* disabled: no user-facing connection errors */ }
+    function hideConnBanner() { }
 
     // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
     try {
@@ -873,10 +865,7 @@
     async function loadUser() {
       try {
         if (!supabase) initSupabase()
-        if (!supabase) {
-          if ($('user-name')) $('user-name').textContent = 'Offline'
-          if ($('user-role')) $('user-role').textContent = '—'
-          showConnBanner()
+                if (!supabase) {
           return
         }
 
@@ -909,16 +898,8 @@
         renderStatusRows()
         hideConnBanner()
 
-        // Background token re-validation against the server (still useful
-        // to catch a revoked/expired session), but now wrapped in its own
-        // timeout and non-blocking -- it can never freeze the page again.
-        withTimeout(supabase.auth.getUser(), 8000).then(function (res) {
-          var freshUser = res && res.data ? res.data.user : null
-          if (!freshUser) window.location.href = "login.html"
-        }).catch(function (err) {
-          console.error('background getUser revalidation failed/timed out (non-fatal)', err)
-        })
-
+                // (background re-validation removed — it was redirecting to login
+        // on transient network blips even with a valid session)
         // The 'profiles' table is the real source of truth for role
         // (auth user_metadata is just a starting hint) -- upgrade to it,
         // wrapped in a timeout so a stalled query can't block the page.
@@ -945,10 +926,8 @@
         } catch (profErr) {
           console.error('profiles lookup failed/timed out (non-fatal, already showing auth-based name):', profErr)
         }
-      } catch (e) {
+            } catch (e) {
         console.error('loadUser failed', e)
-        if ($('user-name')) $('user-name').textContent = 'Member'
-        showConnBanner()
       }
     }
     loadUser()
@@ -1201,12 +1180,10 @@
           if (!supabase) {
             initSupabase()
           }
+                    if (!supabase) {
+            initSupabase()
+          }
           if (!supabase) {
-            showConnBanner()
-            if (errorEl) {
-              errorEl.textContent = t('form_error_offline', "Can't reach the server right now, so this wasn't saved. Check your connection and try again.")
-              errorEl.classList.add('visible')
-            }
             return
           }
 
@@ -1256,11 +1233,7 @@
               successEl.classList.add('visible')
             }
             setTimeout(closeModal, 1200)
-          } catch (err) {
-            if (errorEl) {
-              errorEl.textContent = (err && err.message) || 'Something went wrong.'
-              errorEl.classList.add('visible')
-            }
+          }          } catch (err) {
             console.error('migration submit failed', err)
           } finally {
             if (submitBtn) submitBtn.disabled = false
