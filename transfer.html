@@ -226,12 +226,13 @@
        collapsed, so none of this text/bars can peek out of the sliver --
        that's what was showing through in the "before" screenshot. */
     .status-rows{
-      position:absolute; left:34%; right:9%; top:14%; bottom:12%;
+      position:absolute; left:8%; right:8%; top:10%; bottom:10%;
       display:flex; flex-direction:column; justify-content:space-between;
       opacity:0; pointer-events:none; transition:opacity .25s ease;
     }
     .status-open .status-rows{ opacity:1; pointer-events:auto; transition:opacity .4s ease .35s; }
-    .status-row{ display:flex; align-items:center; gap:10px; }
+    .status-row{ display:flex; align-items:center; gap:14px; }
+    .status-row-icon{ width:34px; height:34px; object-fit:contain; flex-shrink:0; }
     .status-row-body{ flex:1; min-width:0; }
     .status-row-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
     .status-row-name{ font-size:12px; font-weight:700; color:#fff0ec; letter-spacing:.3px; }
@@ -592,13 +593,19 @@
     // Each row lines up with one of the 4 armchair icons already baked into
     // assets/transfer-status-card.PNG -- we only render the bar + percentage
     // (and, for admins, the input), not the icon itself.
-    // "value" is on a 0-10 admin-facing scale (matches the "0/10" scale
-    // requested); the displayed percentage and bar fill are value * 10.
+    // "value" is now a direct 0-100 admin-facing number, shown next to each
+    // bar as "value/100" -- simpler than the old 0-10-scaled-to-percent model.
+    // icon: the individual armchair PNGs you uploaded to Supabase Storage,
+    // one per wing -- each is a real <img> in its row (rendered below) so it
+    // lines up with its own bar instead of relying on baked-in card art.
     var statusRows = [
-      { key: 'wing-a', name: 'Wing A', value: 2 },
-      { key: 'wing-b', name: 'Wing B', value: 6 },
-      { key: 'wing-c', name: 'Wing C', value: 5 },
-      { key: 'wing-d', name: 'Wing D', value: 9 }
+      { key: 'wing-a', name: 'Wing A', value: 20, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
+      { key: 'wing-b', name: 'Wing B', value: 60, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
+      { key: 'wing-c', name: 'Wing C', value: 50, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
+      // NOTE: the Purple and Blue links you sent point to the exact same
+      // file (IMG_7772.png, same token) -- using it for both for now so
+      // nothing breaks. Send the real Blue icon URL and I'll swap it in.
+      { key: 'wing-d', name: 'Wing D', value: 90, icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
     ]
 
     // 0-54 -> slightly dark red, 55-74 -> yellow, 75-100 -> pastel mossy green
@@ -620,22 +627,23 @@
         var admin = isAdmin()
 
         container.innerHTML = statusRows.map(function (row, i) {
-          var pct = Math.max(0, Math.min(10, row.value)) * 10
+          var pct = Math.max(0, Math.min(100, row.value))
           var color = barColorForPercent(pct)
           var adminBlock = admin
             ? '<div class="status-admin">' +
-                '<input type="number" min="0" max="10" step="1" value="' + row.value + '" ' +
-                  'class="status-admin-input" data-row="' + i + '" aria-label="' + row.name + ' value out of 10" />' +
-                '<span>/10 (admin)</span>' +
+                '<input type="number" min="0" max="100" step="1" value="' + row.value + '" ' +
+                  'class="status-admin-input" data-row="' + i + '" aria-label="' + row.name + ' value out of 100" />' +
+                '<span>/100 (admin)</span>' +
               '</div>'
             : ''
 
           return (
             '<div class="status-row" data-row="' + i + '">' +
+              (row.icon ? '<img class="status-row-icon" src="' + row.icon + '" alt="' + row.name + ' icon" onerror="this.style.display=\'none\'" />' : '') +
               '<div class="status-row-body">' +
                 '<div class="status-row-top">' +
                   '<span class="status-row-name">' + row.name + '</span>' +
-                  '<span class="status-percent">' + pct + '%</span>' +
+                  '<span class="status-percent">' + pct + '/100</span>' +
                 '</div>' +
                 '<div class="status-bar-track"><div class="status-bar-fill" style="width:' + pct + '%; background:' + color + ';"></div></div>' +
                 adminBlock +
@@ -648,7 +656,7 @@
         container.querySelectorAll('.status-admin-input').forEach(function (input) {
           input.addEventListener('input', function () {
             var idx = parseInt(input.getAttribute('data-row'), 10)
-            var val = Math.max(0, Math.min(10, parseInt(input.value, 10) || 0))
+            var val = Math.max(0, Math.min(100, parseInt(input.value, 10) || 0))
             statusRows[idx].value = val
             // TODO: once wired to Supabase, persist this the same way the
             // transfer form will -- e.g. supabase.from('wing_status').upsert(...)
@@ -679,10 +687,26 @@
         if (statusCard) statusCard.setAttribute('aria-hidden', 'true')
       }
 
-      on('status-card', 'click', function () {
-        if (!isStatusOpen()) openStatusCard()
+      on('status-card', 'click', function (e) {
+        // Don't toggle closed while the admin is mid-edit in a number input
+        // (clicking/focusing the input still bubbles up to this handler).
+        if (e && e.target && e.target.closest && e.target.closest('.status-admin')) return
+        if (isStatusOpen()) {
+          closeStatusCard()
+        } else {
+          openStatusCard()
+        }
       })
-      on('status-card-close', 'click', closeStatusCard)
+      // stopPropagation is required: the close (x) button is a CHILD of
+      // #status-card, so without this its click bubbled up to the
+      // #status-card listener above. That listener saw closeStatusCard()
+      // had JUST removed 'status-open', read isStatusOpen() as false, and
+      // immediately reopened the card in the same click -- which is why
+      // closing only ever seemed to work via a full page refresh.
+      on('status-card-close', 'click', function (e) {
+        if (e) e.stopPropagation()
+        closeStatusCard()
+      })
 
       // The "CHECK STATUS" pill button (now anchored to the arch, outside the
       // card) is a real, clickable action -- it re-pulls the latest values
