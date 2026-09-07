@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZOO - Transfer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; background: #f4f5fa; overflow-x:hidden; }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar { width: 240px; min-width:240px; background: #fff; border-right: 1px solid #eee; display: flex; flex-direction: column; padding: 24px 0; transition:margin-left .35s ease, opacity .35s ease; z-index:70; }
+    body.sidebar-hidden .sidebar{ margin-left:-240px; opacity:0; pointer-events:none; }
+    .sidebar-backdrop{ display:none; }
+    .sidebar .logo-img { width: 70px; margin: 0 auto 20px auto; display: block; }
+    .user-block { display: flex; align-items: center; gap: 12px; padding: 0 20px 20px 20px; border-bottom: 1px solid #eee; margin-bottom: 12px; }
+    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #3B5BDB; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+    .user-info .user-name { font-weight: 700; font-size: 14px; color: #1a1a2e; }
+    .user-info .user-role { font-size: 12px; color: #888; }
+    .nav-link { display: flex; align-items: center; gap: 10px; padding: 14px 20px; color: #444; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 0.3px; }
+    .nav-link:hover { background: #f4f5fa; }
+    .nav-link.active { background: #3B5BDB; color: white; }
+    .sidebar-bottom { margin-top: auto; padding: 16px 20px 0 20px; border-top: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; }
+    .sidebar-bottom label { font-size: 11px; font-weight: 700; color: #999; letter-spacing: 0.5px; }
+    .lang-select { padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .logout-btn { background: none; border: 1.5px solid #e03131; color: #e03131; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; }
+    .logout-btn:hover { background: #fff0f0; }
+
+    .menu-toggle{
+      position:fixed; top:24px; right:32px; z-index:80;
+      width:46px; height:46px; border-radius:12px; border:none; cursor:pointer;
+      background:rgba(255,255,255,.85); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+      box-shadow:0 2px 8px rgba(0,0,0,.08);
+    }
+    .menu-toggle span{ width:22px; height:3px; border-radius:2px; background:#3B5BDB; display:block; transition:transform .25s ease, opacity .25s ease; }
+    body.sidebar-hidden .menu-toggle span:nth-child(1){ transform:translateY(8px) rotate(45deg); }
+    body.sidebar-hidden .menu-toggle span:nth-child(2){ opacity:0; }
+    body.sidebar-hidden .menu-toggle span:nth-child(3){ transform:translateY(-8px) rotate(-45deg); }
+
+    @media (max-width:760px){
+      .sidebar{ position:fixed; inset:0 auto 0 0; }
+      .sidebar-backdrop{
+        display:none; position:fixed; inset:0; background:rgba(20,20,30,.4); z-index:65;
+      }
+      body:not(.sidebar-hidden) .sidebar-backdrop{ display:block; }
+    }
+
+    /* ================= MAIN / HERO STAGE ================= */
+    .main-content { flex: 1; position:relative; overflow:hidden; min-height:100vh; }
+
+    .transfer-stage{
+      position:relative;
+      width:100%; min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      /* very light yellow-orange, through a soft green, to white */
+      background:linear-gradient(160deg, #fff6e0 0%, #fdf3da 22%, #eef4e4 55%, #ffffff 100%);
+    }
+
+    /* background decoration: stars + gold streak + mountain, spread across
+       the full stage as a backdrop rather than crammed into one corner */
+    .deco-bg{
+      position:absolute; inset:0; z-index:1;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 1.2s ease-out;
+    }
+    .stage-ready .deco-bg{ opacity:1; }
+    .deco-bg img{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover; object-position:center right;
+    }
+
+    /* the arch card itself */
+    .arch-card{
+      position:relative;
+      width:480px; max-width:80vw;
+      z-index:5;
+      opacity:0; transform:scale(.85);
+      transition:opacity 1s cubic-bezier(.22,1,.36,1) .1s, transform 1s cubic-bezier(.22,1,.36,1) .1s;
+    }
+    .stage-ready .arch-card{ opacity:1; transform:scale(1); }
+    .arch-bg{ width:100%; display:block; pointer-events:none; }
+
+    /* header ornament + draping ribbon, overlaid above/through the arch */
+    .header-ribbon{
+      position:absolute; left:50%; top:-9%;
+      width:148%; max-width:720px;
+      transform:translateX(-50%) scale(.5);
+      z-index:8;
+      opacity:0;
+      transition:opacity 1.6s cubic-bezier(.34,1.56,.64,1) .35s, transform 1.6s cubic-bezier(.34,1.56,.64,1) .35s;
+      pointer-events:none;
+    }
+    .stage-ready .header-ribbon{ opacity:1; transform:translateX(-50%) scale(1); }
+    .header-ribbon img{ width:100%; display:block; }
+
+    /* bottom fade: sits above the arch/ribbon, below the button */
+    .bottom-fade{
+      position:absolute; left:0; right:0; bottom:0; height:24%;
+      background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.85) 65%, #f4f5fa 100%);
+      z-index:20; pointer-events:none;
+    }
+
+    /* the clickable transfer button -- topmost layer, pops in last */
+    .transfer-btn{
+      position:absolute; left:50%; top:53%;
+      width:64%;
+      transform:translate(-50%, -50%) scale(.4);
+      z-index:30;
+      border:none; cursor:pointer; padding:0;
+      background:transparent;
+      opacity:0;
+      transition:opacity 1.8s cubic-bezier(.34,1.56,.64,1) .8s, transform 1.8s cubic-bezier(.34,1.56,.64,1) .8s, filter .2s ease;
+    }
+    .stage-ready .transfer-btn{ opacity:1; transform:translate(-50%, -50%) scale(1); }
+    .transfer-btn:hover{ filter:brightness(1.06); }
+    .transfer-btn:active{ filter:brightness(.94); }
+    .transfer-btn img{ width:100%; display:block; }
+    .transfer-btn .btn-label{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:17px; letter-spacing:1px;
+      color:#2c3562;
+    }
+
+    /* ================= MODAL ================= */
+    .modal-overlay{
+      position:fixed; inset:0; background:rgba(20,20,30,.45);
+      z-index:100; display:none; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .modal-overlay.visible{ display:flex; }
+    .modal-box{
+      background:#fff; border-radius:18px; width:100%; max-width:400px;
+      padding:28px 26px; position:relative;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+      animation: modalIn .35s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @keyframes modalIn{ from{opacity:0; transform:scale(.92);} to{opacity:1; transform:scale(1);} }
+    .modal-close{
+      position:absolute; top:14px; right:14px;
+      background:none; border:none; font-size:22px; color:#999; cursor:pointer;
+      width:32px; height:32px; border-radius:8px;
+    }
+    .modal-close:hover{ background:#f4f5fa; color:#333; }
+    .modal-box h2{ font-size:20px; font-weight:800; color:#1a1a2e; margin-bottom:6px; }
+    .modal-sub{ font-size:13px; color:#888; margin-bottom:20px; }
+    .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .field label{ font-size:12px; font-weight:700; color:#888; letter-spacing:.4px; }
+    .field input, .field textarea{
+      padding:12px 14px; border-radius:10px; border:1.5px solid #e3e3ec;
+      font-size:14px; font-family:inherit; outline:none; transition:border-color .2s ease;
+      resize:vertical;
+    }
+    .field input:focus, .field textarea:focus{ border-color:#3B5BDB; }
+    .form-error{
+      background:#fff0f0; color:#e03131; border:1px solid #ffd6d6;
+      border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600;
+      display:none; margin-bottom:14px;
+    }
+    .form-error.visible{ display:block; }
+    .form-success{
+      background:#f0fff4; color:#2b8a3e; border:1px solid #d3f9d8;
+      border-radius:10px; padding:10px 12px; font-size:13px; font-weight:600;
+      display:none; margin-bottom:14px;
+    }
+    .form-success.visible{ display:block; }
+    .submit-btn{
+      width:100%; background:#f2a90f; color:#fff; border:none; border-radius:12px;
+      padding:14px; font-weight:800; font-size:15px; letter-spacing:.4px; cursor:pointer;
+      box-shadow:0 5px 0 #c98c0c; transition:transform .15s ease, box-shadow .15s ease, opacity .2s ease;
+    }
+    .submit-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 #c98c0c; }
+    .submit-btn:disabled{ opacity:.7; cursor:default; }
+
+    @media (max-width:760px){
+      .arch-card{ width:88vw; }
+      .transfer-btn .btn-label{ font-size:15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <aside class="sidebar">
+    <img src="assets/logo.png.PNG" alt="Logo" class="logo-img" />
+
+    <div class="user-block">
+      <div class="user-avatar" id="user-initial">?</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name">Loading...</div>
+        <div class="user-role" data-i18n="role_label">Role: <span id="user-role">MEMBER</span></div>
+      </div>
+    </div>
+
+    <a href="index.html" class="nav-link" data-i18n="nav_home">HOMEPAGE</a>
+    <a href="transfer.html" class="nav-link active" data-i18n="nav_transfer">TRANSFER</a>
+
+    <div class="sidebar-bottom">
+      <label data-i18n="lang_label">LANGUAGE</label>
+      <select class="lang-select" id="lang-select">
+        <option value="en">🇺🇸 English</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="pt-BR">🇧🇷 Português (BR)</option>
+        <option value="vi">🇻🇳 Tiếng Việt</option>
+        <option value="ko">🇰🇷 한국어</option>
+        <option value="zh-CN">🇨🇳 中文（简体）</option>
+      </select>
+      <button class="logout-btn" id="logout-btn" data-i18n="logout">LOG OUT</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle sidebar">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="transfer-stage">
+
+      <div class="deco-bg">
+        <img src="assets/transfer-bg-deco.PNG" alt="" />
+      </div>
+
+      <div class="arch-card">
+        <img class="arch-bg" src="assets/transfer-arch.PNG" alt="" />
+
+        <div class="header-ribbon">
+          <img src="assets/transfer-header.PNG" alt="" />
+        </div>
+
+        <div class="bottom-fade"></div>
+
+        <button class="transfer-btn" id="open-transfer-btn">
+          <img src="assets/transfer-button.PNG" alt="" />
+          <span class="btn-label" data-i18n="transfer_cta">TRANSFER NOW</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ================= TRANSFER POPUP FORM ================= -->
+  <div class="modal-overlay" id="transfer-modal-overlay">
+    <div class="modal-box">
+      <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+      <h2 data-i18n="transfer_heading">Transfer</h2>
+      <p class="modal-sub" data-i18n="transfer_sub">Send items or funds to another member.</p>
+
+      <form id="transfer-form">
+        <div class="field">
+          <label data-i18n="field_recipient">Recipient username</label>
+          <input type="text" id="recipient" required />
+        </div>
+        <div class="field">
+          <label data-i18n="field_amount">Amount / item</label>
+          <input type="text" id="amount" required />
+        </div>
+        <div class="field">
+          <label data-i18n="field_note">Note (optional)</label>
+          <textarea id="note" rows="2"></textarea>
+        </div>
+
+        <div class="form-error" id="transfer-error"></div>
+        <div class="form-success" id="transfer-success"></div>
+
+        <button type="submit" class="submit-btn" id="transfer-submit-btn" data-i18n="submit_label">SEND</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
+    const SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    const translations = {
+      en: {
+        nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", lang_label: "LANGUAGE",
+        logout: "LOG OUT", role_label: "Role: ",
+        transfer_heading: "TRANSFER", transfer_sub: "Send items or funds to another member.",
+        transfer_cta: "TRANSFER NOW",
+        field_recipient: "Recipient username", field_amount: "Amount / item", field_note: "Note (optional)",
+        submit_label: "SEND"
+      },
+      ko: {
+        nav_home: "홈페이지", nav_transfer: "송금", lang_label: "언어",
+        logout: "로그아웃", role_label: "역할: ",
+        transfer_heading: "송금", transfer_sub: "다른 멤버에게 아이템이나 자금을 보내세요.",
+        transfer_cta: "지금 송금하기",
+        field_recipient: "받는 사람 아이디", field_amount: "금액 / 아이템", field_note: "메모 (선택)",
+        submit_label: "보내기"
+      },
+      'zh-CN': {
+        nav_home: "主页", nav_transfer: "转账", lang_label: "语言",
+        logout: "登出", role_label: "角色: ",
+        transfer_heading: "转账", transfer_sub: "向其他成员发送物品或资金。",
+        transfer_cta: "立即转账",
+        field_recipient: "收款用户名", field_amount: "金额 / 物品", field_note: "备注（可选）",
+        submit_label: "发送"
+      },
+      'pt-BR': {
+        nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", lang_label: "IDIOMA",
+        logout: "SAIR", role_label: "Função: ",
+        transfer_heading: "TRANSFERÊNCIA", transfer_sub: "Envie itens ou fundos para outro membro.",
+        transfer_cta: "TRANSFERIR AGORA",
+        field_recipient: "Nome de usuário do destinatário", field_amount: "Valor / item", field_note: "Observação (opcional)",
+        submit_label: "ENVIAR"
+      },
+      vi: {
+        nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", lang_label: "NGÔN NGỮ",
+        logout: "ĐĂNG XUẤT", role_label: "Vai trò: ",
+        transfer_heading: "CHUYỂN KHOẢN", transfer_sub: "Gửi vật phẩm hoặc tiền cho thành viên khác.",
+        transfer_cta: "CHUYỂN NGAY",
+        field_recipient: "Tên người nhận", field_amount: "Số lượng / vật phẩm", field_note: "Ghi chú (không bắt buộc)",
+        submit_label: "GỬI"
+      },
+      fr: {
+        nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", lang_label: "LANGUE",
+        logout: "DÉCONNEXION", role_label: "Rôle : ",
+        transfer_heading: "TRANSFERT", transfer_sub: "Envoyez des objets ou des fonds à un autre membre.",
+        transfer_cta: "TRANSFÉRER",
+        field_recipient: "Nom d'utilisateur du destinataire", field_amount: "Montant / objet", field_note: "Note (facultatif)",
+        submit_label: "ENVOYER"
+      }
+    }
+
+    let currentLang = localStorage.getItem('zoo_lang') || 'en'
+    document.getElementById('lang-select').value = currentLang
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n')
+        if (key === 'role_label') return
+        if (translations[currentLang][key]) el.textContent = translations[currentLang][key]
+      })
+      document.querySelector('[data-i18n="role_label"]').childNodes[0].textContent = translations[currentLang]['role_label']
+    }
+
+    document.getElementById('lang-select').addEventListener('change', (e) => {
+      currentLang = e.target.value
+      localStorage.setItem('zoo_lang', currentLang)
+      applyTranslations()
+    })
+
+    applyTranslations()
+
+    // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
+    function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
+    if (isMobile()) document.body.classList.add('sidebar-hidden')
+
+    document.getElementById('menu-toggle').addEventListener('click', () => {
+      document.body.classList.toggle('sidebar-hidden')
+    })
+    document.getElementById('sidebar-backdrop').addEventListener('click', () => {
+      document.body.classList.add('sidebar-hidden')
+    })
+
+    // ---------- Hero entrance reveal (transition-based, not animation
+    // fill-mode -- fill-mode:forwards can silently revert on some mobile
+    // Safari builds, which is why things were vanishing after ~1s) ----------
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.querySelector('.transfer-stage').classList.add('stage-ready')
+      })
+    })
+
+    async function loadUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        window.location.href = "login.html"
+        return
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, role')
+        .eq('id', user.id)
+        .single()
+
+      if (profile) {
+        document.getElementById('user-name').textContent = profile.display_name
+        document.getElementById('user-role').textContent = profile.role.toUpperCase()
+        document.getElementById('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
+      }
+    }
+    loadUser()
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      await supabase.auth.signOut()
+      window.location.href = "login.html"
+    })
+
+    // ---------- Transfer popup form ----------
+    const overlay = document.getElementById('transfer-modal-overlay')
+    const openBtn = document.getElementById('open-transfer-btn')
+    const closeBtn = document.getElementById('modal-close-btn')
+    const form = document.getElementById('transfer-form')
+    const errorEl = document.getElementById('transfer-error')
+    const successEl = document.getElementById('transfer-success')
+    const submitBtn = document.getElementById('transfer-submit-btn')
+
+    function openModal(){
+      overlay.classList.add('visible')
+      errorEl.classList.remove('visible')
+      successEl.classList.remove('visible')
+      form.reset()
+      submitBtn.disabled = false
+    }
+    function closeModal(){ overlay.classList.remove('visible') }
+
+    openBtn.addEventListener('click', openModal)
+    closeBtn.addEventListener('click', closeModal)
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal() })
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal() })
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      errorEl.classList.remove('visible')
+      successEl.classList.remove('visible')
+      submitBtn.disabled = true
+
+      const recipient = document.getElementById('recipient').value.trim()
+      const amount = document.getElementById('amount').value.trim()
+      const note = document.getElementById('note').value.trim()
+
+      // TODO: wire this up to your actual transfers table/endpoint, e.g.:
+      // const { error } = await supabase.from('transfers').insert({ recipient, amount, note })
+      // if (error) { errorEl.textContent = error.message; errorEl.classList.add('visible'); submitBtn.disabled = false; return }
+
+      try {
+        await new Promise(res => setTimeout(res, 500)) // placeholder for the real request
+        successEl.textContent = 'Transfer request sent!'
+        successEl.classList.add('visible')
+        setTimeout(closeModal, 1200)
+      } catch (err) {
+        errorEl.textContent = err.message || 'Something went wrong.'
+        errorEl.classList.add('visible')
+        submitBtn.disabled = false
+      }
+    })
+  </script>
+</body>
+</html>
