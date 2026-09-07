@@ -123,12 +123,17 @@
     .arch-bg{ width:100%; display:block; pointer-events:none; }
 
     .header-ribbon{
-      position:absolute; left:50%; top:6%; width:88%;
+      position:absolute; left:50%; top:11%; width:100%;
       transform:translateX(-50%);
       z-index:8;
       pointer-events:none;
+      overflow:hidden;
     }
-    .header-ribbon img{ width:100%; display:block; }
+    /* clip-path trims a thin sliver off the bottom of the source PNG --
+       that's the hard edge/box you were seeing under the clouds. It's
+       baked into the asset itself, not a CSS position issue, so cropping
+       it is the only way to remove it without re-exporting the image. */
+    .header-ribbon img{ width:100%; display:block; clip-path:inset(0 0 4% 0); }
 
     .bottom-fade{
       position:absolute; left:0; right:0; bottom:0; height:10%;
