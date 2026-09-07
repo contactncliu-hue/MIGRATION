@@ -123,7 +123,8 @@
     .arch-bg{ width:100%; display:block; pointer-events:none; }
 
     .header-ribbon{
-      position:absolute; left:0; top:0; width:100%;
+      position:absolute; left:50%; top:3%; width:62%;
+      transform:translateX(-50%);
       z-index:8;
       pointer-events:none;
     }
@@ -136,7 +137,8 @@
     }
 
     .transfer-btn{
-      position:absolute; left:42%; top:62%; width:26%;
+      position:absolute; left:50%; top:62%; width:26%;
+      transform:translateX(-50%);
       z-index:30;
       border:none; cursor:pointer; padding:0;
       background:transparent;
@@ -148,8 +150,9 @@
     .transfer-btn .btn-label{
       position:absolute; inset:0;
       display:flex; align-items:center; justify-content:center;
-      font-weight:800; font-size:1.05vw; letter-spacing:.05vw;
-      color:#2c3562;
+      font-weight:800; font-size:1.6vw; letter-spacing:.05vw;
+      color:#fff;
+      text-shadow:0 1px 3px rgba(0,0,0,.35);
     }
 
     /* Fallback color ONLY kicks in if the real image actually fails to
@@ -211,7 +214,7 @@
     .submit-btn:disabled{ opacity:.7; cursor:default; }
 
     @media (max-width:760px){
-      .transfer-btn .btn-label{ font-size:2.2vw; }
+      .transfer-btn .btn-label{ font-size:3.4vw; }
     }
   </style>
 </head>
