@@ -794,22 +794,24 @@
           return true
         } else {
           console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
+          if (window.showAppError) window.showAppError('SUPABASE CDN FAILED TO LOAD')
           return false
         }
       } catch (e) {
         console.error('supabase init failed', e)
+        if (window.showAppError) window.showAppError('SUPABASE INIT FAILED: ' + e.message)
         return false
       }
     }
     initSupabase()
 
-    // Guests are fully allowed on this page now: no redirect to login.html,
-    // and the role that drives admin-only UI comes straight from the
-    // session's user_metadata. The old 'profiles' table lookup that used
-    // to run afterward is gone -- it was async and could overwrite this
-    // correct role with a stale/empty one whenever that query lagged or
-    // failed (e.g. RLS on 'profiles' blocking the read), which is what
-    // made admin controls flicker on/off or never appear.
+    // Role now comes from the 'profiles' table (RLS-protected, kept in
+    // sync by the Admin & Management page / admin-only trigger) instead
+    // of auth user_metadata, which is set once at signup and never
+    // updates when someone's role changes later. TEMPORARY debug banners
+    // are included below so we can see exactly what's happening on a
+    // device with no console access -- remove the window.showAppError
+    // lines once this is confirmed working.
     async function loadUser() {
       try {
         if (!supabase) initSupabase()
@@ -828,6 +830,11 @@
         var res = await supabase.auth.getUser()
         var user = res && res.data ? res.data.user : null
 
+        // ---- TEMP DEBUG: confirm whether a session exists at all ----
+        if (window.showAppError) {
+          window.showAppError('AUTH CHECK: user = ' + (user ? user.email : 'NULL') + (res.error ? ' | ERROR: ' + res.error.message : ''))
+        }
+
         if (!user) {
           // No session -- browse and submit as a guest instead of bouncing
           // to login.html.
@@ -841,11 +848,19 @@
           return
         }
 
-                window.zooUserId = user.id
+        window.zooUserId = user.id
         var meta = user.user_metadata || {}
 
         var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
+
+        // ---- TEMP DEBUG: show exactly what the profiles query returned ----
+        if (window.showAppError) {
+          window.showAppError(profRes.error
+            ? 'PROFILE ERROR: ' + profRes.error.message
+            : 'PROFILE RAW: ' + JSON.stringify(profRes.data))
+        }
         if (profRes.error) console.error('profiles lookup failed', profRes.error)
+
         var profile = profRes && profRes.data
 
         var uname = (profile && profile.display_name) || meta.username || (user.email || 'Member').split('@')[0]
@@ -858,6 +873,7 @@
         renderStatusRows()
       } catch (e) {
         console.error('loadUser failed', e)
+        if (window.showAppError) window.showAppError('loadUser CRASHED: ' + e.message)
         window.zooUserRole = 'GUEST'
         if ($('user-name')) $('user-name').textContent = 'Guest'
         if ($('user-role')) $('user-role').textContent = 'GUEST'
