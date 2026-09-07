@@ -133,8 +133,7 @@
       overflow:hidden;
       opacity:0;
       transform:translate(-50%, 60px);
-      transition:transform 2s cubic-bezier(.22,.68,0,1.01) .6s, opacity 1.6s ease .6s,
-                 opacity .4s ease, transform .4s ease;
+      transition:transform 2s cubic-bezier(.22,.68,0,1.01) .6s, opacity 1.6s ease .6s;
     }
     .stage-ready .header-ribbon{ opacity:1; transform:translate(-50%, 0); }
     /* clip-path trims a thin sliver off the bottom of the source PNG --
@@ -189,48 +188,22 @@
     .arch-card.img-failed { background:#fff8ea; border-radius:24px; aspect-ratio:3/4; }
     .transfer-btn.img-failed { background:#f2a90f; border-radius:14px; aspect-ratio:5/1; }
 
-    /* ================= STATUS TAB (collapsed, peeking from the left edge) ================= */
-    .status-tab{
-      position:absolute; left:0; top:38%; width:11%; min-width:120px;
-      aspect-ratio:2560/1000;
-      z-index:35;
-      border:none; cursor:pointer; padding:0 0 0 4%;
-      background:linear-gradient(155deg, #f2564b 0%, #e5433a 60%, #d33a32 100%);
-      color:#fff8f0;
-      display:flex; align-items:center;
-      clip-path: polygon(
-        0% 8%, 100% 0%, 92% 18%, 100% 34%, 88% 50%, 100% 66%, 92% 82%, 100% 100%, 0% 92%
-      );
-      box-shadow:6px 0 18px rgba(180,40,30,.25);
-      transform:translate(-62%, -50%);
-      transition:transform .35s cubic-bezier(.22,.68,0,1.01), opacity .3s ease;
-      opacity:0;
-    }
-    .stage-ready .status-tab{ opacity:1; }
-    .status-tab:hover{ transform:translate(-52%, -50%); }
-    .status-open .status-tab{ opacity:0; pointer-events:none; transform:translate(-100%, -50%); }
-    .status-tab-label{
-      font-weight:800; font-size:.72vw; letter-spacing:.05vw; line-height:1.3;
-      text-shadow:0 1px 2px rgba(0,0,0,.25);
-    }
-
-    /* ================= STATUS CARD (expanded, centered) ================= */
+    /* ================= STATUS CARD =================
+       ONE element, ONE asset (assets/transfer-status-card.PNG) for both
+       states -- it's the same card, just slid off to the left by default
+       (only a sliver shows, like your reference) and slid to center when
+       clicked. No separate "tab" graphic needed.
+       .status-stage below is only there so `left` can transition against a
+       fixed width without fighting a translateX(-50%) at the same time. */
     .status-card{
-      position:absolute; left:50%; top:8%; width:52%; max-width:640px;
+      position:absolute; top:8%; width:52%; max-width:640px;
+      left:-44%; /* only ~8% of the card's own width peeks past the scene's left edge */
       z-index:36;
-      background:linear-gradient(155deg, #f2564b 0%, #e5433a 55%, #d33a32 100%);
-      border-radius:26px;
-      clip-path: polygon(
-        6% 0%, 94% 0%, 100% 8%, 96% 22%, 100% 36%, 94% 50%, 100% 64%, 96% 78%, 100% 92%, 94% 100%,
-        6% 100%, 0% 92%, 4% 78%, 0% 64%, 6% 50%, 0% 36%, 4% 22%, 0% 8%
-      );
-      padding:6% 7%;
-      opacity:0; pointer-events:none;
-      transform:translate(-50%, 0) scale(.9);
-      transition:opacity .4s ease, transform .4s cubic-bezier(.22,.68,0,1.01);
-      box-shadow:0 24px 60px rgba(160,30,20,.28);
+      cursor:pointer;
+      transition:left .5s cubic-bezier(.22,.68,0,1.01);
     }
-    .status-open .status-card{ opacity:1; pointer-events:auto; transform:translate(-50%, 0) scale(1); }
+    .status-open .status-card{ left:24%; cursor:default; } /* (100% - 52%) / 2 = centered */
+    .status-card-bg{ width:100%; display:block; pointer-events:none; }
 
     .status-card-close{
       position:absolute; top:4%; right:5%;
@@ -240,35 +213,44 @@
     }
     .status-card-close:hover{ background:rgba(255,255,255,.3); }
 
-    .status-rows{ display:flex; flex-direction:column; gap:14px; margin-bottom:6%; }
-    .status-row{ display:flex; align-items:center; gap:14px; }
-    .status-icon{ width:34px; height:34px; flex-shrink:0; color:var(--chair-color, #fff); }
-    .status-icon svg{ width:100%; height:100%; display:block; }
+    /* Positioned to sit over the 4 armchair icons already baked into your
+       PNG art -- adjust the top/bottom/left insets below to match wherever
+       your icons actually land once you drop the real file in. */
+    .status-rows{
+      position:absolute; left:34%; right:9%; top:14%; bottom:12%;
+      display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .status-row{ display:flex; align-items:center; gap:10px; }
     .status-row-body{ flex:1; min-width:0; }
-    .status-row-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:5px; }
+    .status-row-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
     .status-row-name{ font-size:12px; font-weight:700; color:#fff0ec; letter-spacing:.3px; }
     .status-percent{ font-size:12px; font-weight:800; color:#fff; min-width:34px; text-align:right; }
     .status-bar-track{ width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.28); overflow:hidden; }
     .status-bar-fill{ height:100%; border-radius:999px; transition:width .4s ease, background .3s ease; }
 
     /* Admin-only inline editor, hidden unless the logged-in user's role is ADMIN */
-    .status-admin{ display:flex; align-items:center; gap:6px; margin-top:6px; }
+    .status-admin{ display:flex; align-items:center; gap:6px; margin-top:5px; }
     .status-admin input{
-      width:44px; padding:3px 6px; border-radius:6px; border:none;
-      font-size:12px; font-weight:700; text-align:center;
+      width:40px; padding:2px 5px; border-radius:6px; border:1px solid rgba(255,255,255,.5);
+      background:rgba(255,255,255,.9);
+      font-size:11px; font-weight:700; text-align:center;
     }
-    .status-admin span{ font-size:11px; color:#ffe3de; font-weight:600; }
+    .status-admin span{ font-size:10px; color:#ffe3de; font-weight:600; }
 
+    /* assets/transfer-status-button.PNG -- same overlay-label trick as
+       .transfer-btn above (real art underneath, live text on top). */
     .status-check-btn{
-      display:block; width:100%; border:none; cursor:pointer;
-      padding:14px 10px;
-      font-weight:800; font-size:13px; letter-spacing:.5px; color:#2f3d33;
-      background:linear-gradient(90deg, #bfe0b4 0%, #a9cf9f 45%, #8fb3a4 100%);
-      clip-path: polygon(4% 0%, 96% 0%, 100% 50%, 96% 100%, 4% 100%, 0% 50%);
+      position:relative; display:block; width:100%; margin-top:8%;
+      border:none; cursor:pointer; padding:0; background:transparent;
       transition:filter .15s ease, transform .1s ease;
     }
+    .status-check-btn img{ width:100%; display:block; }
     .status-check-btn:hover{ filter:brightness(1.05); }
     .status-check-btn:active{ transform:translateY(1px); filter:brightness(.96); }
+    .status-check-label{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:1.1vw; letter-spacing:.4px; color:#2f3d33;
+    }
 
     /* ================= MODAL ================= */
     .modal-overlay{
@@ -322,9 +304,8 @@
 
     @media (max-width:760px){
       .transfer-btn .btn-label{ font-size:3.4vw; }
-      .status-card{ width:78%; top:6%; padding:8% 8%; }
-      .status-tab{ width:20%; min-width:90px; }
-      .status-tab-label{ font-size:2.6vw; }
+      .status-card{ width:78%; top:6%; left:-70%; }
+      .status-open .status-card{ left:11%; } /* (100 - 78) / 2 */
       .status-row-name, .status-percent{ font-size:11px; }
     }
   </style>
@@ -388,21 +369,20 @@
           <span class="btn-label" data-i18n="transfer_cta">TRANSFER NOW</span>
         </button>
 
-        <!-- Collapsed tab: always visible, peeking in from the left edge.
-             Clicking it opens the full status card, centered, in place of
-             the header ribbon + transfer button. -->
-        <button class="status-tab" id="status-tab-btn" aria-label="Check status" aria-expanded="false">
-          <span class="status-tab-label" data-i18n="status_tab_label">CHECK<br>STATUS</span>
-        </button>
-
-        <!-- Expanded status card -->
+        <!-- Status card: sits mostly off-canvas to the left by default (just
+             a sliver showing, per your reference), and slides to centered --
+             replacing the header ribbon + transfer button -- when clicked.
+             Same asset (assets/transfer-status-card.PNG) in both states. -->
         <div class="status-card" id="status-card" aria-hidden="true">
+          <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
           <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
 
           <div class="status-rows" id="status-rows"><!-- rows injected by renderStatusRows() --></div>
 
-          <button class="status-check-btn" id="status-check-btn" type="button" data-i18n="status_check_cta">
-            CHECK STATUS
+          <!-- assets/transfer-status-button.PNG -- the pastel pill button -->
+          <button class="status-check-btn" id="status-check-btn" type="button">
+            <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
+            <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
           </button>
         </div>
       </div>
@@ -497,7 +477,7 @@
         transfer_cta: "TRANSFER NOW",
         field_recipient: "Recipient username", field_amount: "Amount / item", field_note: "Note (optional)",
         submit_label: "SEND",
-        status_tab_label: "CHECK<br>STATUS", status_check_cta: "CHECK STATUS"
+        status_check_cta: "CHECK STATUS"
       },
       ko: {
         nav_home: "홈페이지", nav_transfer: "송금", lang_label: "언어",
@@ -506,7 +486,7 @@
         transfer_cta: "지금 송금하기",
         field_recipient: "받는 사람 아이디", field_amount: "금액 / 아이템", field_note: "메모 (선택)",
         submit_label: "보내기",
-        status_tab_label: "상태<br>확인", status_check_cta: "상태 확인"
+        status_check_cta: "상태 확인"
       },
       'zh-CN': {
         nav_home: "主页", nav_transfer: "转账", lang_label: "语言",
@@ -515,7 +495,7 @@
         transfer_cta: "立即转账",
         field_recipient: "收款用户名", field_amount: "金额 / 物品", field_note: "备注（可选）",
         submit_label: "发送",
-        status_tab_label: "查看<br>状态", status_check_cta: "查看状态"
+        status_check_cta: "查看状态"
       },
       'pt-BR': {
         nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", lang_label: "IDIOMA",
@@ -524,7 +504,7 @@
         transfer_cta: "TRANSFERIR AGORA",
         field_recipient: "Nome de usuário do destinatário", field_amount: "Valor / item", field_note: "Observação (opcional)",
         submit_label: "ENVIAR",
-        status_tab_label: "VER<br>STATUS", status_check_cta: "VER STATUS"
+        status_check_cta: "VER STATUS"
       },
       vi: {
         nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", lang_label: "NGÔN NGỮ",
@@ -533,7 +513,7 @@
         transfer_cta: "CHUYỂN NGAY",
         field_recipient: "Tên người nhận", field_amount: "Số lượng / vật phẩm", field_note: "Ghi chú (không bắt buộc)",
         submit_label: "GỬI",
-        status_tab_label: "KIỂM TRA<br>TRẠNG THÁI", status_check_cta: "KIỂM TRA TRẠNG THÁI"
+        status_check_cta: "KIỂM TRA TRẠNG THÁI"
       },
       fr: {
         nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", lang_label: "LANGUE",
@@ -542,7 +522,7 @@
         transfer_cta: "TRANSFÉRER",
         field_recipient: "Nom d'utilisateur du destinataire", field_amount: "Montant / objet", field_note: "Note (facultatif)",
         submit_label: "ENVOYER",
-        status_tab_label: "VÉRIFIER<br>STATUT", status_check_cta: "VÉRIFIER LE STATUT"
+        status_check_cta: "VÉRIFIER LE STATUT"
       }
     }
 
@@ -575,22 +555,16 @@
     // =====================================================================
     // ---------- Status card: rows, percentage bars, admin editing ----------
     // =====================================================================
-    // Each row = one armchair icon + its occupancy bar. "value" is on a
-    // 0-10 admin-facing scale (matches the "0/10" scale requested); the
-    // displayed percentage and bar fill are value * 10.
-    // Swap the icon SVGs below for real PNGs later if you export dedicated
-    // art -- see the asset-naming note further down for suggested filenames.
-    var CHAIR_ICON_SVG = '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-      '<path d="M7 9V6.5C7 5.12 8.12 4 9.5 4h5C15.88 4 17 5.12 17 6.5V9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
-      '<path d="M5 9.5c0-.83.67-1.5 1.5-1.5S8 8.67 8 9.5V13H16V9.5c0-.83.67-1.5 1.5-1.5S19 8.67 19 9.5V15c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V9.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>' +
-      '<path d="M6.5 17 6 20M17.5 17l.5 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>' +
-      '</svg>'
-
+    // Each row lines up with one of the 4 armchair icons already baked into
+    // assets/transfer-status-card.PNG -- we only render the bar + percentage
+    // (and, for admins, the input), not the icon itself.
+    // "value" is on a 0-10 admin-facing scale (matches the "0/10" scale
+    // requested); the displayed percentage and bar fill are value * 10.
     var statusRows = [
-      { key: 'wing-a', name: 'Wing A', color: '#3a3a3a', value: 2 },
-      { key: 'wing-b', name: 'Wing B', color: '#f2a90f', value: 6 },
-      { key: 'wing-c', name: 'Wing C', color: '#9775fa', value: 5 },
-      { key: 'wing-d', name: 'Wing D', color: '#3bc9db', value: 9 }
+      { key: 'wing-a', name: 'Wing A', value: 2 },
+      { key: 'wing-b', name: 'Wing B', value: 6 },
+      { key: 'wing-c', name: 'Wing C', value: 5 },
+      { key: 'wing-d', name: 'Wing D', value: 9 }
     ]
 
     // 0-54 -> slightly dark red, 55-74 -> yellow, 75-100 -> pastel mossy green
@@ -624,7 +598,6 @@
 
           return (
             '<div class="status-row" data-row="' + i + '">' +
-              '<span class="status-icon" style="--chair-color:' + row.color + '">' + CHAIR_ICON_SVG + '</span>' +
               '<div class="status-row-body">' +
                 '<div class="status-row-top">' +
                   '<span class="status-row-name">' + row.name + '</span>' +
@@ -651,24 +624,30 @@
       } catch (e) { console.error('renderStatusRows failed', e) }
     }
 
-    // ---------- Status tab / card open+close ----------
+    // ---------- Status card open+close ----------
+    // Same element throughout -- clicking it while it's still in its
+    // collapsed/sliver position opens it; once open, only the explicit
+    // close (x) button or Escape closes it (so clicking the bars/inputs
+    // inside doesn't accidentally re-trigger anything).
     try {
       var statusCard = $('status-card')
-      var openStatusTab = $('status-tab-btn')
 
+      function isStatusOpen() {
+        return document.querySelector('.transfer-stage').classList.contains('status-open')
+      }
       function openStatusCard() {
         document.querySelector('.transfer-stage').classList.add('status-open')
         if (statusCard) statusCard.setAttribute('aria-hidden', 'false')
-        if (openStatusTab) openStatusTab.setAttribute('aria-expanded', 'true')
         renderStatusRows()
       }
       function closeStatusCard() {
         document.querySelector('.transfer-stage').classList.remove('status-open')
         if (statusCard) statusCard.setAttribute('aria-hidden', 'true')
-        if (openStatusTab) openStatusTab.setAttribute('aria-expanded', 'false')
       }
 
-      on('status-tab-btn', 'click', openStatusCard)
+      on('status-card', 'click', function () {
+        if (!isStatusOpen()) openStatusCard()
+      })
       on('status-card-close', 'click', closeStatusCard)
 
       // The "CHECK STATUS" pill button inside the card is a real, clickable
