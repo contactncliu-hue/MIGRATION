@@ -97,11 +97,11 @@
       position:absolute; left:50%; bottom:0;
       width:max(100vw, 177.7vh);
       aspect-ratio:2560/1451;
-      transform:translateX(-50%) translateY(28px) scale(.97);
+      transform:translateX(-50%);
       opacity:0;
-      transition:opacity 2.2s cubic-bezier(.22,1,.36,1), transform 2.2s cubic-bezier(.22,1,.36,1);
+      transition:opacity 1.4s ease;
     }
-    .stage-ready .scene{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
+    .stage-ready .scene{ opacity:1; }
 
     .deco-bg{
       position:absolute; inset:0;
@@ -119,16 +119,23 @@
     .arch-card{
       position:absolute; left:32%; bottom:0; width:36%;
       z-index:5;
+      opacity:0;
+      transform:translateY(90px);
+      transition:transform 2s cubic-bezier(.22,.68,0,1.01) .2s, opacity 1.6s ease .2s;
     }
+    .stage-ready .arch-card{ opacity:1; transform:translateY(0); }
     .arch-bg{ width:100%; display:block; pointer-events:none; }
 
     .header-ribbon{
       position:absolute; left:50%; top:11%; width:100%;
-      transform:translateX(-50%);
       z-index:8;
       pointer-events:none;
       overflow:hidden;
+      opacity:0;
+      transform:translate(-50%, 60px);
+      transition:transform 2s cubic-bezier(.22,.68,0,1.01) .6s, opacity 1.6s ease .6s;
     }
+    .stage-ready .header-ribbon{ opacity:1; transform:translate(-50%, 0); }
     /* clip-path trims a thin sliver off the bottom of the source PNG --
        that's the hard edge/box you were seeing under the clouds. It's
        baked into the asset itself, not a CSS position issue, so cropping
@@ -147,8 +154,8 @@
       border:none; cursor:pointer; padding:0;
       background:transparent;
       opacity:0;
-      transform:translateX(-50%) translateY(14px) scale(.94);
-      transition:filter .2s ease, opacity .9s cubic-bezier(.22,1,.36,1) 1.4s, transform .9s cubic-bezier(.22,1,.36,1) 1.4s;
+      transform:translateX(-50%) translateY(40px) scale(.94);
+      transition:filter .2s ease, opacity 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s, transform 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s;
     }
     .stage-ready .transfer-btn{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
     .transfer-btn:hover{ filter:brightness(1.06); }
@@ -341,12 +348,28 @@
     } catch (e) { console.error('sidebar init failed', e) }
 
     // ---------- Hero entrance reveal ----------
+    // Runs on normal load AND on 'pageshow' (fires again on browser back/forward
+    // cache restores, e.g. iPad Safari, where the page reappears without the
+    // script re-executing -- without this, the class would already be set from
+    // last time and the animation just wouldn't play again).
     try {
-      requestAnimationFrame(function () {
+      function playEntrance(){
+        var stage = document.querySelector('.transfer-stage')
+        if (!stage) return
+        stage.classList.remove('stage-ready')
+        // Force a reflow so removing the class actually takes effect before
+        // we add it back -- otherwise the browser can coalesce both class
+        // changes into one frame and skip the transition entirely.
+        void stage.offsetWidth
         requestAnimationFrame(function () {
-          var stage = document.querySelector('.transfer-stage')
-          if (stage) stage.classList.add('stage-ready')
+          requestAnimationFrame(function () {
+            stage.classList.add('stage-ready')
+          })
         })
+      }
+      playEntrance()
+      window.addEventListener('pageshow', function (e) {
+        if (e.persisted) playEntrance()
       })
     } catch (e) { console.error('stage reveal failed', e) }
 
@@ -449,15 +472,35 @@
           window.location.href = "login.html"
           return
         }
-        var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
-        var profile = profRes && profRes.data
-        if (profile) {
-          if ($('user-name')) $('user-name').textContent = profile.display_name
-          if ($('user-role')) $('user-role').textContent = (profile.role || '').toUpperCase()
-          if ($('user-initial')) $('user-initial').textContent = (profile.display_name || '?').charAt(0).toUpperCase()
+
+        // Same source the homepage uses: read straight off the auth user
+        // (metadata / email) so the name always renders even if a
+        // 'profiles' row doesn't exist yet or a table query fails --
+        // that dependency on 'profiles' alone was why this got stuck on
+        // "Loading..." forever whenever that lookup came back empty.
+        var meta = user.user_metadata || {}
+        var uname = meta.username || (user.email || 'Member').split('@')[0]
+        var role = (meta.role || 'MEMBER')
+        if ($('user-name')) $('user-name').textContent = uname
+        if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
+        if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
+
+        // Optional enhancement: if a 'profiles' row exists with a nicer
+        // display_name/role, upgrade to it -- but never block on it.
+        try {
+          var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
+          var profile = profRes && profRes.data
+          if (profile) {
+            if (profile.display_name && $('user-name')) $('user-name').textContent = profile.display_name
+            if (profile.role && $('user-role')) $('user-role').textContent = String(profile.role).toUpperCase()
+            if (profile.display_name && $('user-initial')) $('user-initial').textContent = profile.display_name.charAt(0).toUpperCase()
+          }
+        } catch (profErr) {
+          console.error('profiles lookup failed (non-fatal, already showing auth-based name):', profErr)
         }
       } catch (e) {
         console.error('loadUser failed', e)
+        if ($('user-name')) $('user-name').textContent = 'Member'
       }
     }
     loadUser()
