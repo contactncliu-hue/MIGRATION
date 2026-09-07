@@ -86,14 +86,6 @@
       background:linear-gradient(160deg, #fff6e0 0%, #fdf3da 22%, #eef4e4 55%, #ffffff 100%);
     }
 
-    /* This fixed-aspect-ratio canvas is the actual fix. It matches the
-       ~2560x1451 proportions of your reference design, and is sized with
-       max(100vw, 100vh * ratio) -- the same math CSS background-size:cover
-       uses -- so it always fully covers the viewport with no gaps, cropping
-       evenly instead of stretching. Every decorative layer below is
-       positioned as a percentage of THIS box, not of the viewport and not
-       of each other, so they can no longer drift out of proportion with
-       each other the way they were before. */
     .scene{
       position:absolute; left:50%; bottom:0;
       width:max(100vw, 177.7vh);
@@ -110,13 +102,6 @@
     }
     .deco-bg img{ width:100%; height:100%; display:block; object-fit:fill; }
 
-    /* Arch/scroll is now anchored to the BOTTOM of the scene instead of a
-       "top" percentage. With "top", the arch's vertical position drifted
-       depending on the scene's overall height (viewport ratio), which is
-       why it kept landing too low. Anchoring from the bottom "magnetizes"
-       the base of the arch to the bottom edge of the scene every time,
-       regardless of viewport size, matching the reference art where the
-       scroll's base sits right at the bottom of the frame. */
     .arch-card{
       position:absolute; left:32%; bottom:0; width:36%;
       z-index:5;
@@ -137,10 +122,6 @@
       transition:transform 2s cubic-bezier(.22,.68,0,1.01) .6s, opacity 1.6s ease .6s;
     }
     .stage-ready .header-ribbon{ opacity:1; transform:translate(-50%, 0); }
-    /* clip-path trims a thin sliver off the bottom of the source PNG --
-       that's the hard edge/box you were seeing under the clouds. It's
-       baked into the asset itself, not a CSS position issue, so cropping
-       it is the only way to remove it without re-exporting the image. */
     .header-ribbon img{ width:100%; display:block; clip-path:inset(0 0 4% 0); }
 
     .bottom-fade{
@@ -170,10 +151,6 @@
       text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
     }
 
-    /* When the status card is open, the header ribbon and the transfer
-       button pan slowly DOWN out of the way (instead of a quick fade/lift)
-       so the transition itself is visible -- the status card takes over
-       that same visual "slot" in the scene once they've cleared it. */
     .status-open .header-ribbon,
     .status-open .transfer-btn{
       opacity:0 !important;
@@ -183,30 +160,16 @@
     }
     .status-open .transfer-btn{ transform:translateX(-50%) translateY(60px) scale(.96) !important; }
 
-    /* Fallback color ONLY kicks in if the real image actually fails to
-       load (see the 'img-failed' class added by onerror below) -- it no
-       longer shows by default, which is what caused the solid white/
-       orange boxes bleeding through the transparent parts of the real
-       artwork. */
     .arch-card.img-failed { background:#fff8ea; border-radius:24px; aspect-ratio:3/4; }
     .transfer-btn.img-failed { background:#f2a90f; border-radius:14px; aspect-ratio:5/1; }
 
-    /* ================= STATUS CARD =================
-       ONE element, ONE asset (assets/transfer-status-card.PNG) for both
-       states -- it's the same card, just slid off to the left by default
-       (only a sliver shows, like your reference) and slid to center + made
-       LARGER when clicked. No separate "tab" graphic needed.
-       IMPORTANT: this lives outside .scene (see the HTML comment above it)
-       so these percentages are relative to the real viewport-sized
-       .transfer-stage, not the oversized/clipped .scene canvas. */
     .status-card{
       position:absolute; top:8%; width:36%; max-width:560px;
-      left:-30%; /* only a sliver of the card's own edge peeks past the real screen edge */
+      left:-30%;
       z-index:36;
       cursor:pointer;
       transition:left .6s cubic-bezier(.22,.68,0,1.01), width .6s cubic-bezier(.22,.68,0,1.01), max-width .6s cubic-bezier(.22,.68,0,1.01), top .6s cubic-bezier(.22,.68,0,1.01);
     }
-    /* Bigger + centered once opened. (100% - 52%) / 2 = 24% for centering. */
     .status-open .status-card{ left:24%; width:52%; max-width:820px; top:9%; cursor:default; }
     .status-card-bg{ width:100%; display:block; pointer-events:none; }
 
@@ -220,12 +183,6 @@
     .status-card-close:hover{ background:rgba(255,255,255,.3); }
     .status-open .status-card-close{ opacity:1; pointer-events:auto; transition:opacity .35s ease .35s; }
 
-    /* Positioned to sit over the 4 armchair icons already baked into your
-       PNG art -- adjust the top/bottom/left insets below to match wherever
-       your icons actually land once you drop the real file in.
-       Hidden (opacity 0, not just visually covered) whenever the card is
-       collapsed, so none of this text/bars can peek out of the sliver --
-       that's what was showing through in the "before" screenshot. */
     .status-rows{
       position:absolute; left:17%; right:19%; top:17%; bottom:17%;
       display:flex; flex-direction:column; justify-content:space-between;
@@ -241,7 +198,6 @@
     .status-bar-track{ width:100%; height:10px; border-radius:999px; background:rgba(255,255,255,.28); overflow:hidden; }
     .status-bar-fill{ height:100%; border-radius:999px; transition:width .4s ease, background .3s ease; }
 
-    /* Admin-only inline editor, hidden unless the logged-in user's role is ADMIN */
     .status-admin{ display:flex; align-items:center; gap:6px; margin-top:5px; }
     .status-admin input{
       width:40px; padding:2px 5px; border-radius:6px; border:1px solid rgba(255,255,255,.5);
@@ -251,11 +207,6 @@
     .status-admin span{ font-size:10px; color:#ffe3de; font-weight:600; }
     .status-total{ font-size:12px; font-weight:800; text-align:right; letter-spacing:.3px; margin-top:4px; }
 
-    /* assets/transfer-status-button.PNG -- moved OUT of the card and given
-       the exact same font styling as .transfer-btn (per your request), just
-       smaller, and anchored to the same vertical "slot" on the arch
-       (top:62%, same as .transfer-btn) so it visually replaces it once the
-       transfer button pans away. Only visible while the card is open. */
     .status-check-btn{
       position:absolute; left:50%; top:62%; width:16%;
       z-index:32;
@@ -329,7 +280,6 @@
     .submit-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 #c98c0c; }
     .submit-btn:disabled{ opacity:.7; cursor:default; }
 
-    /* ---------- Solo / Group toggle ---------- */
     .transfer-type-toggle{
       display:flex; border:1.5px solid #e3e3ec; border-radius:12px; overflow:hidden; margin-bottom:20px;
     }
@@ -341,10 +291,8 @@
     .type-btn.active{ background:#fff; color:#f2a90f; }
     .type-btn + .type-btn{ border-left:1.5px solid #e3e3ec; }
 
-    /* ---------- Alliance tag (group only) ---------- */
     #group-alliance-field{ display:none; }
 
-    /* ---------- Member rows ---------- */
     .member-row{
       border:1.5px solid #eef0f7; border-radius:14px; padding:16px 16px 4px 16px;
       margin-bottom:16px; background:#fafbff;
@@ -371,9 +319,9 @@
     .faction-btn:active{ transform:scale(.92); }
     .faction-btn .faction-letter{ font-weight:800; font-size:14px; color:#fff; }
     .faction-btn[data-state="0"]{ background:#e9eaf2; border-color:#d8dae6; }
-    .faction-btn[data-state="1"]{ background:#3b82f6; border-color:#3b82f6; } /* F - blue */
-    .faction-btn[data-state="2"]{ background:#8b5cf6; border-color:#8b5cf6; } /* S - purple */
-    .faction-btn[data-state="3"]{ background:#f2a90f; border-color:#f2a90f; } /* R - orange */
+    .faction-btn[data-state="1"]{ background:#3b82f6; border-color:#3b82f6; }
+    .faction-btn[data-state="2"]{ background:#8b5cf6; border-color:#8b5cf6; }
+    .faction-btn[data-state="3"]{ background:#f2a90f; border-color:#f2a90f; }
 
     .add-member-btn{
       display:none; width:100%; border:1.5px dashed #d8dae6; background:transparent;
@@ -382,7 +330,6 @@
     }
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
 
-    /* ---------- Connection banner (shown when Supabase / auth can't be reached) ---------- */
     .conn-banner{
       position:fixed; top:0; left:0; right:0; z-index:90;
       background:#fff3cd; color:#7a5b00; border-bottom:1px solid #ffe58f;
@@ -400,7 +347,7 @@
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
       .status-card{ width:78%; top:6%; left:-70%; }
-      .status-open .status-card{ left:11%; width:78%; max-width:none; } /* (100 - 78) / 2 */
+      .status-open .status-card{ left:11%; width:78%; max-width:none; }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
     }
@@ -408,9 +355,6 @@
 </head>
 <body>
 
-  <!-- Shown whenever the Supabase client couldn't be reached, so a bad
-       connection is visible instead of silently leaving the sidebar on
-       "Loading..." forever and letting form submits silently no-op. -->
   <div class="conn-banner" id="conn-banner">
     <span id="conn-banner-text">Can't reach the server. Your login and any submissions won't sync until this is fixed.</span>
     <button id="conn-retry-btn" type="button">Retry</button>
@@ -474,27 +418,12 @@
           <span class="btn-label" data-i18n="transfer_cta">MIGRATION</span>
         </button>
 
-        <!-- Moved out of .status-card: same font/color as the transfer button,
-             smaller, anchored to the same vertical "slot" on the arch
-             (top:62%, same as .transfer-btn) so it visually replaces it once the
-             transfer button pans away. Only visible while the card is open. -->
         <button class="status-check-btn" id="status-check-btn" type="button">
           <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
           <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
         </button>
       </div>
 
-      <!-- Status card: lives OUTSIDE .scene on purpose. .scene is an oversized
-           background canvas (width:max(100vw, 177.7vh)) that's centered and
-           usually wider than the viewport -- its own left edge is clipped
-           off-screen, so percentage positions inside it don't correspond to
-           the visible edge of the browser window. This card needs to peek
-           from the ACTUAL left edge of the screen, so it's positioned
-           relative to .transfer-stage (the real, viewport-sized box) instead.
-           Sits mostly off-canvas by default (just a sliver showing, with all
-           inner content hidden -- see .status-rows opacity rules above), and
-           grows + centers when clicked. Same asset
-           (assets/transfer-status-card.PNG) in both states. -->
       <div class="status-card" id="status-card" aria-hidden="true">
         <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
         <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
@@ -512,7 +441,6 @@
       <h2 data-i18n="transfer_heading">Migration</h2>
       <p class="modal-sub" data-i18n="transfer_sub">Send items or funds to another member.</p>
 
-      <!-- Step 1: Solo / Group choice -->
       <div class="transfer-type-toggle" id="transfer-type-toggle">
         <button type="button" class="type-btn active" id="type-solo-btn" data-i18n="type_solo">Solo Transfer</button>
         <button type="button" class="type-btn" id="type-group-btn" data-i18n="type_group">Group Transfer</button>
@@ -538,8 +466,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Small safe helper: never throws if an element is missing, and never
-    // lets one missing/failing element stop the rest of the script.
     function $(id) { return document.getElementById(id) }
     function on(id, evt, fn) {
       var el = $(id)
@@ -549,11 +475,21 @@
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
     }
 
+    // FIX: generic timeout wrapper. Any Supabase call that stalls (flaky
+    // connection, blocked request, server slow to respond) now rejects
+    // after `ms` instead of hanging the awaiting code forever. This is
+    // what was missing around supabase.auth.getUser() and was the real
+    // cause of the sidebar getting permanently stuck on "Loading...".
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error('timed out after ' + ms + 'ms')) }, ms)
+        })
+      ])
+    }
+
     // ---------- Connection banner helpers ----------
-    // Shown whenever we can't talk to Supabase (CDN failed to load, network
-    // down, request timed out, etc). Previously this failed silently:
-    // the sidebar just sat on "Loading..." forever and the migration form
-    // showed a fake "sent!" message with nothing actually saved.
     function showConnBanner(msg) {
       var banner = $('conn-banner')
       if (!banner) return
@@ -579,18 +515,11 @@
     } catch (e) { console.error('sidebar init failed', e) }
 
     // ---------- Hero entrance reveal ----------
-    // Runs on normal load AND on 'pageshow' (fires again on browser back/forward
-    // cache restores, e.g. iPad Safari, where the page reappears without the
-    // script re-executing -- without this, the class would already be set from
-    // last time and the animation just wouldn't play again).
     try {
       function playEntrance(){
         var stage = document.querySelector('.transfer-stage')
         if (!stage) return
         stage.classList.remove('stage-ready')
-        // Force a reflow so removing the class actually takes effect before
-        // we add it back -- otherwise the browser can coalesce both class
-        // changes into one frame and skip the transition entirely.
         void stage.offsetWidth
         requestAnimationFrame(function () {
           requestAnimationFrame(function () {
@@ -602,11 +531,6 @@
       window.addEventListener('pageshow', function (e) {
         if (e.persisted) {
           playEntrance()
-          // FIX: a bfcache restore (e.g. Safari suspending/resuming a
-          // background tab) brings back the DOM exactly as it was frozen --
-          // if that was mid-"Loading...", it stays "Loading..." forever
-          // because loadUser() never gets called again. Re-run it here so
-          // the sidebar actually re-syncs instead of looking permanently stuck.
           try { loadUser() } catch (err) { console.error('loadUser on pageshow failed', err) }
         }
       })
@@ -746,9 +670,6 @@
     try { currentLang = localStorage.getItem('zoo_lang') || 'en' } catch (e) { console.error('localStorage read failed', e) }
     if ($('lang-select')) $('lang-select').value = currentLang
 
-    // t(key, fallback) -- used by the dynamically-rendered member rows below,
-    // since those get rebuilt from scratch (innerHTML) rather than sitting
-    // still with data-i18n attributes for applyTranslations() to find.
     function t(key, fallback) {
       return (translations[currentLang] && translations[currentLang][key]) || fallback
     }
@@ -773,7 +694,6 @@
       currentLang = e.target.value
       try { localStorage.setItem('zoo_lang', currentLang) } catch (err) { console.error('localStorage write failed', err) }
       applyTranslations()
-      // Re-render any dynamic modal content so it picks up the new language too.
       try { renderMembers() } catch (err) { console.error('re-render on lang change failed', err) }
     })
 
@@ -782,34 +702,18 @@
     // =====================================================================
     // ---------- Status card: RED/ORANGE/PURPLE/BLUE percentage bars ----------
     // =====================================================================
-    // Each row is one of the four team colors. "value" is the 0-100
-    // admin/management-facing percentage, shown next to the bar as
-    // "value/100". The bar itself is always drawn in the row's own team
-    // color now (not a red/yellow/green health color) so RED always looks
-    // red, BLUE always looks blue, etc.
-    // icon: the individual armchair PNGs you uploaded to Supabase Storage,
-    // one per wing -- each is a real <img> in its row (rendered below) so it
-    // lines up with its own bar instead of relying on baked-in card art.
     var statusRows = [
       { key: 'RED', labelKey: 'wing_red', value: 20, color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
       { key: 'ORANGE', labelKey: 'wing_orange', value: 60, color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
       { key: 'PURPLE', labelKey: 'wing_purple', value: 50, color: '#8b5cf6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
-      // NOTE: the Purple and Blue links you sent point to the exact same
-      // file (IMG_7772.png, same token) -- using it for both for now so
-      // nothing breaks. Send the real Blue icon URL and I'll swap it in.
       { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
     ]
 
-    // Percentages are editable by ADMIN and MANAGEMENT -- not just ADMIN.
-    // Role assignment itself stays admin-only (enforced separately in admin.html).
     function isPrivileged() {
       var role = (window.zooUserRole || '').toUpperCase()
       return role === 'ADMIN' || role === 'MANAGEMENT'
     }
 
-    // The nav link is just a convenience -- the real gate is server-side
-    // RLS on admin.html's own queries, so hiding this link is only about
-    // not showing a dead-end link to people who can't use it, not security.
     function updateAdminNavVisibility() {
       var link = $('nav-admin-link')
       if (link) link.style.display = isPrivileged() ? 'flex' : 'none'
@@ -817,19 +721,29 @@
 
     var wingSaveTimer = null
     function scheduleWingSave(row) {
-      // Debounced auto-save: fires ~600ms after the admin/management user
-      // stops typing, instead of hitting Supabase on every keystroke.
       clearTimeout(wingSaveTimer)
       wingSaveTimer = setTimeout(function () {
         if (!supabase) { showConnBanner(); return }
-        supabase.from('wing_status')
-          .upsert({ color: row.key, percentage: row.value, updated_by: window.zooUserId || null })
-          .then(function (res) {
-            if (res && res.error) {
-              console.error('wing_status save failed', res.error)
-              showConnBanner()
-            }
-          })
+        // FIX: upsert needs to know which column identifies "the same row"
+        // (onConflict) -- without it, Supabase can't tell this is meant to
+        // update the existing RED/ORANGE/PURPLE/BLUE row instead of always
+        // trying to insert a new one, which silently fails once a row for
+        // that color already exists and there's no unique constraint match.
+        // Make sure `color` has a UNIQUE constraint in the wing_status table
+        // for this to work (see the SQL notes).
+        withTimeout(
+          supabase.from('wing_status')
+            .upsert({ color: row.key, percentage: row.value, updated_by: window.zooUserId || null }, { onConflict: 'color' }),
+          8000
+        ).then(function (res) {
+          if (res && res.error) {
+            console.error('wing_status save failed', res.error)
+            showConnBanner()
+          }
+        }).catch(function (err) {
+          console.error('wing_status save timed out/failed', err)
+          showConnBanner()
+        })
       }, 600)
     }
 
@@ -866,9 +780,6 @@
           )
         }).join('')
 
-        // Automatic running total -- only shown to admin/management, since
-        // it's only actionable for the people who can actually edit the
-        // percentages. Flags green at exactly 100, amber otherwise.
         var totalHtml = privileged
           ? '<div class="status-total" style="color:' + (total === 100 ? '#a3f0b0' : '#ffd9a0') + '">' +
               t('wing_total_label', 'Total') + ': ' + total + '/100' +
@@ -877,7 +788,6 @@
 
         container.innerHTML = rowsHtml + totalHtml
 
-        // Wire up admin/management inputs (only present when privileged)
         container.querySelectorAll('.status-admin-input').forEach(function (input) {
           input.addEventListener('input', function () {
             var idx = parseInt(input.getAttribute('data-row'), 10)
@@ -891,10 +801,6 @@
     }
 
     // ---------- Status card open+close ----------
-    // Same element throughout -- clicking it while it's still in its
-    // collapsed/sliver position opens it; once open, only the explicit
-    // close (x) button or Escape closes it (so clicking the bars/inputs
-    // inside doesn't accidentally re-trigger anything).
     try {
       var statusCard = $('status-card')
 
@@ -912,8 +818,6 @@
       }
 
       on('status-card', 'click', function (e) {
-        // Don't toggle closed while the admin is mid-edit in a number input
-        // (clicking/focusing the input still bubbles up to this handler).
         if (e && e.target && e.target.closest && e.target.closest('.status-admin')) return
         if (isStatusOpen()) {
           closeStatusCard()
@@ -921,21 +825,11 @@
           openStatusCard()
         }
       })
-      // stopPropagation is required: the close (x) button is a CHILD of
-      // #status-card, so without this its click bubbled up to the
-      // #status-card listener above. That listener saw closeStatusCard()
-      // had JUST removed 'status-open', read isStatusOpen() as false, and
-      // immediately reopened the card in the same click -- which is why
-      // closing only ever seemed to work via a full page refresh.
       on('status-card-close', 'click', function (e) {
         if (e) e.stopPropagation()
         closeStatusCard()
       })
 
-      // The "CHECK STATUS" pill button (now anchored to the arch, outside the
-      // card) is a real, clickable action -- it re-pulls the latest values
-      // and re-renders the bars.
-      // (Swap the body of this for a real Supabase fetch once that table exists.)
       on('status-check-btn', 'click', function () {
         var btn = $('status-check-btn')
         if (btn) { btn.disabled = true; btn.style.opacity = '.7' }
@@ -957,12 +851,6 @@
     var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
     var supabase = null
 
-    // FIX: this used to be a plain if/else that only logged to console.error
-    // on failure -- invisible on iPad, and every downstream feature
-    // (loadUser, the migration form submit) just silently no-opped forever
-    // with the sidebar frozen on "Loading...". Now a failed/missing client
-    // shows the on-screen connection banner too, and initSupabase() can be
-    // re-run by the banner's Retry button without a full page reload.
     function initSupabase() {
       try {
         if (window.supabase) {
@@ -984,11 +872,6 @@
 
     async function loadUser() {
       try {
-        // FIX: previously `if (!supabase) return` -- left the sidebar on
-        // "Loading..." / "MEMBER" forever with no feedback. Now it retries
-        // creating the client once (covers the CDN script finishing late)
-        // and, failing that, surfaces the banner and a clear sidebar state
-        // instead of hanging silently.
         if (!supabase) initSupabase()
         if (!supabase) {
           if ($('user-name')) $('user-name').textContent = 'Offline'
@@ -997,18 +880,23 @@
           return
         }
 
-        var res = await supabase.auth.getUser()
-        var user = res && res.data ? res.data.user : null
+        // FIX (the actual cause of "stuck on Loading..."): getSession()
+        // reads the session straight out of localStorage -- fast, no
+        // network round-trip -- which is exactly why login.html/index.html
+        // sync instantly. The old code used getUser(), which always makes
+        // a live network call to Supabase's Auth server with NO timeout;
+        // if that call ever stalled, the `await` never resolved and
+        // everything downstream (username, role, admin nav) stayed on its
+        // initial "Loading..." state forever. getSession() plus a timeout
+        // as backstop fixes the actual cause instead of just reporting it.
+        var sessRes = await withTimeout(supabase.auth.getSession(), 8000)
+        var session = sessRes && sessRes.data ? sessRes.data.session : null
+        var user = session ? session.user : null
         if (!user) {
           window.location.href = "login.html"
           return
         }
 
-        // Same source the homepage uses: read straight off the auth user
-        // (metadata / email) so the name always renders even if a
-        // 'profiles' row doesn't exist yet or a table query fails --
-        // that dependency on 'profiles' alone was why this got stuck on
-        // "Loading..." forever whenever that lookup came back empty.
         window.zooUserId = user.id
         var meta = user.user_metadata || {}
         var uname = meta.username || (user.email || 'Member').split('@')[0]
@@ -1021,11 +909,24 @@
         renderStatusRows()
         hideConnBanner()
 
+        // Background token re-validation against the server (still useful
+        // to catch a revoked/expired session), but now wrapped in its own
+        // timeout and non-blocking -- it can never freeze the page again.
+        withTimeout(supabase.auth.getUser(), 8000).then(function (res) {
+          var freshUser = res && res.data ? res.data.user : null
+          if (!freshUser) window.location.href = "login.html"
+        }).catch(function (err) {
+          console.error('background getUser revalidation failed/timed out (non-fatal)', err)
+        })
+
         // The 'profiles' table is the real source of truth for role
         // (auth user_metadata is just a starting hint) -- upgrade to it,
-        // but never block the page on this lookup.
+        // wrapped in a timeout so a stalled query can't block the page.
         try {
-          var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
+          var profRes = await withTimeout(
+            supabase.from('profiles').select('display_name, role').eq('id', user.id).single(),
+            8000
+          )
           var profile = profRes && profRes.data
           if (profile) {
             if (profile.display_name && $('user-name')) $('user-name').textContent = profile.display_name
@@ -1035,16 +936,14 @@
             updateAdminNavVisibility()
             renderStatusRows()
           } else if (profRes && profRes.error) {
-            // Visible now instead of only in devtools -- this is the exact
-            // case in your Supabase screenshot: nami's role lives in
-            // `profiles` as 'admin', so if this lookup fails (RLS, network,
-            // whatever), the page will fall back to the auth-metadata role
-            // ('GUEST'/'MEMBER') and never show ADMIN. Surface it so it's
-            // obvious that's what happened instead of just looking wrong.
+            // If this logs an RLS/permission-denied error, add a SELECT
+            // policy on `profiles` for authenticated users (see SQL notes)
+            // -- otherwise the page silently falls back to the
+            // auth-metadata role and can under-report ADMIN/MANAGEMENT.
             console.error('profiles lookup returned an error:', profRes.error)
           }
         } catch (profErr) {
-          console.error('profiles lookup failed (non-fatal, already showing auth-based name):', profErr)
+          console.error('profiles lookup failed/timed out (non-fatal, already showing auth-based name):', profErr)
         }
       } catch (e) {
         console.error('loadUser failed', e)
@@ -1071,11 +970,6 @@
     // =====================================================================
     // ---------- Migration popup: Solo / Group + member rows ----------
     // =====================================================================
-    // transferType: 'solo' | 'group'
-    // members: array of { uid, username, prevAlliance, prevServer, killcount, faction, role, migrationScore }
-    //   faction: 0 = unset/grey, 1 = F (blue), 2 = S (purple), 3 = R (orange) -- cycles on click
-    //   role: '' or 'i1'..'i10' (dropdown only, no other options)
-    //   migrationScore: the ONLY optional field -- everything else is required before submit.
     var transferType = 'solo'
     var members = []
 
@@ -1207,9 +1101,6 @@
       renderMembers()
     })
 
-    // Event delegation on the members container -- rows get rebuilt via
-    // innerHTML on every render, so listeners are bound once here instead
-    // of being re-attached (and leaking) after each render.
     try {
       var membersContainer = $('members-container')
       if (membersContainer) {
@@ -1292,8 +1183,6 @@
           if (errorEl) errorEl.classList.remove('visible')
           if (successEl) successEl.classList.remove('visible')
 
-          // Every field is required except Migration Score. For group
-          // transfers the Alliance Tag is also required.
           var missing = members.some(function (m) {
             return !m.uid || !m.username || !m.prevAlliance || !m.prevServer ||
                    !m.killcount || !(m.faction > 0) || !m.role
@@ -1309,13 +1198,6 @@
             return
           }
 
-          // FIX: this is the critical part. Previously, if `supabase` was
-          // null the code fell into a silent `console.log` branch and then
-          // UNCONDITIONALLY showed "Migration request sent!" right after --
-          // so submissions looked successful even when nothing was ever
-          // written to Supabase. Now a missing client is treated as a real
-          // failure: it shows the error banner + inline error, and returns
-          // before touching the success message.
           if (!supabase) {
             initSupabase()
           }
@@ -1343,23 +1225,32 @@
               }
             })
 
-            // Persist to Supabase: one row in migration_requests (type +
-            // alliance tag), then one row per member in migration_members.
-            // See the provided schema.sql for the matching table/RLS setup.
-            var reqRes = await supabase.from('migration_requests').insert({
-              type: transferType,
-              alliance_tag: allianceTagVal || null
-            }).select().single()
+            // FIX: wrapped in withTimeout so a stalled insert can't hang
+            // the Send button in a disabled state forever. If this fails
+            // with a permission-denied / RLS error, add INSERT + SELECT
+            // policies on migration_requests (see SQL notes) -- the
+            // .select().single() after insert needs a SELECT policy on
+            // top of the INSERT policy or the whole call throws and
+            // nothing gets saved.
+            var reqRes = await withTimeout(
+              supabase.from('migration_requests').insert({
+                type: transferType,
+                alliance_tag: allianceTagVal || null
+              }).select().single(),
+              10000
+            )
 
             if (reqRes.error) throw reqRes.error
 
             var requestId = reqRes.data.id
-            var membersRes = await supabase.from('migration_members').insert(
-              memberPayload.map(function (m) { return Object.assign({ request_id: requestId }, m) })
+            var membersRes = await withTimeout(
+              supabase.from('migration_members').insert(
+                memberPayload.map(function (m) { return Object.assign({ request_id: requestId }, m) })
+              ),
+              10000
             )
             if (membersRes.error) throw membersRes.error
 
-            // Only shown once the insert(s) above actually succeeded.
             if (successEl) {
               successEl.textContent = 'Migration request sent!'
               successEl.classList.add('visible')
@@ -1370,6 +1261,7 @@
               errorEl.textContent = (err && err.message) || 'Something went wrong.'
               errorEl.classList.add('visible')
             }
+            console.error('migration submit failed', err)
           } finally {
             if (submitBtn) submitBtn.disabled = false
           }
