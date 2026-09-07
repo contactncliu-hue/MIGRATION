@@ -667,8 +667,8 @@
     function scheduleWingSave(row) {
       clearTimeout(wingSaveTimer)
       wingSaveTimer = setTimeout(function () {
-        if (!supabase) { console.error('wing_status save skipped: no supabase client'); return }
-        supabase.from('wing_status')
+        if (!supabaseClient) { console.error('wing_status save skipped: no supabase client'); return }
+        supabaseClient.from('wing_status')
           .upsert({ color: row.key, percentage: row.value, updated_by: window.zooUserId || null })
           .then(function (res) {
             if (res && res.error) console.error('wing_status save failed', res.error)
@@ -776,14 +776,21 @@
     } catch (e) { console.error('status card init failed', e) }
 
     // ---------- Supabase ----------
+    // NOTE: named supabaseClient (NOT "supabase") so we never shadow/clobber
+    // window.supabase, which is the actual library object set by the CDN
+    // script below. Previously this was `var supabase = null`, and because
+    // top-level `var` declarations become properties of `window`, that line
+    // was silently overwriting window.supabase with null on every load —
+    // which is why initSupabase() always found window.supabase falsy and
+    // reported "failed to load" even when the CDN worked fine.
     var SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
     var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-    var supabase = null
+    var supabaseClient = null
 
     function initSupabase() {
       try {
         if (window.supabase) {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
           return true
         } else {
           console.error('Supabase failed to load from the CDN.')
@@ -800,9 +807,9 @@
 
     async function loadUser() {
       try {
-        if (!supabase) initSupabase()
+        if (!supabaseClient) initSupabase()
 
-        if (!supabase) {
+        if (!supabaseClient) {
           window.zooUserId = null
           window.zooUserRole = 'GUEST'
           if ($('user-name')) $('user-name').textContent = 'Guest'
@@ -813,7 +820,7 @@
           return
         }
 
-        var res = await supabase.auth.getUser()
+        var res = await supabaseClient.auth.getUser()
         var user = res && res.data ? res.data.user : null
 
         if (!user) {
@@ -830,7 +837,7 @@
         window.zooUserId = user.id
         var meta = user.user_metadata || {}
 
-        var profRes = await supabase.from('profiles').select('display_name, role').eq('id', user.id).single()
+        var profRes = await supabaseClient.from('profiles').select('display_name, role').eq('id', user.id).single()
         if (profRes.error) console.error('profiles lookup failed', profRes.error)
 
         var profile = profRes && profRes.data
@@ -854,7 +861,7 @@
 
     on('logout-btn', 'click', async function () {
       try {
-        if (supabase) await supabase.auth.signOut()
+        if (supabaseClient) await supabaseClient.auth.signOut()
       } catch (err) {
         console.error('Sign out failed:', err)
       }
@@ -1092,10 +1099,10 @@
             return
           }
 
-          if (!supabase) {
+          if (!supabaseClient) {
             initSupabase()
           }
-          if (!supabase) {
+          if (!supabaseClient) {
             if (errorEl) {
               errorEl.textContent = t('form_error_offline', "Can't reach the server right now, so this wasn't saved. Check your connection and try again.")
               errorEl.classList.add('visible')
@@ -1118,7 +1125,7 @@
               }
             })
 
-            var reqRes = await supabase.from('migration_requests').insert({
+            var reqRes = await supabaseClient.from('migration_requests').insert({
               type: transferType,
               alliance_tag: allianceTagVal || null
             }).select().single()
@@ -1126,7 +1133,7 @@
             if (reqRes.error) throw reqRes.error
 
             var requestId = reqRes.data.id
-            var membersRes = await supabase.from('migration_members').insert(
+            var membersRes = await supabaseClient.from('migration_members').insert(
               memberPayload.map(function (m) { return Object.assign({ request_id: requestId }, m) })
             )
             if (membersRes.error) throw membersRes.error
