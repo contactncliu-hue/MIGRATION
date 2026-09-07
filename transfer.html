@@ -5,33 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZOO - Transfer</title>
 
-  <script>
-    (function () {
-      function showError(text) {
-        var box = document.createElement('div')
-        box.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#e03131;color:#fff;' +
-          'padding:12px 16px;font-size:13px;font-family:monospace;z-index:999999;' +
-          'white-space:pre-wrap;word-break:break-word;box-shadow:0 2px 8px rgba(0,0,0,.3);'
-        box.textContent = text
-        var closeBtn = document.createElement('span')
-        closeBtn.textContent = ' ✕'
-        closeBtn.style.cssText = 'float:right;cursor:pointer;font-weight:bold;'
-        closeBtn.onclick = function () { box.remove() }
-        box.appendChild(closeBtn)
-        if (document.body) document.body.appendChild(box)
-        else window.addEventListener('DOMContentLoaded', function () { document.body.appendChild(box) })
-      }
-      window.showAppError = showError
-      window.addEventListener('error', function (e) {
-        showError('JS ERROR: ' + e.message + '\n(' + (e.filename || '') + ':' + e.lineno + ':' + e.colno + ')')
-      })
-      window.addEventListener('unhandledrejection', function (e) {
-        var reason = e.reason && e.reason.message ? e.reason.message : String(e.reason)
-        showError('PROMISE ERROR: ' + reason)
-      })
-    })()
-  </script>
-
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; background: #f4f5fa; overflow-x:hidden; }
@@ -150,7 +123,6 @@
     }
     .status-open .status-rows{ opacity:1; pointer-events:auto; transition:opacity .4s ease .35s; }
     .status-row{ display:flex; align-items:center; gap:14px; }
-    .status-row-icon{ width:40px; height:40px; object-fit:contain; flex-shrink:0; }
     .status-row-body{ flex:1; min-width:0; }
     .status-row-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
     .status-row-name{ font-size:12px; font-weight:700; color:#fff0ec; letter-spacing:.3px; }
@@ -262,9 +234,9 @@
     <img src="assets/logo.png.PNG" alt="Logo" class="logo-img" onerror="this.style.display='none'" />
 
     <div class="user-block">
-      <div class="user-avatar" id="user-initial">?</div>
+      <div class="user-avatar" id="user-initial">A</div>
       <div class="user-info">
-        <div class="user-name" id="user-name">Guest</div>
+        <div class="user-name" id="user-name">Admin</div>
         <div class="user-role" data-i18n="role_label">Role: <span id="user-role">ADMIN</span></div>
       </div>
     </div>
@@ -352,7 +324,6 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     function $(id) { return document.getElementById(id) }
     function on(id, evt, fn) {
@@ -368,7 +339,7 @@
       if (isMobile()) document.body.classList.add('sidebar-hidden')
       on('menu-toggle', 'click', function () { document.body.classList.toggle('sidebar-hidden') })
       on('sidebar-backdrop', 'click', function () { document.body.classList.add('sidebar-hidden') })
-    } catch (e) { console.error('sidebar init failed', e) }
+    } catch (e) {}
 
     try {
       function playEntrance(){
@@ -384,7 +355,7 @@
       window.addEventListener('pageshow', function (e) {
         if (e.persisted) playEntrance()
       })
-    } catch (e) { console.error('stage reveal failed', e) }
+    } catch (e) {}
 
     var translations = {
       en: {
@@ -401,7 +372,7 @@
         add_member: "+ Add Member", remove_member: "Remove", member_label: "MEMBER #",
         submit_label: "SEND",
         status_check_cta: "CHECK STATUS",
-        form_error_required: "Please fill in every field for every member (Migration Score is the only optional one).",
+        form_error_required: "Please fill in every field for every member.",
         wing_red: "RED", wing_orange: "ORANGE", wing_purple: "PURPLE", wing_blue: "BLUE",
         wing_total_label: "Total"
       }
@@ -427,13 +398,11 @@
     applyTranslations()
 
     var statusRows = [
-      { key: 'RED', labelKey: 'wing_red', value: 20, color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
-      { key: 'ORANGE', labelKey: 'wing_orange', value: 60, color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
-      { key: 'PURPLE', labelKey: 'wing_purple', value: 50, color: '#8b5cf6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
-      { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
+      { key: 'RED', labelKey: 'wing_red', value: 20, color: '#c1442e', icon: '' },
+      { key: 'ORANGE', labelKey: 'wing_orange', value: 60, color: '#f2a90f', icon: '' },
+      { key: 'PURPLE', labelKey: 'wing_purple', value: 50, color: '#8b5cf6', icon: '' },
+      { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: '' }
     ]
-
-    function isPrivileged() { return true; } // Single admin role access guaranteed
 
     function renderStatusRows() {
       try {
@@ -452,7 +421,6 @@
 
           return (
             '<div class="status-row" data-row="' + i + '">' +
-              (row.icon ? '<img class="status-row-icon" src="' + row.icon + '" alt="' + name + ' icon" onerror="this.style.display=\'none\'" />' : '') +
               '<div class="status-row-body">' +
                 '<div class="status-row-top">' +
                   '<span class="status-row-name">' + name + '</span>' +
@@ -507,10 +475,68 @@
       renderStatusRows()
     } catch (e) {}
 
-    // Supabase Client Setup
+    // Supabase Configuration
     var SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
     var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
-    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    var supabase = {
+      from: function(table) {
+        return {
+          insert: function(payload) {
+            return {
+              select: function() {
+                return {
+                  single: async function() {
+                    try {
+                      var res = await fetch(SUPABASE_URL + '/rest/v1/' + table, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'apikey': SUPABASE_ANON_KEY,
+                          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+                          'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify(Array.isArray(payload) ? payload[0] : payload)
+                      });
+                      if (!res.ok) {
+                        var errText = await res.text();
+                        return { error: { message: errText || 'Database error' }, data: null };
+                      }
+                      var json = await res.json();
+                      return { error: null, data: Array.isArray(json) ? json[0] : json };
+                    } catch (err) {
+                      return { error: { message: err.message || 'Network error' }, data: null };
+                    }
+                  }
+                }
+              },
+              then: async function(resolve, reject) {
+                try {
+                  var res = await fetch(SUPABASE_URL + '/rest/v1/' + table, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'apikey': SUPABASE_ANON_KEY,
+                      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+                      'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                  });
+                  if (!res.ok) {
+                    var errText = await res.text();
+                    resolve({ error: { message: errText || 'Database error' } });
+                  } else {
+                    resolve({ error: null });
+                  }
+                } catch (err) {
+                  resolve({ error: { message: err.message || 'Network error' } });
+                }
+              }
+            }
+          }
+        }
+      }
+    };
 
     var transferType = 'solo'
     var members = []
@@ -712,19 +738,19 @@
               }
             })
 
-            // Syncs directly to Supabase tables matching index setup
+            // Save directly to Supabase - your Apps Script will pick it up on its next timer run!
             var reqRes = await supabase.from('migration_requests').insert({
               type: transferType,
               alliance_tag: allianceTagVal || null
             }).select().single()
 
-            if (reqRes.error) throw reqRes.error
+            if (reqRes.error) throw new Error(reqRes.error.message)
 
             var requestId = reqRes.data.id
             var membersRes = await supabase.from('migration_members').insert(
               memberPayload.map(function (m) { return Object.assign({ request_id: requestId }, m) })
             )
-            if (membersRes.error) throw membersRes.error
+            if (membersRes.error) throw new Error(membersRes.error.message)
 
             if (successEl) {
               successEl.textContent = 'Migration request sent successfully!'
