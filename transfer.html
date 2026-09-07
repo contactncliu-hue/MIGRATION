@@ -25,6 +25,7 @@
         if (document.body) document.body.appendChild(box)
         else window.addEventListener('DOMContentLoaded', function () { document.body.appendChild(box) })
       }
+      window.showAppError = showError
       window.addEventListener('error', function (e) {
         showError('JS ERROR: ' + e.message + '\n(' + (e.filename || '') + ':' + e.lineno + ':' + e.colno + ')')
       })
@@ -381,6 +382,19 @@
     }
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
 
+    /* ---------- Connection banner (shown when Supabase / auth can't be reached) ---------- */
+    .conn-banner{
+      position:fixed; top:0; left:0; right:0; z-index:90;
+      background:#fff3cd; color:#7a5b00; border-bottom:1px solid #ffe58f;
+      font-size:13px; font-weight:600; padding:10px 16px;
+      display:none; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .conn-banner.visible{ display:flex; }
+    .conn-banner button{
+      background:#7a5b00; color:#fff; border:none; border-radius:8px;
+      padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer; flex-shrink:0;
+    }
+
     @media (max-width:760px){
       .transfer-btn .btn-label{ font-size:3.4vw; }
       .status-check-label{ font-size:3.4vw; }
@@ -393,6 +407,14 @@
   </style>
 </head>
 <body>
+
+  <!-- Shown whenever the Supabase client couldn't be reached, so a bad
+       connection is visible instead of silently leaving the sidebar on
+       "Loading..." forever and letting form submits silently no-op. -->
+  <div class="conn-banner" id="conn-banner">
+    <span id="conn-banner-text">Can't reach the server. Your login and any submissions won't sync until this is fixed.</span>
+    <button id="conn-retry-btn" type="button">Retry</button>
+  </div>
 
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
@@ -527,6 +549,22 @@
       return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
     }
 
+    // ---------- Connection banner helpers ----------
+    // Shown whenever we can't talk to Supabase (CDN failed to load, network
+    // down, request timed out, etc). Previously this failed silently:
+    // the sidebar just sat on "Loading..." forever and the migration form
+    // showed a fake "sent!" message with nothing actually saved.
+    function showConnBanner(msg) {
+      var banner = $('conn-banner')
+      if (!banner) return
+      if (msg && $('conn-banner-text')) $('conn-banner-text').textContent = msg
+      banner.classList.add('visible')
+    }
+    function hideConnBanner() {
+      var banner = $('conn-banner')
+      if (banner) banner.classList.remove('visible')
+    }
+
     // ---------- Sidebar toggle (hamburger + mobile backdrop) ----------
     try {
       function isMobile(){ return window.matchMedia('(max-width:760px)').matches }
@@ -562,7 +600,15 @@
       }
       playEntrance()
       window.addEventListener('pageshow', function (e) {
-        if (e.persisted) playEntrance()
+        if (e.persisted) {
+          playEntrance()
+          // FIX: a bfcache restore (e.g. Safari suspending/resuming a
+          // background tab) brings back the DOM exactly as it was frozen --
+          // if that was mid-"Loading...", it stays "Loading..." forever
+          // because loadUser() never gets called again. Re-run it here so
+          // the sidebar actually re-syncs instead of looking permanently stuck.
+          try { loadUser() } catch (err) { console.error('loadUser on pageshow failed', err) }
+        }
       })
     } catch (e) { console.error('stage reveal failed', e) }
 
@@ -583,8 +629,11 @@
         submit_label: "SEND",
         status_check_cta: "CHECK STATUS",
         form_error_required: "Please fill in every field for every member (Migration Score is the only optional one).",
+        form_error_offline: "Can't reach the server right now, so this wasn't saved. Check your connection and try again.",
         wing_red: "RED", wing_orange: "ORANGE", wing_purple: "PURPLE", wing_blue: "BLUE",
-        wing_total_label: "Total"
+        wing_total_label: "Total",
+        conn_banner_text: "Can't reach the server. Your login and any submissions won't sync until this is fixed.",
+        conn_retry: "Retry"
       },
       ko: {
         nav_home: "홈페이지", nav_transfer: "송금", nav_admin: "관리자 및 매니지먼트", lang_label: "언어",
@@ -601,8 +650,11 @@
         submit_label: "보내기",
         status_check_cta: "상태 확인",
         form_error_required: "이주 점수를 제외한 모든 항목을 입력해 주세요.",
+        form_error_offline: "지금은 서버에 연결할 수 없어 저장되지 않았습니다. 연결을 확인한 뒤 다시 시도해 주세요.",
         wing_red: "레드", wing_orange: "오렌지", wing_purple: "퍼플", wing_blue: "블루",
-        wing_total_label: "합계"
+        wing_total_label: "합계",
+        conn_banner_text: "서버에 연결할 수 없습니다. 이 문제가 해결될 때까지 로그인 및 제출 내용이 동기화되지 않습니다.",
+        conn_retry: "재시도"
       },
       'zh-CN': {
         nav_home: "主页", nav_transfer: "转账", nav_admin: "管理与运营", lang_label: "语言",
@@ -619,8 +671,11 @@
         submit_label: "发送",
         status_check_cta: "查看状态",
         form_error_required: "请填写除迁移分数以外的所有字段。",
+        form_error_offline: "目前无法连接服务器，未能保存。请检查网络后重试。",
         wing_red: "红方", wing_orange: "橙方", wing_purple: "紫方", wing_blue: "蓝方",
-        wing_total_label: "总计"
+        wing_total_label: "总计",
+        conn_banner_text: "无法连接服务器。此问题解决前，登录状态和提交内容都不会同步。",
+        conn_retry: "重试"
       },
       'pt-BR': {
         nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", nav_admin: "ADMIN E GESTÃO", lang_label: "IDIOMA",
@@ -637,8 +692,11 @@
         submit_label: "ENVIAR",
         status_check_cta: "VER STATUS",
         form_error_required: "Preencha todos os campos de todos os membros (a Pontuação de Migração é o único opcional).",
+        form_error_offline: "Não foi possível conectar ao servidor agora, então isso não foi salvo. Verifique sua conexão e tente novamente.",
         wing_red: "VERMELHO", wing_orange: "LARANJA", wing_purple: "ROXO", wing_blue: "AZUL",
-        wing_total_label: "Total"
+        wing_total_label: "Total",
+        conn_banner_text: "Não foi possível conectar ao servidor. Seu login e envios não serão sincronizados até que isso seja corrigido.",
+        conn_retry: "Tentar novamente"
       },
       vi: {
         nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", nav_admin: "QUẢN TRỊ & QUẢN LÝ", lang_label: "NGÔN NGỮ",
@@ -655,8 +713,11 @@
         submit_label: "GỬI",
         status_check_cta: "KIỂM TRA TRẠNG THÁI",
         form_error_required: "Vui lòng điền đầy đủ tất cả các trường cho mỗi thành viên (chỉ Điểm di chuyển là không bắt buộc).",
+        form_error_offline: "Hiện không thể kết nối máy chủ nên dữ liệu chưa được lưu. Vui lòng kiểm tra kết nối và thử lại.",
         wing_red: "ĐỎ", wing_orange: "CAM", wing_purple: "TÍM", wing_blue: "XANH DƯƠNG",
-        wing_total_label: "Tổng"
+        wing_total_label: "Tổng",
+        conn_banner_text: "Không thể kết nối máy chủ. Đăng nhập và dữ liệu gửi đi sẽ không đồng bộ cho đến khi khắc phục xong.",
+        conn_retry: "Thử lại"
       },
       fr: {
         nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", nav_admin: "ADMIN & GESTION", lang_label: "LANGUE",
@@ -673,8 +734,11 @@
         submit_label: "ENVOYER",
         status_check_cta: "VÉRIFIER LE STATUT",
         form_error_required: "Merci de remplir tous les champs pour chaque membre (le score de migration est le seul facultatif).",
+        form_error_offline: "Impossible de joindre le serveur pour le moment, donc rien n'a été enregistré. Vérifiez votre connexion et réessayez.",
         wing_red: "ROUGE", wing_orange: "ORANGE", wing_purple: "VIOLET", wing_blue: "BLEU",
-        wing_total_label: "Total"
+        wing_total_label: "Total",
+        conn_banner_text: "Impossible de joindre le serveur. Votre connexion et vos envois ne seront pas synchronisés tant que ce n'est pas résolu.",
+        conn_retry: "Réessayer"
       }
     }
 
@@ -700,6 +764,8 @@
         if (roleEl && roleEl.childNodes[0] && translations[currentLang]) {
           roleEl.childNodes[0].textContent = translations[currentLang]['role_label']
         }
+        if ($('conn-banner-text')) $('conn-banner-text').textContent = t('conn_banner_text', 'Can\'t reach the server. Your login and any submissions won\'t sync until this is fixed.')
+        if ($('conn-retry-btn')) $('conn-retry-btn').textContent = t('conn_retry', 'Retry')
       } catch (e) { console.error('applyTranslations failed', e) }
     }
 
@@ -755,11 +821,14 @@
       // stops typing, instead of hitting Supabase on every keystroke.
       clearTimeout(wingSaveTimer)
       wingSaveTimer = setTimeout(function () {
-        if (!supabase) return
+        if (!supabase) { showConnBanner(); return }
         supabase.from('wing_status')
           .upsert({ color: row.key, percentage: row.value, updated_by: window.zooUserId || null })
           .then(function (res) {
-            if (res && res.error) console.error('wing_status save failed', res.error)
+            if (res && res.error) {
+              console.error('wing_status save failed', res.error)
+              showConnBanner()
+            }
           })
       }, 600)
     }
@@ -887,17 +956,47 @@
     var SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
     var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
     var supabase = null
-    try {
-      if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      } else {
-        console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
+
+    // FIX: this used to be a plain if/else that only logged to console.error
+    // on failure -- invisible on iPad, and every downstream feature
+    // (loadUser, the migration form submit) just silently no-opped forever
+    // with the sidebar frozen on "Loading...". Now a failed/missing client
+    // shows the on-screen connection banner too, and initSupabase() can be
+    // re-run by the banner's Retry button without a full page reload.
+    function initSupabase() {
+      try {
+        if (window.supabase) {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+          hideConnBanner()
+          return true
+        } else {
+          console.error('Supabase failed to load from the CDN -- login check and logout will not fully work until this loads.')
+          showConnBanner()
+          return false
+        }
+      } catch (e) {
+        console.error('supabase init failed', e)
+        showConnBanner()
+        return false
       }
-    } catch (e) { console.error('supabase init failed', e) }
+    }
+    initSupabase()
 
     async function loadUser() {
       try {
-        if (!supabase) return
+        // FIX: previously `if (!supabase) return` -- left the sidebar on
+        // "Loading..." / "MEMBER" forever with no feedback. Now it retries
+        // creating the client once (covers the CDN script finishing late)
+        // and, failing that, surfaces the banner and a clear sidebar state
+        // instead of hanging silently.
+        if (!supabase) initSupabase()
+        if (!supabase) {
+          if ($('user-name')) $('user-name').textContent = 'Offline'
+          if ($('user-role')) $('user-role').textContent = '—'
+          showConnBanner()
+          return
+        }
+
         var res = await supabase.auth.getUser()
         var user = res && res.data ? res.data.user : null
         if (!user) {
@@ -920,6 +1019,7 @@
         if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
         updateAdminNavVisibility()
         renderStatusRows()
+        hideConnBanner()
 
         // The 'profiles' table is the real source of truth for role
         // (auth user_metadata is just a starting hint) -- upgrade to it,
@@ -934,6 +1034,14 @@
             if (profile.role) window.zooUserRole = profile.role
             updateAdminNavVisibility()
             renderStatusRows()
+          } else if (profRes && profRes.error) {
+            // Visible now instead of only in devtools -- this is the exact
+            // case in your Supabase screenshot: nami's role lives in
+            // `profiles` as 'admin', so if this lookup fails (RLS, network,
+            // whatever), the page will fall back to the auth-metadata role
+            // ('GUEST'/'MEMBER') and never show ADMIN. Surface it so it's
+            // obvious that's what happened instead of just looking wrong.
+            console.error('profiles lookup returned an error:', profRes.error)
           }
         } catch (profErr) {
           console.error('profiles lookup failed (non-fatal, already showing auth-based name):', profErr)
@@ -941,9 +1049,15 @@
       } catch (e) {
         console.error('loadUser failed', e)
         if ($('user-name')) $('user-name').textContent = 'Member'
+        showConnBanner()
       }
     }
     loadUser()
+
+    on('conn-retry-btn', 'click', function () {
+      initSupabase()
+      loadUser()
+    })
 
     on('logout-btn', 'click', async function () {
       try {
@@ -1195,6 +1309,25 @@
             return
           }
 
+          // FIX: this is the critical part. Previously, if `supabase` was
+          // null the code fell into a silent `console.log` branch and then
+          // UNCONDITIONALLY showed "Migration request sent!" right after --
+          // so submissions looked successful even when nothing was ever
+          // written to Supabase. Now a missing client is treated as a real
+          // failure: it shows the error banner + inline error, and returns
+          // before touching the success message.
+          if (!supabase) {
+            initSupabase()
+          }
+          if (!supabase) {
+            showConnBanner()
+            if (errorEl) {
+              errorEl.textContent = t('form_error_offline', "Can't reach the server right now, so this wasn't saved. Check your connection and try again.")
+              errorEl.classList.add('visible')
+            }
+            return
+          }
+
           if (submitBtn) submitBtn.disabled = true
           try {
             var memberPayload = members.map(function (m) {
@@ -1213,23 +1346,20 @@
             // Persist to Supabase: one row in migration_requests (type +
             // alliance tag), then one row per member in migration_members.
             // See the provided schema.sql for the matching table/RLS setup.
-            if (supabase) {
-              var reqRes = await supabase.from('migration_requests').insert({
-                type: transferType,
-                alliance_tag: allianceTagVal || null
-              }).select().single()
+            var reqRes = await supabase.from('migration_requests').insert({
+              type: transferType,
+              alliance_tag: allianceTagVal || null
+            }).select().single()
 
-              if (reqRes.error) throw reqRes.error
+            if (reqRes.error) throw reqRes.error
 
-              var requestId = reqRes.data.id
-              var membersRes = await supabase.from('migration_members').insert(
-                memberPayload.map(function (m) { return Object.assign({ request_id: requestId }, m) })
-              )
-              if (membersRes.error) throw membersRes.error
-            } else {
-              console.log('Supabase not available -- migration request not persisted:', { type: transferType, allianceTag: allianceTagVal, members: memberPayload })
-            }
+            var requestId = reqRes.data.id
+            var membersRes = await supabase.from('migration_members').insert(
+              memberPayload.map(function (m) { return Object.assign({ request_id: requestId }, m) })
+            )
+            if (membersRes.error) throw membersRes.error
 
+            // Only shown once the insert(s) above actually succeeded.
             if (successEl) {
               successEl.textContent = 'Migration request sent!'
               successEl.classList.add('visible')
