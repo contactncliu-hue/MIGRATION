@@ -97,11 +97,11 @@
       position:absolute; left:50%; bottom:0;
       width:max(100vw, 177.7vh);
       aspect-ratio:2560/1451;
-      transform:translateX(-50%);
+      transform:translateX(-50%) translateY(28px) scale(.97);
       opacity:0;
-      transition:opacity 1.1s cubic-bezier(.22,1,.36,1);
+      transition:opacity 2.2s cubic-bezier(.22,1,.36,1), transform 2.2s cubic-bezier(.22,1,.36,1);
     }
-    .stage-ready .scene{ opacity:1; }
+    .stage-ready .scene{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
 
     .deco-bg{
       position:absolute; inset:0;
@@ -143,12 +143,14 @@
 
     .transfer-btn{
       position:absolute; left:50%; top:62%; width:26%;
-      transform:translateX(-50%);
       z-index:30;
       border:none; cursor:pointer; padding:0;
       background:transparent;
-      transition:filter .2s ease;
+      opacity:0;
+      transform:translateX(-50%) translateY(14px) scale(.94);
+      transition:filter .2s ease, opacity .9s cubic-bezier(.22,1,.36,1) 1.4s, transform .9s cubic-bezier(.22,1,.36,1) 1.4s;
     }
+    .stage-ready .transfer-btn{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
     .transfer-btn:hover{ filter:brightness(1.06); }
     .transfer-btn:active{ filter:brightness(.94); }
     .transfer-btn img{ width:100%; display:block; }
