@@ -193,16 +193,17 @@
        states -- it's the same card, just slid off to the left by default
        (only a sliver shows, like your reference) and slid to center when
        clicked. No separate "tab" graphic needed.
-       .status-stage below is only there so `left` can transition against a
-       fixed width without fighting a translateX(-50%) at the same time. */
+       IMPORTANT: this lives outside .scene (see the HTML comment above it)
+       so these percentages are relative to the real viewport-sized
+       .transfer-stage, not the oversized/clipped .scene canvas. */
     .status-card{
-      position:absolute; top:8%; width:52%; max-width:640px;
-      left:-44%; /* only ~8% of the card's own width peeks past the scene's left edge */
+      position:absolute; top:8%; width:36%; max-width:560px;
+      left:-28%; /* only ~8% of the card's own width peeks past the real screen edge */
       z-index:36;
       cursor:pointer;
       transition:left .5s cubic-bezier(.22,.68,0,1.01);
     }
-    .status-open .status-card{ left:24%; cursor:default; } /* (100% - 52%) / 2 = centered */
+    .status-open .status-card{ left:32%; cursor:default; } /* (100% - 36%) / 2 = centered */
     .status-card-bg{ width:100%; display:block; pointer-events:none; }
 
     .status-card-close{
@@ -368,23 +369,30 @@
           <img src="assets/transfer-button.PNG" alt="" onerror="this.style.display='none'; this.closest('.transfer-btn').classList.add('img-failed')" />
           <span class="btn-label" data-i18n="transfer_cta">TRANSFER NOW</span>
         </button>
+      </div>
 
-        <!-- Status card: sits mostly off-canvas to the left by default (just
-             a sliver showing, per your reference), and slides to centered --
-             replacing the header ribbon + transfer button -- when clicked.
-             Same asset (assets/transfer-status-card.PNG) in both states. -->
-        <div class="status-card" id="status-card" aria-hidden="true">
-          <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
-          <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
+      <!-- Status card: lives OUTSIDE .scene on purpose. .scene is an oversized
+           background canvas (width:max(100vw, 177.7vh)) that's centered and
+           usually wider than the viewport -- its own left edge is clipped
+           off-screen, so percentage positions inside it don't correspond to
+           the visible edge of the browser window. This card needs to peek
+           from the ACTUAL left edge of the screen, so it's positioned
+           relative to .transfer-stage (the real, viewport-sized box) instead.
+           Sits mostly off-canvas by default (just a sliver showing, per your
+           reference), and slides to centered -- replacing the header ribbon +
+           transfer button -- when clicked. Same asset
+           (assets/transfer-status-card.PNG) in both states. -->
+      <div class="status-card" id="status-card" aria-hidden="true">
+        <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
+        <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
 
-          <div class="status-rows" id="status-rows"><!-- rows injected by renderStatusRows() --></div>
+        <div class="status-rows" id="status-rows"><!-- rows injected by renderStatusRows() --></div>
 
-          <!-- assets/transfer-status-button.PNG -- the pastel pill button -->
-          <button class="status-check-btn" id="status-check-btn" type="button">
-            <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
-            <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
-          </button>
-        </div>
+        <!-- assets/transfer-status-button.PNG -- the pastel pill button -->
+        <button class="status-check-btn" id="status-check-btn" type="button">
+          <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
+          <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
+        </button>
       </div>
 
     </div>
