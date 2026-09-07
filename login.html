@@ -479,27 +479,6 @@
 
   .back-link:hover { color: #666; }
 
-  /* New-here / sign-up prompt shown under the login form */
-  .signup-prompt {
-    width: 100%;
-    text-align: center;
-    font-size: 13px;
-    font-weight: 600;
-    color: #888;
-  }
-
-  .signup-prompt .signup-link-btn {
-    background: none;
-    border: none;
-    color: #3B5BDB;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .signup-prompt .signup-link-btn:hover { text-decoration: underline; }
-
   /* Shown at the top of the stage if Supabase itself never loaded */
   .load-error {
     display: none;
@@ -582,16 +561,16 @@
       <button class="guest-link" id="guest-btn">PROCEED<br />AS GUEST</button>
     </div>
 
-    <!-- Login / Sign up form -->
+    <!-- Login form -->
     <form class="login-form" id="login-form">
       <img src="assets/logo.png.PNG" class="form-logo" alt="ZOO" />
-      <h1 id="form-title">Welcome back</h1>
+      <h1>Welcome back</h1>
 
       <div class="form-error" id="form-error">Something went wrong.</div>
       <div class="form-success" id="form-success"></div>
 
       <div class="field">
-        <label for="username" id="username-label">Username</label>
+        <label for="username">Username</label>
         <input type="text" id="username" autocomplete="username" minlength="3" pattern="[A-Za-z0-9_\-]+" title="Letters, numbers, - and _ only" required />
       </div>
 
@@ -602,11 +581,6 @@
 
       <button type="submit" class="submit-btn" id="submit-btn">LOG IN</button>
 
-      <div class="signup-prompt" id="signup-prompt">
-        Don't have an account?
-        <button type="button" class="signup-link-btn" id="signup-toggle-btn">Sign up</button>
-      </div>
-
       <button type="button" class="back-link" id="back-btn">&larr; Back</button>
     </form>
 
@@ -615,8 +589,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // ---------- Grab elements + bind buttons FIRST, unconditionally ----------
-    // This guarantees LOG IN / GUEST / BACK always respond, even if
-    // Supabase itself fails to load below.
     const stage = document.getElementById('stage')
     const intro = document.getElementById('intro')
     const loginForm = document.getElementById('login-form')
@@ -628,25 +600,13 @@
     const submitBtn = document.getElementById('submit-btn')
     const loadErrorEl = document.getElementById('load-error')
 
-    // Re-measure once more after full load (and shortly after), since the
-    // iPad Safari toolbar can still settle into its final size a moment
-    // after DOMContentLoaded/inline-script time.
     if (typeof setAppHeight === 'function') {
       window.addEventListener('load', () => {
         setAppHeight()
         setTimeout(setAppHeight, 300)
       })
     }
-    const formTitle = document.getElementById('form-title')
-    const signupPrompt = document.getElementById('signup-prompt')
-    const signupToggleBtn = document.getElementById('signup-toggle-btn')
 
-    // Whether the form is currently in "sign up" mode or "log in" mode
-    let mode = 'login'
-
-    // Supabase auth needs an email under the hood, but the UI only ever
-    // collects a username (both for sign up AND log in) — this maps a
-    // username to a stable synthetic email so no real email is required.
     function usernameToAuthEmail(username) {
       return username.trim().toLowerCase().replace(/\s+/g, '') + '@zoo-app.local'
     }
@@ -685,29 +645,6 @@
       ])
     }
 
-    function setMode(newMode) {
-      mode = newMode
-      clearError()
-      clearSuccess()
-      if (mode === 'signup') {
-        formTitle.textContent = 'Create your account'
-        submitBtn.textContent = 'SIGN UP'
-        signupPrompt.innerHTML = 'Already have an account? <button type="button" class="signup-link-btn" id="signup-toggle-btn">Log in</button>'
-      } else {
-        formTitle.textContent = 'Welcome back'
-        submitBtn.textContent = 'LOG IN'
-        signupPrompt.innerHTML = "Don't have an account? <button type=\"button\" class=\"signup-link-btn\" id=\"signup-toggle-btn\">Sign up</button>"
-      }
-      // Re-bind, since innerHTML replaced the button node
-      document.getElementById('signup-toggle-btn').addEventListener('click', () => {
-        setMode(mode === 'login' ? 'signup' : 'login')
-      })
-    }
-
-    signupToggleBtn.addEventListener('click', () => {
-      setMode(mode === 'login' ? 'signup' : 'login')
-    })
-
     const sharkSprite = document.getElementById('shark-sprite')
     const sharkFrames = [
       'assets/shark-1.PNG', // calm, mouth closed
@@ -725,16 +662,6 @@
     loginTrigger.addEventListener('click', () => {
       if (stage.classList.contains('launching')) return
       stage.classList.add('launching')
-      // Timeline (~4.0s total — nudged a couple hundred ms slower again
-      // after feeling slightly too fast):
-      //  0.0s  logo pulses, flames begin their sweep in from the edges
-      //  0.9s  shark fades in behind the logo, open-mouthed, logo still visible inside it
-      //  1.2s  mouth opening further — shark grows slightly and rises, like it's lunging closer
-      //  1.5s  mouth wide open — grows/rises again, closing the distance
-      //  2.0s  chomp shut (snap) — shark glides back to resting size, and jumps in
-      //        front of the logo so it visually clamps shut over it ("biting it off")
-      //  2.55s everything fades
-      //  2.95s login form appears
       setTimeout(() => stage.classList.add('shark-active'), 900)
       setTimeout(() => kickFrame(sharkFrames[1], 'frame-2'), 1200)
       setTimeout(() => kickFrame(sharkFrames[2], 'frame-3'), 1500)
@@ -751,7 +678,6 @@
         intro.classList.add('hidden')
         loginForm.classList.add('visible')
         document.getElementById('username').focus()
-        // Reset so it's back to the idle logo if the user hits Back later
         sharkSprite.src = sharkFrames[0]
         sharkSprite.classList.remove('frame-2', 'frame-3')
         stage.classList.remove('shark-active', 'chomp')
@@ -771,7 +697,6 @@
       clearError()
       clearSuccess()
       loginForm.reset()
-      setMode('login')
     })
 
     // ---------- Supabase init (guarded) ----------
@@ -796,7 +721,6 @@
         })
         .catch(err => {
           console.error('getUser check failed:', err)
-          // Non-fatal: just means we couldn't pre-check; let them log in manually.
         })
 
       loginForm.addEventListener('submit', async (e) => {
@@ -809,58 +733,30 @@
         const authEmail = usernameToAuthEmail(username)
 
         submitBtn.disabled = true
-        submitBtn.textContent = mode === 'signup' ? 'SIGNING UP...' : 'LOGGING IN...'
+        submitBtn.textContent = 'LOGGING IN...'
 
         try {
-          if (mode === 'signup') {
-            const { data, error } = await withTimeout(
-              supabaseClient.auth.signUp({
-                email: authEmail,
-                password,
-                options: { data: { username } }
-              }),
-              8000, 'signUp'
-            )
+          const { error } = await withTimeout(
+            supabaseClient.auth.signInWithPassword({ email: authEmail, password }),
+            8000, 'signInWithPassword'
+          )
 
-            if (error) {
-              showError(error.message)
-              submitBtn.disabled = false
-              submitBtn.textContent = 'SIGN UP'
-              return
-            }
-
-            // If email confirmation is on, there's no session yet.
-            if (data && data.session) {
-              window.location.href = 'index.html'
-            } else {
-              showSuccess('Account created! You can log in now.')
-              submitBtn.disabled = false
-              submitBtn.textContent = 'SIGN UP'
-              setMode('login')
-            }
-          } else {
-            const { error } = await withTimeout(
-              supabaseClient.auth.signInWithPassword({ email: authEmail, password }),
-              8000, 'signInWithPassword'
-            )
-
-            if (error) {
-              showError(error.message)
-              submitBtn.disabled = false
-              submitBtn.textContent = 'LOG IN'
-              return
-            }
-
-            window.location.href = 'index.html'
+          if (error) {
+            showError(error.message)
+            submitBtn.disabled = false
+            submitBtn.textContent = 'LOG IN'
+            return
           }
+
+          window.location.href = 'index.html'
         } catch (err) {
-          console.error((mode === 'signup' ? 'Sign up' : 'Login') + ' failed:', err)
+          console.error('Login failed:', err)
           showError(
             (err && (err.message || err.error_description || err.toString())) ||
-            'Unknown error while ' + (mode === 'signup' ? 'signing up.' : 'logging in.')
+            'Unknown error while logging in.'
           )
           submitBtn.disabled = false
-          submitBtn.textContent = mode === 'signup' ? 'SIGN UP' : 'LOG IN'
+          submitBtn.textContent = 'LOG IN'
         }
       })
     }
