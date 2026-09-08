@@ -224,16 +224,26 @@
        rectangular box-shadow shows up as a straight bar poking out past the
        artwork's curved silhouette. drop-shadow follows the image's alpha
        channel instead, so it hugs the actual shape. The genuinely rectangular
-       CSS buttons keep box-shadow, which is the right tool for them. */
+       CSS buttons keep box-shadow, which is the right tool for them.
+       Blur radius set to 0 throughout so the shadow reads as a solid offset
+       block rather than a soft/blurred edge. */
     .transfer-btn,
     .status-check-btn{
-      filter:drop-shadow(0 5px 2px #14361f);
+      filter:drop-shadow(0 5px 0 #14361f);
       transition:transform .12s ease, filter .16s ease;
     }
-    .transfer-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 2px #14361f); }
-    .status-check-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 2px #14361f); }
-    .transfer-btn:active{ filter:brightness(.94) drop-shadow(0 2px 1px #14361f); }
-    .status-check-btn:active{ filter:brightness(.94) drop-shadow(0 2px 1px #14361f); }
+    .transfer-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 0 #14361f); }
+    .status-check-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 0 #14361f); }
+    .transfer-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
+    .status-check-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
+
+    /* The green in the ticket artwork itself is baked into the PNGs (we
+       don't have source files to recolor), so lightening it is done with a
+       CSS filter on the images rather than editing the asset. */
+    .transfer-btn img,
+    .status-check-btn img{
+      filter:brightness(1.1) saturate(1.05);
+    }
 
     .submit-btn,
     .type-btn,
@@ -388,15 +398,15 @@
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
 
-      /* Two button "slots": TOP (near the upper part of the arch) and
+      /* Two button "slots": TOP (above the header-ribbon entirely) and
          MIDDLE (the original top:62% spot). At rest, migration sits in
-         the TOP slot. Opening the card swaps them: migration drops
-         down to the MIDDLE slot, and check-status takes over the TOP
-         slot it just vacated. This overrides desktop's rule that just
-         hides the migration button outright on open — here it moves
-         instead of disappearing. */
+         the TOP slot, above the "277" header. Opening the card swaps
+         them: migration drops down to the MIDDLE slot, and
+         check-status takes over the TOP slot it just vacated. This
+         overrides desktop's rule that just hides the migration button
+         outright on open — here it moves instead of disappearing. */
       .transfer-btn{
-        top:35%;
+        top:-6%;
         transition:filter .16s ease, opacity .5s cubic-bezier(.22,.68,0,1.01) .15s, transform .5s cubic-bezier(.22,.68,0,1.01) .15s, top .5s cubic-bezier(.22,.68,0,1.01) .15s;
       }
       .status-open .transfer-btn{
@@ -405,7 +415,7 @@
         transform:translateX(-50%) translateY(0) scale(1) !important;
         top:62% !important;
       }
-      .status-check-btn{ top:35%; }
+      .status-check-btn{ top:-6%; }
 
       /* Peeks in from the left edge, same as desktop — just at mobile's
          width/scale. Unlike the earlier bottom-peek attempt, this is
