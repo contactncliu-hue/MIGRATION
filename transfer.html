@@ -134,7 +134,7 @@
       background:transparent;
       opacity:0;
       transform:translateX(-50%) translateY(40px) scale(.94);
-      transition:filter .16s ease, opacity 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s, transform 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s;
+      transition:filter .16s ease, opacity .5s cubic-bezier(.22,.68,0,1.01) .15s, transform .5s cubic-bezier(.22,.68,0,1.01) .15s;
     }
     .stage-ready .transfer-btn{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
     .transfer-btn img{ width:100%; display:block; }
@@ -152,7 +152,7 @@
       opacity:0 !important;
       transform:translate(-50%, 60px) !important;
       pointer-events:none;
-      transition:transform 1.4s cubic-bezier(.22,.68,0,1.01), opacity 1s ease;
+      transition:transform .5s cubic-bezier(.22,.68,0,1.01), opacity .4s ease;
     }
     .status-open .transfer-btn{ transform:translateX(-50%) translateY(60px) scale(.96) !important; }
 
@@ -202,7 +202,7 @@
       border:none; cursor:pointer; padding:0; background:transparent;
       opacity:0; pointer-events:none;
       transform:translateX(-50%) translateY(24px) scale(.94);
-      transition:filter .16s ease, opacity 1s cubic-bezier(.22,.68,0,1.01) .5s, transform 1s cubic-bezier(.22,.68,0,1.01) .5s;
+      transition:filter .16s ease, opacity .4s cubic-bezier(.22,.68,0,1.01) .1s, transform .4s cubic-bezier(.22,.68,0,1.01) .1s;
     }
     .status-open .status-check-btn{
       opacity:1; pointer-events:auto;
@@ -227,13 +227,13 @@
        CSS buttons keep box-shadow, which is the right tool for them. */
     .transfer-btn,
     .status-check-btn{
-      filter:drop-shadow(0 5px 0 #14361f);
+      filter:drop-shadow(0 5px 2px #14361f);
       transition:transform .12s ease, filter .16s ease;
     }
-    .transfer-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 0 #14361f); }
-    .status-check-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 0 #14361f); }
-    .transfer-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
-    .status-check-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
+    .transfer-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 2px #14361f); }
+    .status-check-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 2px #14361f); }
+    .transfer-btn:active{ filter:brightness(.94) drop-shadow(0 2px 1px #14361f); }
+    .status-check-btn:active{ filter:brightness(.94) drop-shadow(0 2px 1px #14361f); }
 
     .submit-btn,
     .type-btn,
