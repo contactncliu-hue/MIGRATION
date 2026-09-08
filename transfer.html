@@ -373,6 +373,17 @@
          bigger than the "tiny" version, without the extreme zoom. */
       .scene{ width:max(100vw, 105vh); }
 
+      /* The shared desktop rule hides BOTH the header ribbon and the
+         migration button when the card opens. The button swap
+         (migration ↔ check-status, same slot) is correct and should
+         stay — but the header must never move or hide, on mobile,
+         after its initial entrance animation. Overriding just the
+         header half of that rule back to its resting state. */
+      .status-open .header-ribbon{
+        opacity:1 !important;
+        transform:translate(-50%, 0) !important;
+      }
+
       .transfer-btn .btn-label{ font-size:3.4vw; }
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
