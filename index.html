@@ -108,6 +108,19 @@
     object-fit:contain; object-position:top center;
     pointer-events:none;
   }
+
+  /* title logo (ZOO / SDL style wordmark): floats above everything else,
+     centered over the arch, only shown for the active/center card. */
+  .portal-title{
+    position:absolute; left:50%; top:-16%;
+    width:78%; max-width:420px;
+    transform:translate(-50%, 40px);
+    transition:transform 1.6s cubic-bezier(.22,.68,0,1.01), opacity 1.3s ease;
+    opacity:0; pointer-events:none;
+    z-index:16;
+  }
+  .portal-title img{ width:100%; display:block; }
+
   /* header ornament: nudged slightly right so the star lines up visually
      centered on the arch (the artwork itself is a touch left-heavy). */
   .portal-header{
@@ -132,6 +145,7 @@
   }
   .portal-icons img{ width:100%; display:block; }
 
+  .portal.pos-center .portal-title{ opacity:1; transform:translate(-50%, 0%); pointer-events:auto; }
   .portal.pos-center .portal-header{ opacity:1; transform:translate(-46%, 0%); pointer-events:auto; }
   .portal.pos-center .portal-icons{ opacity:1; transform:translate(-50%, 0); }
 
@@ -172,6 +186,8 @@
 
     .portal{ left:50%; width:88vw; max-width:390px; height: calc(88vw / 0.7607); bottom:0; }
     .portal.pos-center{ transform:translateX(-50%) scale(1); }
+
+    .portal-title{ top:-14%; width:70%; max-width:280px; }
 
     /* Unselected cards: hang from the TOP of the screen instead of the
        bottom, offset far enough sideways that roughly half of each card
@@ -231,18 +247,21 @@
       <button class="nav-arrow prev" id="prevBtn" aria-label="Previous">&lt;</button>
 
       <div class="portal" data-index="0">
+        <div class="portal-title"><img src="assets/title-purple.PNG" alt=""></div>
         <div class="portal-header"><img src="assets/header-purple.PNG" alt=""></div>
         <img class="portal-arch" src="assets/arch-purple.PNG" alt="">
         <div class="portal-icons"><img src="assets/icons-purple.PNG" alt=""></div>
       </div>
 
       <div class="portal" data-index="1">
+        <div class="portal-title"><img src="assets/title-red.PNG" alt=""></div>
         <div class="portal-header"><img src="assets/header-red.PNG" alt=""></div>
         <img class="portal-arch" src="assets/arch-red.PNG" alt="">
         <div class="portal-icons"><img src="assets/icons-red.PNG" alt=""></div>
       </div>
 
       <div class="portal" data-index="2">
+        <div class="portal-title"><img src="assets/title-green.PNG" alt=""></div>
         <div class="portal-header"><img src="assets/header-green.PNG" alt=""></div>
         <img class="portal-arch" src="assets/arch-green.PNG" alt="">
         <div class="portal-icons"><img src="assets/icons-green.PNG" alt=""></div>
