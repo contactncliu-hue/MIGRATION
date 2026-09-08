@@ -925,7 +925,7 @@
               header +
               '<div class="field">' +
                 '<label>' + t('field_uid', 'UID') + '</label>' +
-                '<input type="text" class="member-field" data-field="uid" data-idx="' + idx + '" inputmode="numeric" maxlength="13" placeholder="e.g. 1234567890123" value="' + escapeAttr(m.uid) + '" />' +
+                '<input type="text" class="member-field" data-field="uid" data-idx="' + idx + '" inputmode="numeric" maxlength="21" placeholder="e.g. 1234567890123" value="' + escapeAttr(m.uid) + '" />' +
               '</div>' +
               '<div class="field">' +
                 '<label>' + t('field_username', 'Username') + '</label>' +
@@ -1021,7 +1021,7 @@
             var field = target.getAttribute('data-field')
             var idx = parseInt(target.getAttribute('data-idx'), 10)
             if (field === 'uid') {
-              var uidVal = target.value.replace(/[^0-9]/g, '').slice(0, 13)
+              var uidVal = target.value.replace(/[^0-9]/g, '').slice(0, 21)
               target.value = uidVal
               members[idx].uid = uidVal
               return
