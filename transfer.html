@@ -416,7 +416,10 @@
         transform:translateX(-50%) translateY(0) scale(1) !important;
         top:62% !important;
       }
-      .status-check-btn{ top:-6%; }
+      .status-check-btn{
+        top:-6%;
+        transition:filter .16s ease, opacity .75s cubic-bezier(.22,.68,0,1.01) .1s, transform .75s cubic-bezier(.22,.68,0,1.01) .1s;
+      }
 
       /* Peeks in from the left edge, same as desktop — just at mobile's
          width/scale. Unlike the earlier bottom-peek attempt, this is
