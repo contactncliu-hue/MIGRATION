@@ -134,7 +134,7 @@
       background:transparent;
       opacity:0;
       transform:translateX(-50%) translateY(40px) scale(.94);
-      transition:filter .2s ease, opacity 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s, transform 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s;
+      transition:filter .2s ease, opacity 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s, transform 1.6s cubic-bezier(.22,.68,0,1.01) 1.1s, box-shadow .12s ease;
     }
     .stage-ready .transfer-btn{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
     .transfer-btn:hover{ filter:brightness(1.06); }
@@ -146,6 +146,7 @@
       font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
       color:#fffaf0;
       text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
+      transition:text-shadow .12s ease;
     }
 
     .status-open .header-ribbon,
@@ -181,9 +182,8 @@
     .status-open .status-card-close{ opacity:1; pointer-events:auto; transition:opacity .35s ease .35s; }
 
     .status-rows{
-      position:absolute; left:17%; right:19%; top:17%; bottom:11%;
-      display:flex; flex-direction:column; gap:14px;
-      overflow-y:auto; overscroll-behavior:contain;
+      position:absolute; left:17%; right:19%; top:19%; bottom:13%;
+      display:flex; flex-direction:column; justify-content:space-between; gap:10px;
       opacity:0; pointer-events:none; transition:opacity .25s ease;
     }
     .status-open .status-rows{ opacity:1; pointer-events:auto; transition:opacity .4s ease .35s; }
@@ -211,7 +211,7 @@
       border:none; cursor:pointer; padding:0; background:transparent;
       opacity:0; pointer-events:none;
       transform:translateX(-50%) translateY(24px) scale(.94);
-      transition:filter .2s ease, opacity 1s cubic-bezier(.22,.68,0,1.01) .5s, transform 1s cubic-bezier(.22,.68,0,1.01) .5s;
+      transition:filter .2s ease, opacity 1s cubic-bezier(.22,.68,0,1.01) .5s, transform 1s cubic-bezier(.22,.68,0,1.01) .5s, box-shadow .12s ease;
     }
     .status-open .status-check-btn{
       opacity:1; pointer-events:auto;
@@ -225,7 +225,43 @@
       font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
       color:#fffaf0;
       text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
+      transform:translateY(-14%);
+      transition:text-shadow .12s ease;
     }
+
+    /* ---------- Solid dark-green "pressable" shadow + press animation on all action buttons ---------- */
+    .transfer-btn,
+    .status-check-btn,
+    .submit-btn,
+    .type-btn,
+    .add-member-btn,
+    .remove-member-btn,
+    .logout-btn,
+    .faction-btn{
+      box-shadow:0 5px 0 #14361f;
+      transition:transform .12s ease, box-shadow .12s ease, filter .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+    }
+    .transfer-btn:active,
+    .status-check-btn:active,
+    .submit-btn:active,
+    .type-btn:active,
+    .add-member-btn:active,
+    .remove-member-btn:active,
+    .logout-btn:active,
+    .faction-btn:active{
+      transform:scale(.97);
+      box-shadow:0 2px 0 #14361f;
+    }
+    .transfer-btn:active .btn-label,
+    .status-check-btn:active .status-check-label{
+      text-shadow:none;
+    }
+    /* Preserve the existing entrance transforms on these two (translateX centering etc.) while still allowing the press scale */
+    .transfer-btn:active{ transform:translateX(-50%) translateY(0) scale(.97); }
+    .status-open .transfer-btn:active{ transform:translateX(-50%) translateY(60px) scale(.93) !important; }
+    .status-check-btn:active{ transform:translateX(-50%) translateY(0) scale(.97); }
+
+    .status-admin .img-failed{ box-shadow:none; }
 
     /* ================= MODAL ================= */
     .modal-overlay{
@@ -273,9 +309,8 @@
     .submit-btn{
       width:100%; background:#f2a90f; color:#fff; border:none; border-radius:12px;
       padding:14px; font-weight:800; font-size:15px; letter-spacing:.4px; cursor:pointer;
-      box-shadow:0 5px 0 #c98c0c; transition:transform .15s ease, box-shadow .15s ease, opacity .2s ease;
     }
-    .submit-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 #c98c0c; }
+    .submit-btn:active{ transform:translateY(3px) scale(.97); }
     .submit-btn:disabled{ opacity:.7; cursor:default; }
 
     /* ---------- Solo / Group toggle ---------- */
@@ -285,7 +320,6 @@
     .type-btn{
       flex:1; padding:13px 8px; border:none; background:#f4f5fa; color:#666;
       font-weight:700; font-size:12.5px; letter-spacing:.2px; cursor:pointer;
-      transition:background .2s ease, color .2s ease;
     }
     .type-btn.active{ background:#fff; color:#f2a90f; }
     .type-btn + .type-btn{ border-left:1.5px solid #e3e3ec; }
@@ -315,9 +349,7 @@
     .faction-btn{
       width:44px; height:44px; border-radius:50%; border:2px solid #d8dae6; background:#e9eaf2;
       display:flex; align-items:center; justify-content:center; cursor:pointer;
-      transition:background .2s ease, border-color .2s ease, transform .15s ease;
     }
-    .faction-btn:active{ transform:scale(.92); }
     .faction-btn .faction-letter{ font-weight:800; font-size:14px; color:#fff; }
     .faction-btn[data-state="0"]{ background:#e9eaf2; border-color:#d8dae6; }
     .faction-btn[data-state="1"]{ background:#3b82f6; border-color:#3b82f6; } /* F - blue */
@@ -327,7 +359,7 @@
     .add-member-btn{
       display:none; width:100%; border:1.5px dashed #d8dae6; background:transparent;
       border-radius:12px; padding:12px; font-weight:700; font-size:13px; color:#666;
-      cursor:pointer; margin-bottom:18px; transition:border-color .2s ease, color .2s ease;
+      cursor:pointer; margin-bottom:18px;
     }
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
 
@@ -656,7 +688,7 @@
       RED:    { labelKey: 'wing_red',    color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
       ORANGE: { labelKey: 'wing_orange', color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
       PURPLE: { labelKey: 'wing_purple', color: '#8b5cf6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
-      BLUE:   { labelKey: 'wing_blue',   color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
+      BLUE:   { labelKey: 'wing_blue',   color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7773.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzMucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODgzNDA4MCwiZXhwIjoxODIwMzcwMDgwfQ.xiVvGabs0ckHZWPZKNew22JCukGm9KDEPAo6Ziq63Dp4-n7WLxsWRygvtanYC6k-Vb9ec2pLx-kX9rf-MJ8MeA' }
     }
     var WING_ORDER_FALLBACK = ['RED', 'ORANGE', 'PURPLE', 'BLUE']
 
@@ -693,8 +725,10 @@
 
     // Pulls seat_capacity/min_score from wing_config, live member counts per
     // wing from migration_members (assigned_wing), and any manual overrides
-    // from wing_status — then builds statusRows from that, in wing_config
-    // order (falls back to RED/ORANGE/PURPLE/BLUE if wing_config is empty).
+    // from wing_status — then builds statusRows from that. Display order is
+    // always forced to the canonical RED, ORANGE, PURPLE, BLUE order (this is
+    // a presentation concern, independent of whatever row order the
+    // wing_config table happens to return).
     async function loadWingStatus() {
       try {
         if (!supabaseClient) { console.error('loadWingStatus skipped: no supabase client'); return }
@@ -716,9 +750,17 @@
         var overrides = {}
         ;((overrideRes && overrideRes.data) || []).forEach(function (r) { overrides[r.color] = r.count })
 
-        var order = configRows.length ? configRows.map(function (r) { return r.color }) : WING_ORDER_FALLBACK
         var capacityByColor = {}
         configRows.forEach(function (r) { capacityByColor[r.color] = r.seat_capacity })
+
+        // Always render in canonical order, restricted to colors we actually
+        // have config for (falling back to the full canonical set if
+        // wing_config came back empty).
+        var knownColors = configRows.length ? configRows.map(function (r) { return r.color }) : WING_ORDER_FALLBACK
+        var order = WING_ORDER_FALLBACK.filter(function (c) { return knownColors.indexOf(c) !== -1 })
+        // Any colors present in the DB but not in our canonical list get
+        // appended at the end rather than silently dropped.
+        knownColors.forEach(function (c) { if (order.indexOf(c) === -1) order.push(c) })
 
         statusRows = order.map(function (color) {
           var hasOverride = Object.prototype.hasOwnProperty.call(overrides, color)
