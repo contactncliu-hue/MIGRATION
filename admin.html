@@ -129,7 +129,7 @@
     }
     .members-toolbar input:focus { border-color: #3B5BDB; }
     .members-table-wrap { overflow-x: auto; }
-    .members-table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    .members-table { width: 100%; border-collapse: collapse; min-width: 900px; }
     .members-table th {
       text-align: left; font-size: 11px; font-weight: 800; color: #999;
       letter-spacing: .4px; text-transform: uppercase; padding: 8px 10px;
@@ -146,6 +146,14 @@
     }
     .override-badge.manual { background: #fff4e0; color: #c98c0c; }
     .override-badge.auto { background: #eef4e4; color: #4a8f52; }
+
+    .status-badge {
+      font-size: 10px; font-weight: 800; letter-spacing: .3px;
+      padding: 3px 10px; border-radius: 999px; text-transform: uppercase;
+    }
+    .status-badge.pending { background: #f4f5fa; color: #888; }
+    .status-badge.approved { background: #eef4e4; color: #2b8a3e; }
+    .status-badge.rejected { background: #fff0f0; color: #e03131; }
 
     .empty-state { font-size: 13px; color: #999; padding: 20px 0; text-align: center; }
   </style>
@@ -229,6 +237,8 @@
                 <th>Assigned Wing</th>
                 <th>Change To</th>
                 <th></th>
+                <th>Status</th>
+                <th>Set Status</th>
               </tr>
             </thead>
             <tbody id="members-body"></tbody>
@@ -395,7 +405,7 @@
     async function loadMembers() {
       try {
         var res = await supabaseClient.from('migration_members')
-          .select('id, uid, username, migration_score, assigned_wing, wing_manual_override')
+          .select('id, uid, username, migration_score, assigned_wing, wing_manual_override, status')
           .order('id', { ascending: false })
           .limit(500)
         if (res.error) throw res.error
@@ -437,6 +447,10 @@
         var assignedLabel = m.assigned_wing
           ? '<span class="wing-swatch"><span class="wing-dot" style="background:' + (WING_COLORS[m.assigned_wing] || '#ccc') + '"></span>' + m.assigned_wing + '</span>'
           : '<span style="color:#aaa;">Unassigned</span>'
+        var status = m.status || 'pending'
+        var statusOptions = ['pending', 'approved', 'rejected'].map(function (s) {
+          return '<option value="' + s + '"' + (status === s ? ' selected' : '') + '>' + s.charAt(0).toUpperCase() + s.slice(1) + '</option>'
+        }).join('')
 
         return (
           '<tr data-id="' + m.id + '">' +
@@ -448,6 +462,10 @@
             '<td><button type="button" class="row-save-btn" data-action="assign-member">Set</button>' +
               (m.wing_manual_override ? ' <button type="button" class="row-save-btn" data-action="clear-override" style="background:#999;">Clear override</button>' : '') +
               '<span class="row-status" data-status></span></td>' +
+            '<td><span class="status-badge ' + status + '">' + status + '</span></td>' +
+            '<td><select class="status-select">' + statusOptions + '</select> ' +
+              '<button type="button" class="row-save-btn" data-action="set-status">Set</button>' +
+              '<span class="row-status" data-status-status></span></td>' +
           '</tr>'
         )
       }).join('')
@@ -497,6 +515,33 @@
               .eq('id', id)
             if (updateRes.error) throw updateRes.error
             statusEl.textContent = 'Cleared'
+            statusEl.className = 'row-status ok'
+            loadMembers()
+          } catch (e) {
+            statusEl.textContent = (e && e.message) || 'Failed'
+            statusEl.className = 'row-status err'
+          } finally {
+            btn.disabled = false
+          }
+        })
+      })
+
+      body.querySelectorAll('[data-action="set-status"]').forEach(function (btn) {
+        btn.addEventListener('click', async function () {
+          var tr = btn.closest('tr')
+          var id = tr.getAttribute('data-id')
+          var newStatus = tr.querySelector('.status-select').value
+          var statusEl = tr.querySelector('[data-status-status]')
+
+          btn.disabled = true
+          statusEl.textContent = ''
+          statusEl.className = 'row-status'
+          try {
+            var updateRes = await supabaseClient.from('migration_members')
+              .update({ status: newStatus })
+              .eq('id', id)
+            if (updateRes.error) throw updateRes.error
+            statusEl.textContent = 'Saved'
             statusEl.className = 'row-status ok'
             loadMembers()
           } catch (e) {
