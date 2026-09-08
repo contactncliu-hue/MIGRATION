@@ -647,14 +647,23 @@
     applyTranslations()
 
     // =====================================================================
-    // ---------- Status card: RED/ORANGE/PURPLE/BLUE percentage bars ----------
+    // ---------- Status card: wing seat-fill bars, driven by wing_config ----------
     // =====================================================================
-    var statusRows = [
-      { key: 'RED', labelKey: 'wing_red', value: 20, color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
-      { key: 'ORANGE', labelKey: 'wing_orange', value: 60, color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
-      { key: 'PURPLE', labelKey: 'wing_purple', value: 50, color: '#8b5cf6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
-      { key: 'BLUE', labelKey: 'wing_blue', value: 90, color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
-    ]
+
+    // Static per-color display config (colors/icons never change; the counts
+    // and capacities come from Supabase, not from this object).
+    var WING_DISPLAY = {
+      RED:    { labelKey: 'wing_red',    color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
+      ORANGE: { labelKey: 'wing_orange', color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
+      PURPLE: { labelKey: 'wing_purple', color: '#8b5cf6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' },
+      BLUE:   { labelKey: 'wing_blue',   color: '#3b82f6', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ' }
+    }
+    var WING_ORDER_FALLBACK = ['RED', 'ORANGE', 'PURPLE', 'BLUE']
+
+    // Live rows, rebuilt from Supabase every time the status card is (re)opened.
+    // Each row: { key, capacity, count, overridden }
+    var statusRows = []
+    var statusRowsLoaded = false
 
     function isPrivileged() {
       var role = (window.zooUserRole || '').toUpperCase()
@@ -666,17 +675,65 @@
       if (link) link.style.display = isPrivileged() ? 'flex' : 'none'
     }
 
+    // Admin manual override of a wing's displayed count, saved to wing_status
+    // (color, count, updated_by). This does NOT change seat_capacity or
+    // min_score — those live in wing_config and are edited on the Admin page.
     var wingSaveTimer = null
     function scheduleWingSave(row) {
       clearTimeout(wingSaveTimer)
       wingSaveTimer = setTimeout(function () {
         if (!supabaseClient) { console.error('wing_status save skipped: no supabase client'); return }
         supabaseClient.from('wing_status')
-          .upsert({ color: row.key, percentage: row.value, updated_by: window.zooUserId || null })
+          .upsert({ color: row.key, count: row.count, updated_by: window.zooUserId || null })
           .then(function (res) {
             if (res && res.error) console.error('wing_status save failed', res.error)
           })
       }, 600)
+    }
+
+    // Pulls seat_capacity/min_score from wing_config, live member counts per
+    // wing from migration_members (assigned_wing), and any manual overrides
+    // from wing_status — then builds statusRows from that, in wing_config
+    // order (falls back to RED/ORANGE/PURPLE/BLUE if wing_config is empty).
+    async function loadWingStatus() {
+      try {
+        if (!supabaseClient) { console.error('loadWingStatus skipped: no supabase client'); return }
+
+        var configRes = await supabaseClient.from('wing_config').select('color, min_score, seat_capacity')
+        if (configRes.error) throw configRes.error
+        var configRows = configRes.data || []
+
+        var membersRes = await supabaseClient.from('migration_members').select('assigned_wing')
+        if (membersRes.error) throw membersRes.error
+        var liveCounts = {}
+        ;(membersRes.data || []).forEach(function (m) {
+          if (!m.assigned_wing) return
+          liveCounts[m.assigned_wing] = (liveCounts[m.assigned_wing] || 0) + 1
+        })
+
+        var overrideRes = await supabaseClient.from('wing_status').select('color, count')
+        if (overrideRes.error) console.error('wing_status lookup failed', overrideRes.error)
+        var overrides = {}
+        ;((overrideRes && overrideRes.data) || []).forEach(function (r) { overrides[r.color] = r.count })
+
+        var order = configRows.length ? configRows.map(function (r) { return r.color }) : WING_ORDER_FALLBACK
+        var capacityByColor = {}
+        configRows.forEach(function (r) { capacityByColor[r.color] = r.seat_capacity })
+
+        statusRows = order.map(function (color) {
+          var hasOverride = Object.prototype.hasOwnProperty.call(overrides, color)
+          return {
+            key: color,
+            capacity: capacityByColor[color] != null ? capacityByColor[color] : 100,
+            count: hasOverride ? overrides[color] : (liveCounts[color] || 0),
+            overridden: hasOverride
+          }
+        })
+        statusRowsLoaded = true
+      } catch (e) {
+        console.error('loadWingStatus failed', e)
+        if (window.showAppError) window.showAppError('WING STATUS LOAD FAILED: ' + ((e && e.message) || 'unknown error'))
+      }
     }
 
     function renderStatusRows() {
@@ -684,28 +741,34 @@
         var container = $('status-rows')
         if (!container) return
         var privileged = isPrivileged()
-        var total = statusRows.reduce(function (sum, r) { return sum + (Math.max(0, Math.min(100, r.value)) || 0) }, 0)
+
+        var totalCount = statusRows.reduce(function (sum, r) { return sum + (r.count || 0) }, 0)
+        var totalCapacity = statusRows.reduce(function (sum, r) { return sum + (r.capacity || 0) }, 0)
 
         var rowsHtml = statusRows.map(function (row, i) {
-          var pct = Math.max(0, Math.min(100, row.value))
-          var name = t(row.labelKey, row.key)
+          var disp = WING_DISPLAY[row.key] || { labelKey: null, color: '#999', icon: '' }
+          var name = t(disp.labelKey, row.key)
+          var capacity = row.capacity || 0
+          var count = Math.max(0, row.count || 0)
+          var pct = capacity > 0 ? Math.max(0, Math.min(100, (count / capacity) * 100)) : 0
+
           var adminBlock = privileged
             ? '<div class="status-admin">' +
-                '<input type="number" min="0" max="100" step="1" value="' + row.value + '" ' +
-                  'class="status-admin-input" data-row="' + i + '" aria-label="' + name + ' value out of 100" />' +
-                '<span>/100</span>' +
+                '<input type="number" min="0" step="1" value="' + count + '" ' +
+                  'class="status-admin-input" data-row="' + i + '" aria-label="' + name + ' count out of ' + capacity + '" />' +
+                '<span>/' + capacity + '</span>' +
               '</div>'
             : ''
 
           return (
             '<div class="status-row" data-row="' + i + '">' +
-              (row.icon ? '<img class="status-row-icon" src="' + row.icon + '" alt="' + name + ' icon" onerror="this.style.display=\'none\'" />' : '') +
+              (disp.icon ? '<img class="status-row-icon" src="' + disp.icon + '" alt="' + name + ' icon" onerror="this.style.display=\'none\'" />' : '') +
               '<div class="status-row-body">' +
                 '<div class="status-row-top">' +
                   '<span class="status-row-name">' + name + '</span>' +
-                  '<span class="status-percent">' + pct + '/100</span>' +
+                  '<span class="status-percent">' + count + '/' + capacity + '</span>' +
                 '</div>' +
-                '<div class="status-bar-track"><div class="status-bar-fill" style="width:' + pct + '%; background:' + row.color + ';"></div></div>' +
+                '<div class="status-bar-track"><div class="status-bar-fill" style="width:' + pct + '%; background:' + disp.color + ';"></div></div>' +
                 adminBlock +
               '</div>' +
             '</div>'
@@ -713,8 +776,8 @@
         }).join('')
 
         var totalHtml = privileged
-          ? '<div class="status-total" style="color:' + (total === 100 ? '#a3f0b0' : '#ffd9a0') + '">' +
-              t('wing_total_label', 'Total') + ': ' + total + '/100' +
+          ? '<div class="status-total" style="color:' + (totalCount >= totalCapacity ? '#a3f0b0' : '#ffd9a0') + '">' +
+              t('wing_total_label', 'Total') + ': ' + totalCount + '/' + totalCapacity +
             '</div>'
           : ''
 
@@ -723,13 +786,19 @@
         container.querySelectorAll('.status-admin-input').forEach(function (input) {
           input.addEventListener('input', function () {
             var idx = parseInt(input.getAttribute('data-row'), 10)
-            var val = Math.max(0, Math.min(100, parseInt(input.value, 10) || 0))
-            statusRows[idx].value = val
+            var val = Math.max(0, parseInt(input.value, 10) || 0)
+            statusRows[idx].count = val
+            statusRows[idx].overridden = true
             scheduleWingSave(statusRows[idx])
             renderStatusRows()
           })
         })
       } catch (e) { console.error('renderStatusRows failed', e) }
+    }
+
+    async function refreshAndRenderStatusRows() {
+      await loadWingStatus()
+      renderStatusRows()
     }
 
     // ---------- Status card open+close ----------
@@ -742,7 +811,7 @@
       function openStatusCard() {
         document.querySelector('.transfer-stage').classList.add('status-open')
         if (statusCard) statusCard.setAttribute('aria-hidden', 'false')
-        renderStatusRows()
+        refreshAndRenderStatusRows()
       }
       function closeStatusCard() {
         document.querySelector('.transfer-stage').classList.remove('status-open')
@@ -765,17 +834,14 @@
       on('status-check-btn', 'click', function () {
         var btn = $('status-check-btn')
         if (btn) { btn.disabled = true; btn.style.opacity = '.7' }
-        setTimeout(function () {
-          renderStatusRows()
+        refreshAndRenderStatusRows().finally(function () {
           if (btn) { btn.disabled = false; btn.style.opacity = '1' }
-        }, 400)
+        })
       })
 
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeStatusCard()
       })
-
-      renderStatusRows()
     } catch (e) { console.error('status card init failed', e) }
 
     // ---------- Supabase ----------
@@ -819,7 +885,6 @@
           if ($('user-role')) $('user-role').textContent = 'GUEST'
           if ($('user-initial')) $('user-initial').textContent = 'G'
           updateAdminNavVisibility()
-          renderStatusRows()
           return
         }
 
@@ -833,7 +898,6 @@
           if ($('user-role')) $('user-role').textContent = 'GUEST'
           if ($('user-initial')) $('user-initial').textContent = 'G'
           updateAdminNavVisibility()
-          renderStatusRows()
           return
         }
 
@@ -852,7 +916,11 @@
         if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
         if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
         updateAdminNavVisibility()
-        renderStatusRows()
+        // If the status card happens to already be open (e.g. bfcache pageshow),
+        // refresh it now that we know the user's role (affects admin controls).
+        if (document.querySelector('.transfer-stage').classList.contains('status-open')) {
+          refreshAndRenderStatusRows()
+        }
       } catch (e) {
         console.error('loadUser failed', e)
         window.zooUserRole = 'GUEST'
