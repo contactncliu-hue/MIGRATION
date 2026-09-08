@@ -722,13 +722,13 @@
         if (configRes.error) throw configRes.error
         var configRows = configRes.data || []
 
-        var membersRes = await supabaseClient.from('migration_members').select('assigned_wing')
-        if (membersRes.error) throw membersRes.error
-        var liveCounts = {}
-        ;(membersRes.data || []).forEach(function (m) {
-          if (!m.assigned_wing) return
-          liveCounts[m.assigned_wing] = (liveCounts[m.assigned_wing] || 0) + 1
-        })
+        var membersRes = await supabaseClient.from('migration_members').select('assigned_wing, status')
+if (membersRes.error) throw membersRes.error
+var liveCounts = {}
+;(membersRes.data || []).forEach(function (m) {
+  if (!m.assigned_wing || m.status !== 'approved') return
+  liveCounts[m.assigned_wing] = (liveCounts[m.assigned_wing] || 0) + 1
+})
 
         var overrideRes = await supabaseClient.from('wing_status').select('color, count')
         if (overrideRes.error) console.error('wing_status lookup failed', overrideRes.error)
