@@ -87,8 +87,8 @@
      Enlarged slightly per request (icons excluded from this). */
   .portal{
     position:absolute; left:50%; bottom:0;
-    width:560px;
-    height:736px;
+    width:640px;
+    height:841px;
     transition:transform 1.1s cubic-bezier(.22,.68,0,1.01), opacity .9s ease, filter .9s ease;
     cursor:pointer;
   }
@@ -96,9 +96,10 @@
   .portal.pos-left,
   .portal.pos-right{ transform-origin:bottom center; z-index:10; opacity:1; filter:none; }
   /* Non-active cards: pushed well out toward the screen edges so only
-     roughly half of each card peeks in, cropped by .carousel's overflow. */
-  .portal.pos-left{  transform:translate(calc(-50% - 560px), 70px) scale(.7); }
-  .portal.pos-right{ transform:translate(calc(-50% + 560px), 70px) scale(.7); }
+     roughly half of each card peeks in, cropped by .carousel's overflow.
+     Raised up (negative Y) instead of sinking toward the floor. */
+  .portal.pos-left{  transform:translate(calc(-50% - 600px), -30px) scale(.7); }
+  .portal.pos-right{ transform:translate(calc(-50% + 600px), -30px) scale(.7); }
 
   .portal-arch{
     position:absolute; inset:0;
@@ -110,8 +111,8 @@
   /* title logo (ZOO / SDL style wordmark): floats above everything else,
      centered over the arch, only shown for the active/center card. */
   .portal-title{
-    position:absolute; left:50%; top:-8%;
-    width:58%; max-width:320px;
+    position:absolute; left:50%; top:-4%;
+    width:44%; max-width:250px;
     transform:translate(-50%, 40px);
     transition:transform 1.6s cubic-bezier(.22,.68,0,1.01), opacity 1.3s ease;
     opacity:0; pointer-events:none;
@@ -123,7 +124,7 @@
      centered on the arch (the artwork itself is a touch left-heavy). */
   .portal-header{
     position:absolute; left:50%; top:-6%;
-    width:148%; max-width:770px;
+    width:162%; max-width:870px;
     transform:translate(-46%, 35%);
     transition:transform 1.6s cubic-bezier(.22,.68,0,1.01), opacity 1.3s ease;
     opacity:0; pointer-events:none;
