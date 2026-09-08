@@ -363,35 +363,42 @@
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
 
     @media (max-width:760px){
-      /* The desktop width formula (max(100vw, 177.7vh)) is a "cover" fit:
-         on a tall/narrow phone it forces the scene's width way past 100vw
-         just so its height can reach 100vh, which crops/zooms the artwork
-         hard. On mobile we instead just let it be 100vw wide and letterbox
-         (shorter than 100vh, gradient bg fills the space above) — nothing
-         gets cropped. Because the arch/header/buttons/status-card are all
-         positioned as children of .scene, they stay correctly aligned with
-         the artwork no matter how tall .scene ends up being. */
-      .scene{ width:100vw; }
+      /* A landscape scene can't both fill the full screen height AND
+         show zero horizontal crop on a portrait phone — that's a
+         geometry limit, not a bug. width:100vw (no crop at all) made
+         the whole scene tiny, pinned to a sliver at the very bottom.
+         The original desktop formula (177.7vh) went the other way and
+         filled 100% of the height, cropping the artwork down to a
+         narrow zoomed-in strip. This splits the difference: noticeably
+         bigger than the "tiny" version, without the extreme zoom. */
+      .scene{ width:max(100vw, 90vh); }
 
       .transfer-btn .btn-label{ font-size:3.4vw; }
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
 
-      /* Desktop slides the card in from the side (left/width/top). On a
-         narrow phone screen there's no "side" to slide from, so mobile
-         gets its own bottom-sheet treatment instead: the card sits
-         centered horizontally at all times and slides up from below the
-         scene + fades in, closing back down the same way. */
+      /* The card is a sibling of .scene, not a child of it — .scene is
+         intentionally wider than the screen above (cropped/zoomed), and
+         .scene has a CSS transform, which makes it a positioning
+         context for any descendant. A %-based position inside it can
+         land outside the visible center slice, which is why the card
+         disappeared before. Positioning it against .transfer-stage
+         instead (which is never transformed or cropped) keeps it
+         reliably on-screen regardless of how the artwork is cropped.
+         Desktop slides the card in from the side; on a narrow phone
+         there's no "side" to slide from, so mobile gets a bottom-sheet
+         treatment instead — it slides up from off-screen and fades in,
+         and reverses the same way on close. */
       .status-card{
-        width:78%; left:11%; top:auto; bottom:2%;
+        position:absolute; left:11%; width:78%; top:auto;
+        bottom:-70%;
         opacity:0;
-        transform:translateY(120%);
-        transition:transform .5s cubic-bezier(.22,.68,0,1.01), opacity .35s ease;
+        transition:bottom .5s cubic-bezier(.22,.68,0,1.01), opacity .35s ease;
       }
       .status-open .status-card{
-        left:11%; width:78%; max-width:none; top:auto; bottom:2%;
+        left:11%; width:78%; max-width:none; top:auto;
+        bottom:48%;
         opacity:1;
-        transform:translateY(0);
       }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
@@ -474,13 +481,13 @@
           <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
           <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
         </button>
+      </div>
 
-        <div class="status-card" id="status-card" aria-hidden="true">
-          <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
-          <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
+      <div class="status-card" id="status-card" aria-hidden="true">
+        <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
+        <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
 
-          <div class="status-rows" id="status-rows"></div>
-        </div>
+        <div class="status-rows" id="status-rows"></div>
       </div>
 
     </div>
