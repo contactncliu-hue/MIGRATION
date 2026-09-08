@@ -430,15 +430,20 @@
          mobile — tapping the card itself already closes it (same as
          desktop), so a second dedicated close control isn't needed. */
       .status-card{
-        position:absolute; left:-58%; width:78%; top:8%; bottom:auto;
+        position:absolute; left:-58%; width:78%; top:13%; bottom:auto;
         opacity:1;
         transform:scale(.9);
         transform-origin:left center;
         transition:left .5s cubic-bezier(.22,.68,0,1.01), transform .5s cubic-bezier(.22,.68,0,1.01);
       }
       .status-open .status-card{
-        left:11%; width:78%; max-width:none; top:8%; bottom:auto;
-        transform:scale(1.1);
+        left:11%; width:78%; max-width:none; top:13%; bottom:auto;
+        transform:scale(1.15);
+        /* Switching the scale origin to the card's own center once open
+           is what actually centers the grow-animation — "left center"
+           (needed for the closed peek to hug the screen edge) was
+           making it balloon out to the right only, not symmetrically. */
+        transform-origin:center center;
       }
       .status-card-close{ display:none; }
       .status-row-name, .status-percent{ font-size:11px; }
@@ -451,8 +456,10 @@
          (looked "cut off"/invisible). Scaling these down lets all 4 rows
          fit inside the card. Also centering the icons against the
          name+bar block explicitly, since the shorter mobile icon size
-         wasn't lining up with it vertically before. */
-      .status-rows{ top:18%; bottom:11%; gap:2px; }
+         wasn't lining up with it vertically before. Left/right insets
+         are now equal (18%/18% instead of 17%/19%) so the row block
+         itself sits centered inside the card rather than skewed. */
+      .status-rows{ left:18%; right:18%; top:18%; bottom:11%; gap:2px; }
       .status-row{ gap:8px; align-items:center; }
       .status-row-icon{ width:22px; height:22px; align-self:center; }
       .status-row-top{ margin-bottom:2px; }
