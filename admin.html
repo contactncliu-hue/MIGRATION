@@ -128,14 +128,19 @@
       font-size: 13px; font-family: inherit; outline: none;
     }
     .members-toolbar input:focus { border-color: #3B5BDB; }
+    .members-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+    .members-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #666; }
+    .members-legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
     .members-table-wrap { overflow-x: auto; }
-    .members-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    .members-table { width: 100%; border-collapse: collapse; min-width: 1000px; }
     .members-table th {
       text-align: left; font-size: 11px; font-weight: 800; color: #999;
       letter-spacing: .4px; text-transform: uppercase; padding: 8px 10px;
       border-bottom: 1.5px solid #eef0f7; white-space: nowrap;
     }
     .members-table td { padding: 10px; border-bottom: 1px solid #f4f5fa; font-size: 13px; white-space: nowrap; }
+    .members-table td.group-bar-cell { border-left: 4px solid transparent; }
+    .members-table tr.new-group td { border-top: 2px solid #e3e3ec; }
     .members-table select {
       padding: 6px 10px; border-radius: 8px; border: 1.5px solid #e3e3ec;
       font-size: 12px; font-family: inherit; outline: none; font-weight: 700;
@@ -146,6 +151,12 @@
     }
     .override-badge.manual { background: #fff4e0; color: #c98c0c; }
     .override-badge.auto { background: #eef4e4; color: #4a8f52; }
+
+    .group-tag-badge {
+      font-size: 10px; font-weight: 800; letter-spacing: .3px;
+      padding: 2px 8px; border-radius: 999px; margin-left: 6px;
+      background: #eef0f7; color: #444;
+    }
 
     .status-badge {
       font-size: 10px; font-weight: 800; letter-spacing: .3px;
@@ -222,10 +233,12 @@
         <h2>Member Assignments</h2>
         <div class="panel-sub">
           Auto-assigned wing shown per member. Manually reassigning a member locks their wing so future score changes won't move them automatically &mdash; use "Clear override" to hand control back to auto-assignment.
+          Rows from the same Group Transfer request share a colored left bar and a group tag; Solo Transfer members show no bar.
         </div>
         <div class="members-toolbar">
           <input type="text" id="members-search" placeholder="Search by username or UID..." />
         </div>
+        <div class="members-legend" id="members-legend"></div>
         <div class="load-msg" id="members-loading">Loading...</div>
         <div class="members-table-wrap">
           <table class="members-table" id="members-table" style="display:none;">
@@ -233,6 +246,8 @@
               <tr>
                 <th>Username</th>
                 <th>UID</th>
+                <th>F1 Power</th>
+                <th>F2 Power</th>
                 <th>Migration Score</th>
                 <th>Assigned Wing</th>
                 <th>Change To</th>
@@ -298,6 +313,11 @@
       BLUE: '#3b82f6'
     }
     var WING_ORDER = ['RED', 'ORANGE', 'PURPLE', 'BLUE']
+
+    // Palette cycled across distinct Group Transfer requests (by request_id),
+    // purely so adjacent rows from the same group are visually tied together.
+    // Solo Transfer members never get a bar, regardless of this palette.
+    var GROUP_BAR_COLORS = ['#3B5BDB', '#f2a90f', '#2b8a3e', '#8b5cf6', '#e03131', '#0ca678', '#c2255c', '#1971c2']
 
     async function loadUser() {
       try {
@@ -404,9 +424,13 @@
 
     async function loadMembers() {
       try {
+        // migration_requests(type, alliance_tag) rides along via the
+        // request_id foreign key, so we know per-member whether their
+        // request was a Solo or Group Transfer without a second round trip.
         var res = await supabaseClient.from('migration_members')
-          .select('id, uid, username, migration_score, assigned_wing, wing_manual_override, status')
-          .order('id', { ascending: false })
+          .select('id, uid, username, migration_score, assigned_wing, wing_manual_override, status, f1_power, f2_power, request_id, migration_requests(type, alliance_tag)')
+          .order('request_id', { ascending: false })
+          .order('id', { ascending: true })
           .limit(500)
         if (res.error) throw res.error
 
@@ -427,6 +451,42 @@
       return out
     }
 
+    // Walks the (already request_id-ordered) member list and assigns each
+    // distinct Group Transfer request_id a color from the palette, in the
+    // order those groups first appear. Solo Transfer requests never get an
+    // entry here, so their bar renders transparent.
+    function buildGroupColorMap(members) {
+      var map = {}
+      var idx = 0
+      members.forEach(function (m) {
+        var req = m.migration_requests
+        var isGroup = req && req.type === 'group'
+        if (isGroup && !Object.prototype.hasOwnProperty.call(map, m.request_id)) {
+          map[m.request_id] = GROUP_BAR_COLORS[idx % GROUP_BAR_COLORS.length]
+          idx++
+        }
+      })
+      return map
+    }
+
+    function renderMembersLegend(members, colorMap) {
+      var legend = $('members-legend')
+      var seen = {}
+      var items = []
+      members.forEach(function (m) {
+        var req = m.migration_requests
+        if (req && req.type === 'group' && !seen[m.request_id]) {
+          seen[m.request_id] = true
+          var color = colorMap[m.request_id]
+          var label = req.alliance_tag ? req.alliance_tag : ('Group #' + m.request_id)
+          items.push(
+            '<span class="members-legend-item"><span class="members-legend-swatch" style="background:' + color + '"></span>' + escapeHtml(label) + '</span>'
+          )
+        }
+      })
+      legend.innerHTML = items.join('')
+    }
+
     function renderMembers(members) {
       var body = $('members-body')
       var table = $('members-table')
@@ -435,10 +495,16 @@
       if (!members.length) {
         table.style.display = 'none'
         empty.style.display = 'block'
+        $('members-legend').innerHTML = ''
         return
       }
       table.style.display = 'table'
       empty.style.display = 'none'
+
+      var groupColorByRequest = buildGroupColorMap(members)
+      renderMembersLegend(members, groupColorByRequest)
+
+      var lastRequestId = null
 
       body.innerHTML = members.map(function (m) {
         var badge = m.wing_manual_override
@@ -452,10 +518,26 @@
           return '<option value="' + s + '"' + (status === s ? ' selected' : '') + '>' + s.charAt(0).toUpperCase() + s.slice(1) + '</option>'
         }).join('')
 
+        var req = m.migration_requests
+        var isGroup = req && req.type === 'group'
+        var barColor = groupColorByRequest[m.request_id] || 'transparent'
+        var groupTag = isGroup
+          ? '<span class="group-tag-badge">' + escapeHtml(req.alliance_tag || ('Group #' + m.request_id)) + '</span>'
+          : ''
+
+        var isNewGroup = lastRequestId !== null && lastRequestId !== m.request_id
+        lastRequestId = m.request_id
+        var rowClass = isNewGroup ? ' class="new-group"' : ''
+
+        var f1 = (m.f1_power != null && m.f1_power !== '') ? m.f1_power : '&mdash;'
+        var f2 = (m.f2_power != null && m.f2_power !== '') ? m.f2_power : '&mdash;'
+
         return (
-          '<tr data-id="' + m.id + '">' +
-            '<td>' + escapeHtml(m.username) + '</td>' +
+          '<tr data-id="' + m.id + '"' + rowClass + '>' +
+            '<td class="group-bar-cell" style="border-left-color:' + barColor + ';">' + escapeHtml(m.username) + groupTag + '</td>' +
             '<td>' + escapeHtml(m.uid) + '</td>' +
+            '<td>' + f1 + '</td>' +
+            '<td>' + f2 + '</td>' +
             '<td>' + (m.migration_score != null ? m.migration_score : '&mdash;') + '</td>' +
             '<td>' + assignedLabel + badge + '</td>' +
             '<td><select class="wing-select">' + wingOptionsHtml(m.assigned_wing) + '</select></td>' +
