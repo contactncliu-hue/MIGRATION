@@ -181,8 +181,9 @@
     .status-open .status-card-close{ opacity:1; pointer-events:auto; transition:opacity .35s ease .35s; }
 
     .status-rows{
-      position:absolute; left:17%; right:19%; top:17%; bottom:17%;
-      display:flex; flex-direction:column; justify-content:space-between;
+      position:absolute; left:17%; right:19%; top:17%; bottom:11%;
+      display:flex; flex-direction:column; gap:14px;
+      overflow-y:auto; overscroll-behavior:contain;
       opacity:0; pointer-events:none; transition:opacity .25s ease;
     }
     .status-open .status-rows{ opacity:1; pointer-events:auto; transition:opacity .4s ease .35s; }
@@ -507,10 +508,12 @@
         field_prev_alliance: "Previous Alliance", field_prev_server: "Previous Server",
         field_killcount: "Kill Count", field_faction: "Faction", field_role: "Role",
         field_migration_score: "Migration Score (optional)",
+        field_f1_power: "F1 Power",
+        field_f2_power: "F2 Power (optional)",
         add_member: "+ Add Member", remove_member: "Remove", member_label: "MEMBER #",
         submit_label: "SEND",
         status_check_cta: "CHECK STATUS",
-        form_error_required: "Please fill in every field for every member (Migration Score is the only optional one).",
+        form_error_required: "Please fill in every field for every member (Migration Score and F2 Power are the only optional ones).",
         form_error_offline: "Can't reach the server right now, so this wasn't saved. Check your connection and try again.",
         wing_red: "RED", wing_orange: "ORANGE", wing_purple: "PURPLE", wing_blue: "BLUE",
         wing_total_label: "Total"
@@ -875,7 +878,7 @@
     var members = []
 
     function createEmptyMember() {
-      return { uid: '', username: '', prevAlliance: '', prevServer: '', killcount: '', faction: 0, role: '', migrationScore: '' }
+      return { uid: '', username: '', prevAlliance: '', prevServer: '', killcount: '', faction: 0, role: '', migrationScore: '', f1Power: '', f2Power: '' }
     }
 
     function factionLetter(state) {
@@ -962,6 +965,14 @@
               '<div class="field">' +
                 '<label>' + t('field_migration_score', 'Migration Score (optional)') + '</label>' +
                 '<input type="text" class="member-field" data-field="migrationScore" data-idx="' + idx + '" inputmode="numeric" value="' + escapeAttr(m.migrationScore) + '" />' +
+              '</div>' +
+              '<div class="field">' +
+                '<label>' + t('field_f1_power', 'F1 Power') + '</label>' +
+                '<input type="text" class="member-field" data-field="f1Power" data-idx="' + idx + '" inputmode="numeric" value="' + escapeAttr(m.f1Power) + '" required />' +
+              '</div>' +
+              '<div class="field">' +
+                '<label>' + t('field_f2_power', 'F2 Power (optional)') + '</label>' +
+                '<input type="text" class="member-field" data-field="f2Power" data-idx="' + idx + '" inputmode="numeric" value="' + escapeAttr(m.f2Power) + '" />' +
               '</div>' +
             '</div>'
           )
@@ -1086,7 +1097,7 @@
 
           var missing = members.some(function (m) {
             return !m.uid || !m.username || !m.prevAlliance || !m.prevServer ||
-                   !m.killcount || !(m.faction > 0) || !m.role
+                   !m.killcount || !(m.faction > 0) || !m.role || !m.f1Power
           })
           var allianceTagVal = (transferType === 'group' && $('alliance-tag')) ? $('alliance-tag').value.trim() : ''
           if (transferType === 'group' && !allianceTagVal) missing = true
@@ -1121,7 +1132,9 @@
                 kill_count: m.killcount ? (m.killcount + 'M') : '',
                 faction: factionLetter(m.faction || 0),
                 role: m.role,
-                migration_score: m.migrationScore ? Number(m.migrationScore) : null
+                migration_score: m.migrationScore ? Number(m.migrationScore) : null,
+                f1_power: Number(m.f1Power),
+                f2_power: m.f2Power ? Number(m.f2Power) : null
               }
             })
 
