@@ -377,32 +377,31 @@
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
 
-      /* The card is a sibling of .scene, not a child of it — .scene is
-         intentionally wider than the screen above (cropped/zoomed), and
-         .scene has a CSS transform, which makes it a positioning
-         context for any descendant. A %-based position inside it can
-         land outside the visible center slice, which is why the card
-         disappeared once nested there. Positioning it against
-         .transfer-stage instead (which is never transformed or cropped)
-         keeps it reliably on-screen regardless of how the artwork is
-         cropped.
-
-         IMPORTANT: there is no separate "open" button for this card —
+      /* IMPORTANT: there is no separate "open" button for this card —
          the only way to open it, on desktop too, is tapping the card
          itself while a sliver of it pokes onscreen at rest (CHECK
          STATUS only appears once it's already open, as a refresh
          action). So the closed state below must stay opacity:1 and
-         leave a real peek visible/tappable — it must NOT fully vanish
-         off-screen the way a true off-canvas drawer would. */
+         leave a real peek visible/tappable.
+
+         Anchoring by "bottom:-32%" (a % of the *screen*) was the bug —
+         if the card's actual image is shorter than that guess, the
+         whole thing lands below the visible area and nothing pokes up
+         at all, which is exactly what happened. Anchoring by "top" in
+         a fixed vh value instead is robust regardless of how tall the
+         card art actually is: whatever doesn't fit before the bottom
+         edge just gets clipped by .transfer-stage's overflow:hidden,
+         but the top portion above that line is always shown. */
       .status-card{
-        position:absolute; left:11%; width:78%; top:auto;
-        bottom:-32%;
+        position:absolute; left:11%; width:78%; top:84vh; bottom:auto;
         opacity:1;
-        transition:bottom .5s cubic-bezier(.22,.68,0,1.01);
+        transform:scale(.9);
+        transform-origin:top center;
+        transition:top .5s cubic-bezier(.22,.68,0,1.01), transform .5s cubic-bezier(.22,.68,0,1.01);
       }
       .status-open .status-card{
-        left:11%; width:78%; max-width:none; top:auto;
-        bottom:48%;
+        left:11%; width:78%; max-width:none; top:20vh; bottom:auto;
+        transform:scale(1);
       }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
