@@ -371,7 +371,7 @@
          filled 100% of the height, cropping the artwork down to a
          narrow zoomed-in strip. This splits the difference: noticeably
          bigger than the "tiny" version, without the extreme zoom. */
-      .scene{ width:max(100vw, 90vh); }
+      .scene{ width:max(100vw, 105vh); }
 
       .transfer-btn .btn-label{ font-size:3.4vw; }
       .status-check-label{ font-size:3.4vw; }
@@ -382,23 +382,27 @@
          .scene has a CSS transform, which makes it a positioning
          context for any descendant. A %-based position inside it can
          land outside the visible center slice, which is why the card
-         disappeared before. Positioning it against .transfer-stage
-         instead (which is never transformed or cropped) keeps it
-         reliably on-screen regardless of how the artwork is cropped.
-         Desktop slides the card in from the side; on a narrow phone
-         there's no "side" to slide from, so mobile gets a bottom-sheet
-         treatment instead — it slides up from off-screen and fades in,
-         and reverses the same way on close. */
+         disappeared once nested there. Positioning it against
+         .transfer-stage instead (which is never transformed or cropped)
+         keeps it reliably on-screen regardless of how the artwork is
+         cropped.
+
+         IMPORTANT: there is no separate "open" button for this card —
+         the only way to open it, on desktop too, is tapping the card
+         itself while a sliver of it pokes onscreen at rest (CHECK
+         STATUS only appears once it's already open, as a refresh
+         action). So the closed state below must stay opacity:1 and
+         leave a real peek visible/tappable — it must NOT fully vanish
+         off-screen the way a true off-canvas drawer would. */
       .status-card{
         position:absolute; left:11%; width:78%; top:auto;
-        bottom:-70%;
-        opacity:0;
-        transition:bottom .5s cubic-bezier(.22,.68,0,1.01), opacity .35s ease;
+        bottom:-32%;
+        opacity:1;
+        transition:bottom .5s cubic-bezier(.22,.68,0,1.01);
       }
       .status-open .status-card{
         left:11%; width:78%; max-width:none; top:auto;
         bottom:48%;
-        opacity:1;
       }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
