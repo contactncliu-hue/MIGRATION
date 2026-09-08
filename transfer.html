@@ -464,7 +464,7 @@
 
       <form id="transfer-form">
         <div class="field" id="group-alliance-field">
-          <label data-i18n="alliance_tag_label">Alliance Tag</label>
+          <label data-i18n="alliance_tag_label">Group Name</label>
           <input type="text" id="alliance-tag" placeholder="e.g. ONE" />
         </div>
 
@@ -534,7 +534,7 @@
         transfer_heading: "Migration", transfer_sub: "Send items or funds to another member.",
         transfer_cta: "MIGRATION",
         type_solo: "Solo Transfer", type_group: "Group Transfer",
-        alliance_tag_label: "Alliance Tag",
+        alliance_tag_label: "Group Name",
         field_uid: "UID", field_username: "Username",
         field_prev_alliance: "Previous Alliance", field_prev_server: "Previous Server",
         field_killcount: "Kill Count", field_faction: "Faction", field_role: "Role",
@@ -555,7 +555,7 @@
         transfer_heading: "이주", transfer_sub: "다른 멤버에게 아이템이나 자금을 보내세요.",
         transfer_cta: "이주하기",
         type_solo: "개인 이전", type_group: "그룹 이전",
-        alliance_tag_label: "연맹 태그",
+        alliance_tag_label: "그룹 이름",
         field_uid: "UID", field_username: "사용자 이름",
         field_prev_alliance: "이전 연맹", field_prev_server: "이전 서버",
         field_killcount: "킬 수", field_faction: "진영", field_role: "역할",
@@ -574,7 +574,7 @@
         transfer_heading: "迁移", transfer_sub: "向其他成员发送物品或资金。",
         transfer_cta: "迁移",
         type_solo: "个人转移", type_group: "团队转移",
-        alliance_tag_label: "联盟标签",
+        alliance_tag_label: "团队名称",
         field_uid: "UID", field_username: "用户名",
         field_prev_alliance: "前联盟", field_prev_server: "前服务器",
         field_killcount: "击杀数", field_faction: "阵营", field_role: "角色",
@@ -593,7 +593,7 @@
         transfer_heading: "Migração", transfer_sub: "Envie itens ou fundos para outro membro.",
         transfer_cta: "MIGRAÇÃO",
         type_solo: "Transferência individual", type_group: "Transferência em grupo",
-        alliance_tag_label: "Tag da aliança",
+        alliance_tag_label: "Nome do grupo",
         field_uid: "UID", field_username: "Nome de usuário",
         field_prev_alliance: "Aliança anterior", field_prev_server: "Servidor anterior",
         field_killcount: "Contagem de abates", field_faction: "Facção", field_role: "Função",
@@ -612,7 +612,7 @@
         transfer_heading: "Di chuyển", transfer_sub: "Gửi vật phẩm hoặc tiền cho thành viên khác.",
         transfer_cta: "DI CHUYỂN",
         type_solo: "Chuyển đơn", type_group: "Chuyển nhóm",
-        alliance_tag_label: "Tên liên minh",
+        alliance_tag_label: "Tên nhóm",
         field_uid: "UID", field_username: "Tên người dùng",
         field_prev_alliance: "Liên minh trước", field_prev_server: "Máy chủ trước",
         field_killcount: "Số lượt tiêu diệt", field_faction: "Phe", field_role: "Vai trò",
@@ -631,7 +631,7 @@
         transfer_heading: "Migration", transfer_sub: "Envoyez des objets ou des fonds à un autre membre.",
         transfer_cta: "MIGRATION",
         type_solo: "Transfert individuel", type_group: "Transfert de groupe",
-        alliance_tag_label: "Tag d'alliance",
+        alliance_tag_label: "Nom du groupe",
         field_uid: "UID", field_username: "Nom d'utilisateur",
         field_prev_alliance: "Alliance précédente", field_prev_server: "Serveur précédent",
         field_killcount: "Nombre d'éliminations", field_faction: "Faction", field_role: "Rôle",
@@ -707,13 +707,15 @@
     }
 
     // Pulls seat_capacity/min_score from wing_config, live member counts per
-    // wing from migration_members (assigned_wing), and any manual overrides
-    // from wing_status (set elsewhere, e.g. the Admin page) — then builds
-    // statusRows from that. This popup is read-only: it displays whatever is
-    // already synced, it does not let anyone edit counts here. Display order
-    // is always forced to the canonical RED, ORANGE, PURPLE, BLUE order (this
-    // is a presentation concern, independent of whatever row order the
-    // wing_config table happens to return).
+    // wing from migration_members (assigned_wing) — counting only members
+    // whose status is 'approved' (pending/rejected members never occupy a
+    // seat) — and any manual overrides from wing_status (set elsewhere, e.g.
+    // the Admin page) — then builds statusRows from that. This popup is
+    // read-only: it displays whatever is already synced, it does not let
+    // anyone edit counts here. Display order is always forced to the
+    // canonical RED, ORANGE, PURPLE, BLUE order (this is a presentation
+    // concern, independent of whatever row order the wing_config table
+    // happens to return).
     async function loadWingStatus() {
       try {
         if (!supabaseClient) { console.error('loadWingStatus skipped: no supabase client'); return }
@@ -723,12 +725,12 @@
         var configRows = configRes.data || []
 
         var membersRes = await supabaseClient.from('migration_members').select('assigned_wing, status')
-if (membersRes.error) throw membersRes.error
-var liveCounts = {}
-;(membersRes.data || []).forEach(function (m) {
-  if (!m.assigned_wing || m.status !== 'approved') return
-  liveCounts[m.assigned_wing] = (liveCounts[m.assigned_wing] || 0) + 1
-})
+        if (membersRes.error) throw membersRes.error
+        var liveCounts = {}
+        ;(membersRes.data || []).forEach(function (m) {
+          if (!m.assigned_wing || m.status !== 'approved') return
+          liveCounts[m.assigned_wing] = (liveCounts[m.assigned_wing] || 0) + 1
+        })
 
         var overrideRes = await supabaseClient.from('wing_status').select('color, count')
         if (overrideRes.error) console.error('wing_status lookup failed', overrideRes.error)
