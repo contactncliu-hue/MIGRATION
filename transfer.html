@@ -372,17 +372,7 @@
     }
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
 
-    /* ---------- UID status lookup button + result ---------- */
-    .uid-lookup-btn{
-      position:absolute; top:24px; left:24px; z-index:40;
-      background:#3B5BDB; color:#fff; border:none; border-radius:999px;
-      padding:12px 20px; font-weight:700; font-size:13px; letter-spacing:.3px;
-      cursor:pointer; box-shadow:0 4px 0 #23399c;
-      transition:transform .12s ease, box-shadow .12s ease, filter .16s ease;
-    }
-    .uid-lookup-btn:hover{ filter:brightness(1.06); }
-    .uid-lookup-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 #23399c; }
-
+    /* ---------- UID status lookup result ---------- */
     .uid-lookup-result{
       display:none; margin-top:2px; padding:14px 16px; border-radius:12px;
       font-weight:800; font-size:14px; text-align:center; letter-spacing:.4px;
@@ -487,8 +477,6 @@
       .status-row-icon{ width:22px; height:22px; align-self:center; }
       .status-row-top{ margin-bottom:2px; }
       .status-bar-track{ height:7px; }
-
-      .uid-lookup-btn{ top:16px; left:16px; padding:10px 14px; font-size:11px; }
     }
   </style>
 </head>
@@ -531,8 +519,6 @@
     </button>
 
     <div class="transfer-stage">
-
-      <button class="uid-lookup-btn" id="uid-lookup-btn" type="button" data-i18n="uid_lookup_cta">CHECK MY STATUS</button>
 
       <div class="scene">
         <div class="deco-bg">
@@ -601,7 +587,7 @@
     </div>
   </div>
 
-  <!-- ================= UID STATUS LOOKUP POPUP ================= -->
+  <!-- ================= UID STATUS LOOKUP POPUP (opened from the green CHECK STATUS button) ================= -->
   <div class="modal-overlay" id="uid-lookup-overlay">
     <div class="modal-box">
       <button class="modal-close" id="uid-lookup-close-btn" aria-label="Close">&times;</button>
@@ -688,7 +674,6 @@
         form_error_offline: "Can't reach the server right now, so this wasn't saved. Check your connection and try again.",
         wing_red: "RED", wing_orange: "ORANGE", wing_purple: "PURPLE", wing_blue: "BLUE",
         wing_total_label: "Total",
-        uid_lookup_cta: "CHECK MY STATUS",
         uid_lookup_heading: "Check Status",
         uid_lookup_sub: "Enter your UID to see your migration status.",
         uid_lookup_search: "SEARCH",
@@ -997,14 +982,6 @@
         closeStatusCard()
       })
 
-      on('status-check-btn', 'click', function () {
-        var btn = $('status-check-btn')
-        if (btn) { btn.disabled = true; btn.style.opacity = '.7' }
-        refreshAndRenderStatusRows().finally(function () {
-          if (btn) { btn.disabled = false; btn.style.opacity = '1' }
-        })
-      })
-
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') closeStatusCard()
       })
@@ -1105,7 +1082,7 @@
       window.location.href = "login.html"
     })
 
-    // ---------- UID status lookup ----------
+    // ---------- UID status lookup (now opened from the green CHECK STATUS button in the scene) ----------
     try {
       var uidLookupOverlay = $('uid-lookup-overlay')
       var uidLookupInput = $('uid-lookup-input')
@@ -1121,7 +1098,8 @@
       }
       function closeUidLookup(){ if (uidLookupOverlay) uidLookupOverlay.classList.remove('visible') }
 
-      on('uid-lookup-btn', 'click', openUidLookup)
+      // The green "CHECK STATUS" ticket button in the scene opens this popup.
+      on('status-check-btn', 'click', openUidLookup)
       on('uid-lookup-close-btn', 'click', closeUidLookup)
       if (uidLookupOverlay) uidLookupOverlay.addEventListener('click', function (e) { if (e.target === uidLookupOverlay) closeUidLookup() })
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && uidLookupOverlay && uidLookupOverlay.classList.contains('visible')) closeUidLookup() })
