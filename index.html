@@ -72,13 +72,13 @@
     position:absolute; top:66%; transform:translateY(-50%);
     z-index:45;
     width:52px; height:52px; border-radius:50%; border:none; cursor:pointer;
-    background:rgba(255,255,255,.92);
-    box-shadow:0 3px 10px rgba(0,0,0,.15);
+    background:transparent;
+    box-shadow:none;
     color:#4b4b55; font-size:26px; font-weight:700; line-height:1;
     display:flex; align-items:center; justify-content:center;
     transition:background .2s ease, color .2s ease, transform .2s ease;
   }
-  .nav-arrow:hover{ background:#fff; color:#1f1f24; }
+  .nav-arrow:hover{ background:rgba(255,255,255,.35); color:#1f1f24; }
   .nav-arrow.prev{ left:24px; }
   .nav-arrow.next{ right:24px; }
 
@@ -87,19 +87,19 @@
      Enlarged slightly per request (icons excluded from this). */
   .portal{
     position:absolute; left:50%; bottom:0;
-    width:640px;
-    height:841px;
+    width:720px;
+    height:946px;
     transition:transform 1.1s cubic-bezier(.22,.68,0,1.01), opacity .9s ease, filter .9s ease;
     cursor:pointer;
   }
   .portal.pos-center{ transform:translateX(-50%) scale(1); z-index:20; opacity:1; filter:none; }
   .portal.pos-left,
   .portal.pos-right{ transform-origin:bottom center; z-index:10; opacity:1; filter:none; }
-  /* Non-active cards: pushed well out toward the screen edges so only
+  /* Non-active cards: pushed far out toward the screen edges so only
      roughly half of each card peeks in, cropped by .carousel's overflow.
-     Raised up (negative Y) instead of sinking toward the floor. */
-  .portal.pos-left{  transform:translate(calc(-50% - 600px), -30px) scale(.7); }
-  .portal.pos-right{ transform:translate(calc(-50% + 600px), -30px) scale(.7); }
+     Vertical offset kept small so they stay level with the center card. */
+  .portal.pos-left{  transform:translate(calc(-50% - 900px), -30px) scale(.7); }
+  .portal.pos-right{ transform:translate(calc(-50% + 900px), -30px) scale(.7); }
 
   .portal-arch{
     position:absolute; inset:0;
@@ -124,7 +124,7 @@
      centered on the arch (the artwork itself is a touch left-heavy). */
   .portal-header{
     position:absolute; left:50%; top:-6%;
-    width:162%; max-width:870px;
+    width:162%; max-width:980px;
     transform:translate(-46%, 35%);
     transition:transform 1.6s cubic-bezier(.22,.68,0,1.01), opacity 1.3s ease;
     opacity:0; pointer-events:none;
