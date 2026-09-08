@@ -388,30 +388,20 @@
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
 
-      /* IMPORTANT: there is no separate "open" button for this card —
-         the only way to open it, on desktop too, is tapping the card
-         itself while a sliver of it pokes onscreen at rest (CHECK
-         STATUS only appears once it's already open, as a refresh
-         action). So the closed state below must stay opacity:1 and
-         leave a real peek visible/tappable.
-
-         Anchoring by "bottom:-32%" (a % of the *screen*) was the bug —
-         if the card's actual image is shorter than that guess, the
-         whole thing lands below the visible area and nothing pokes up
-         at all, which is exactly what happened. Anchoring by "top" in
-         a fixed vh value instead is robust regardless of how tall the
-         card art actually is: whatever doesn't fit before the bottom
-         edge just gets clipped by .transfer-stage's overflow:hidden,
-         but the top portion above that line is always shown. */
+      /* Peeks in from the left edge, same as desktop — just at mobile's
+         width/scale. Unlike the earlier bottom-peek attempt, this is
+         exact and reliable: width (78%) is a value we set ourselves,
+         not something derived from the card image's unknown height, so
+         there's no guessing involved in how much of it shows. */
       .status-card{
-        position:absolute; left:11%; width:78%; top:84vh; bottom:auto;
+        position:absolute; left:-67%; width:78%; top:8%; bottom:auto;
         opacity:1;
         transform:scale(.9);
-        transform-origin:top center;
-        transition:top .5s cubic-bezier(.22,.68,0,1.01), transform .5s cubic-bezier(.22,.68,0,1.01);
+        transform-origin:left center;
+        transition:left .5s cubic-bezier(.22,.68,0,1.01), transform .5s cubic-bezier(.22,.68,0,1.01);
       }
       .status-open .status-card{
-        left:11%; width:78%; max-width:none; top:20vh; bottom:auto;
+        left:11%; width:78%; max-width:none; top:8%; bottom:auto;
         transform:scale(1);
       }
       .status-row-name, .status-percent{ font-size:11px; }
