@@ -813,6 +813,12 @@
     // canonical RED, ORANGE, PURPLE, BLUE order (this is a presentation
     // concern, independent of whatever row order the wing_config table
     // happens to return).
+    //
+    // NOTE on wing_status: its actual column is called `percentage`, not
+    // `count` — confirmed directly from the Supabase table schema. It
+    // stores a manually-set override value (0-100), separate from live
+    // member counts. When an override exists for a color, it takes
+    // precedence over the live-counted number from migration_members.
     async function loadWingStatus() {
       try {
         if (!supabaseClient) { console.error('loadWingStatus skipped: no supabase client'); return }
@@ -829,10 +835,12 @@
           liveCounts[m.assigned_wing] = (liveCounts[m.assigned_wing] || 0) + 1
         })
 
-        var overrideRes = await supabaseClient.from('wing_status').select('color, count')
+        var overrideRes = await supabaseClient.from('wing_status').select('color, percentage')
         if (overrideRes.error) console.error('wing_status lookup failed', overrideRes.error)
         var overrides = {}
-        ;((overrideRes && overrideRes.data) || []).forEach(function (r) { overrides[r.color] = r.count })
+        ;((overrideRes && overrideRes.data) || []).forEach(function (r) {
+          if (r.percentage != null) overrides[r.color] = r.percentage
+        })
 
         var capacityByColor = {}
         configRows.forEach(function (r) { capacityByColor[r.color] = r.seat_capacity })
