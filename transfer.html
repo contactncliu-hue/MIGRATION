@@ -363,13 +363,50 @@
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
 
     @media (max-width:760px){
+      /* The desktop width formula (max(100vw, 177.7vh)) is a "cover" fit:
+         on a tall/narrow phone it forces the scene's width way past 100vw
+         just so its height can reach 100vh, which crops/zooms the artwork
+         hard. On mobile we instead just let it be 100vw wide and letterbox
+         (shorter than 100vh, gradient bg fills the space above) — nothing
+         gets cropped. Because the arch/header/buttons/status-card are all
+         positioned as children of .scene, they stay correctly aligned with
+         the artwork no matter how tall .scene ends up being. */
+      .scene{ width:100vw; }
+
       .transfer-btn .btn-label{ font-size:3.4vw; }
       .status-check-label{ font-size:3.4vw; }
       .status-check-btn{ width:34%; }
-      .status-card{ width:78%; top:6%; left:-70%; }
-      .status-open .status-card{ left:11%; width:78%; max-width:none; }
+
+      /* Desktop slides the card in from the side (left/width/top). On a
+         narrow phone screen there's no "side" to slide from, so mobile
+         gets its own bottom-sheet treatment instead: the card sits
+         centered horizontally at all times and slides up from below the
+         scene + fades in, closing back down the same way. */
+      .status-card{
+        width:78%; left:11%; top:auto; bottom:2%;
+        opacity:0;
+        transform:translateY(120%);
+        transition:transform .5s cubic-bezier(.22,.68,0,1.01), opacity .35s ease;
+      }
+      .status-open .status-card{
+        left:11%; width:78%; max-width:none; top:auto; bottom:2%;
+        opacity:1;
+        transform:translateY(0);
+      }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
+
+      /* Icon/bar sizes below were fixed px values tuned for desktop card
+         sizes; on a narrow mobile card they didn't shrink with everything
+         else, so the 3rd/4th row (PURPLE/BLUE) spilled past the bottom of
+         the printed card art and rendered on the plain background instead
+         (looked "cut off"/invisible). Scaling these down lets all 4 rows
+         fit inside the card. */
+      .status-rows{ top:18%; bottom:11%; gap:2px; }
+      .status-row{ gap:8px; }
+      .status-row-icon{ width:22px; height:22px; }
+      .status-row-top{ margin-bottom:2px; }
+      .status-bar-track{ height:7px; }
     }
   </style>
 </head>
@@ -437,13 +474,13 @@
           <img src="assets/transfer-status-button.PNG" alt="" onerror="this.style.display='none'" />
           <span class="status-check-label" data-i18n="status_check_cta">CHECK STATUS</span>
         </button>
-      </div>
 
-      <div class="status-card" id="status-card" aria-hidden="true">
-        <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
-        <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
+        <div class="status-card" id="status-card" aria-hidden="true">
+          <img class="status-card-bg" src="assets/transfer-status-card.PNG" alt="" onerror="this.style.display='none'" />
+          <button class="status-card-close" id="status-card-close" aria-label="Close">&times;</button>
 
-        <div class="status-rows" id="status-rows"></div>
+          <div class="status-rows" id="status-rows"></div>
+        </div>
       </div>
 
     </div>
