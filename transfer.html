@@ -372,6 +372,26 @@
     }
     .add-member-btn:hover{ border-color:#3B5BDB; color:#3B5BDB; }
 
+    /* ---------- UID status lookup button + result ---------- */
+    .uid-lookup-btn{
+      position:absolute; top:24px; left:24px; z-index:40;
+      background:#3B5BDB; color:#fff; border:none; border-radius:999px;
+      padding:12px 20px; font-weight:700; font-size:13px; letter-spacing:.3px;
+      cursor:pointer; box-shadow:0 4px 0 #23399c;
+      transition:transform .12s ease, box-shadow .12s ease, filter .16s ease;
+    }
+    .uid-lookup-btn:hover{ filter:brightness(1.06); }
+    .uid-lookup-btn:active{ transform:translateY(3px); box-shadow:0 1px 0 #23399c; }
+
+    .uid-lookup-result{
+      display:none; margin-top:2px; padding:14px 16px; border-radius:12px;
+      font-weight:800; font-size:14px; text-align:center; letter-spacing:.4px;
+    }
+    .uid-lookup-result.visible{ display:block; }
+    .uid-lookup-result.status-pending{ background:#fff8e6; color:#b8860b; border:1px solid #ffe6a3; }
+    .uid-lookup-result.status-approved{ background:#f0fff4; color:#2b8a3e; border:1px solid #d3f9d8; }
+    .uid-lookup-result.status-rejected{ background:#fff0f0; color:#e03131; border:1px solid #ffd6d6; }
+
     @media (max-width:760px){
       /* A landscape scene can't both fill the full screen height AND
          show zero horizontal crop on a portrait phone — that's a
@@ -467,6 +487,8 @@
       .status-row-icon{ width:22px; height:22px; align-self:center; }
       .status-row-top{ margin-bottom:2px; }
       .status-bar-track{ height:7px; }
+
+      .uid-lookup-btn{ top:16px; left:16px; padding:10px 14px; font-size:11px; }
     }
   </style>
 </head>
@@ -509,6 +531,8 @@
     </button>
 
     <div class="transfer-stage">
+
+      <button class="uid-lookup-btn" id="uid-lookup-btn" type="button" data-i18n="uid_lookup_cta">CHECK MY STATUS</button>
 
       <div class="scene">
         <div class="deco-bg">
@@ -574,6 +598,25 @@
 
         <button type="submit" class="submit-btn" id="transfer-submit-btn" data-i18n="submit_label">SEND</button>
       </form>
+    </div>
+  </div>
+
+  <!-- ================= UID STATUS LOOKUP POPUP ================= -->
+  <div class="modal-overlay" id="uid-lookup-overlay">
+    <div class="modal-box">
+      <button class="modal-close" id="uid-lookup-close-btn" aria-label="Close">&times;</button>
+      <h2 data-i18n="uid_lookup_heading">Check Status</h2>
+      <p class="modal-sub" data-i18n="uid_lookup_sub">Enter your UID to see your migration status.</p>
+
+      <div class="field">
+        <label data-i18n="field_uid">UID</label>
+        <input type="text" id="uid-lookup-input" inputmode="numeric" maxlength="21" placeholder="e.g. 1234567890123" />
+      </div>
+
+      <button type="button" class="submit-btn" id="uid-lookup-search-btn" data-i18n="uid_lookup_search">SEARCH</button>
+
+      <div class="form-error" id="uid-lookup-error"></div>
+      <div class="uid-lookup-result" id="uid-lookup-result"></div>
     </div>
   </div>
 
@@ -644,7 +687,16 @@
         form_error_required: "Please fill in every field for every member (Migration Score and F2 Power are the only optional ones).",
         form_error_offline: "Can't reach the server right now, so this wasn't saved. Check your connection and try again.",
         wing_red: "RED", wing_orange: "ORANGE", wing_purple: "PURPLE", wing_blue: "BLUE",
-        wing_total_label: "Total"
+        wing_total_label: "Total",
+        uid_lookup_cta: "CHECK MY STATUS",
+        uid_lookup_heading: "Check Status",
+        uid_lookup_sub: "Enter your UID to see your migration status.",
+        uid_lookup_search: "SEARCH",
+        uid_lookup_error_missing: "Please enter a UID.",
+        uid_lookup_error_notfound: "No migration request found for this UID.",
+        status_pending: "PENDING",
+        status_approved: "APPROVED",
+        status_rejected: "REJECTED"
       },
       ko: {
         nav_home: "홈페이지", nav_transfer: "송금", nav_admin: "관리자 및 매니지먼트", lang_label: "언어",
@@ -1052,6 +1104,99 @@
       }
       window.location.href = "login.html"
     })
+
+    // ---------- UID status lookup ----------
+    try {
+      var uidLookupOverlay = $('uid-lookup-overlay')
+      var uidLookupInput = $('uid-lookup-input')
+      var uidLookupError = $('uid-lookup-error')
+      var uidLookupResult = $('uid-lookup-result')
+      var uidLookupSearchBtn = $('uid-lookup-search-btn')
+
+      function openUidLookup(){
+        if (uidLookupOverlay) uidLookupOverlay.classList.add('visible')
+        if (uidLookupInput) { uidLookupInput.value = ''; uidLookupInput.focus() }
+        if (uidLookupError) uidLookupError.classList.remove('visible')
+        if (uidLookupResult) { uidLookupResult.classList.remove('visible','status-pending','status-approved','status-rejected'); uidLookupResult.textContent = '' }
+      }
+      function closeUidLookup(){ if (uidLookupOverlay) uidLookupOverlay.classList.remove('visible') }
+
+      on('uid-lookup-btn', 'click', openUidLookup)
+      on('uid-lookup-close-btn', 'click', closeUidLookup)
+      if (uidLookupOverlay) uidLookupOverlay.addEventListener('click', function (e) { if (e.target === uidLookupOverlay) closeUidLookup() })
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && uidLookupOverlay && uidLookupOverlay.classList.contains('visible')) closeUidLookup() })
+
+      on('uid-lookup-input', 'input', function (e) {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 21)
+      })
+      on('uid-lookup-input', 'keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); runUidLookup() }
+      })
+
+      async function runUidLookup(){
+        if (uidLookupError) uidLookupError.classList.remove('visible')
+        if (uidLookupResult) { uidLookupResult.classList.remove('visible','status-pending','status-approved','status-rejected'); uidLookupResult.textContent = '' }
+
+        var uidVal = (uidLookupInput && uidLookupInput.value || '').trim()
+        if (!uidVal) {
+          if (uidLookupError) {
+            uidLookupError.textContent = t('uid_lookup_error_missing', 'Please enter a UID.')
+            uidLookupError.classList.add('visible')
+          }
+          return
+        }
+
+        if (!supabaseClient) initSupabase()
+        if (!supabaseClient) {
+          if (uidLookupError) {
+            uidLookupError.textContent = t('form_error_offline', "Can't reach the server right now, so this wasn't saved. Check your connection and try again.")
+            uidLookupError.classList.add('visible')
+          }
+          return
+        }
+
+        if (uidLookupSearchBtn) uidLookupSearchBtn.disabled = true
+        try {
+          // A UID could appear on more than one row (e.g. a resubmission),
+          // so grab the most recent one as their current status.
+          var res = await supabaseClient
+            .from('migration_members')
+            .select('status, created_at')
+            .eq('uid', uidVal)
+            .order('created_at', { ascending: false })
+            .limit(1)
+
+          if (res.error) throw res.error
+
+          var row = (res.data || [])[0]
+          if (!row) {
+            if (uidLookupError) {
+              uidLookupError.textContent = t('uid_lookup_error_notfound', 'No migration request found for this UID.')
+              uidLookupError.classList.add('visible')
+            }
+            return
+          }
+
+          var statusKey = (row.status || 'pending').toLowerCase()
+          var labelKey = statusKey === 'approved' ? 'status_approved' : (statusKey === 'rejected' ? 'status_rejected' : 'status_pending')
+          var cssClass = statusKey === 'approved' ? 'status-approved' : (statusKey === 'rejected' ? 'status-rejected' : 'status-pending')
+
+          if (uidLookupResult) {
+            uidLookupResult.textContent = t(labelKey, statusKey.toUpperCase())
+            uidLookupResult.classList.add('visible', cssClass)
+          }
+        } catch (err) {
+          if (uidLookupError) {
+            uidLookupError.textContent = (err && err.message) || 'Something went wrong.'
+            uidLookupError.classList.add('visible')
+          }
+        } finally {
+          if (uidLookupSearchBtn) uidLookupSearchBtn.disabled = false
+        }
+      }
+
+      on('uid-lookup-search-btn', 'click', runUidLookup)
+    } catch (e) { console.error('uid lookup init failed', e) }
 
     // =====================================================================
     // ---------- Migration popup: Solo / Group + member rows ----------
