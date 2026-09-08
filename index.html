@@ -10,9 +10,19 @@
     font-family:'Poppins', sans-serif;
     display:flex;
     min-height:100vh;
-    background:#f4f5fa;
+    background:linear-gradient(to top, #FFFAF1 0%, #ffffff 45%);
     overflow-x:hidden;
   }
+
+  /* Background landscape scenery (matches login.html) -- fixed to the
+     viewport corners, sits behind everything else on the page. */
+  .scene{
+    position:fixed; bottom:0;
+    z-index:0; height:auto;
+    pointer-events:none;
+  }
+  .scene-left{ left:0; width:34vw; max-width:380px; }
+  .scene-right{ right:0; width:34vw; max-width:380px; }
 
   /* ================= SIDEBAR ================= */
   .sidebar{
@@ -150,7 +160,7 @@
   /* ---------- bottom fade: sits above the arch, below the icons ---------- */
   .bottom-fade{
     position:fixed; left:0; right:0; bottom:0; height:14vh;
-    background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.6) 75%, #f4f5fa 100%);
+    background:linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.6) 75%, #ffffff 100%);
     z-index:25; pointer-events:none;
   }
 
@@ -171,7 +181,7 @@
 
     .bottom-fade{
       height:8vh;
-      background:linear-gradient(to bottom, rgba(244,245,250,0) 0%, rgba(244,245,250,.5) 80%, #f4f5fa 100%);
+      background:linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.5) 80%, #ffffff 100%);
     }
 
     .nav-arrow{
@@ -190,6 +200,13 @@
 
     .portal-icons{ bottom:4%; width:52%; }
 
+    /* scenery: same treatment as login.html's mobile breakpoint --
+       left half pinned to the bottom-left corner, right half a touch
+       bigger and lifted slightly off the bottom edge. */
+    .scene-left, .scene-right{ width:62vw; max-width:340px; }
+    .scene-left{ left:-2vw; bottom:0; }
+    .scene-right{ width:70vw; max-width:360px; transform:translateY(-8%); }
+
     /* Unselected cards: hang from the TOP of the screen instead of the
        bottom, offset far enough sideways that roughly half of each card
        peeks out past the center card's edges -- matching the reference:
@@ -202,13 +219,16 @@
        own fade at each card's own bottom so the cutoff isn't a hard edge */
     .portal.pos-left::after, .portal.pos-right::after{
       content:""; position:absolute; left:0; right:0; bottom:-2px; height:46%;
-      background:linear-gradient(to bottom, rgba(244,245,250,0), #f4f5fa 96%);
+      background:linear-gradient(to bottom, rgba(255,255,255,0), #ffffff 96%);
       z-index:26; pointer-events:none;
     }
   }
 </style>
 </head>
 <body>
+
+  <img src="assets/scene-left.png" class="scene scene-left" alt="" />
+  <img src="assets/scene-right.png" class="scene scene-right" alt="" />
 
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
