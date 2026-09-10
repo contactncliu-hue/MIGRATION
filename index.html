@@ -40,9 +40,8 @@
      JS ever fails). */
   .sidebar{
     width:var(--sidebar-w, 240px);
-    max-width:46vw;
     border-right:none;
-    display:flex; flex-direction:column; padding:28px 0 8px 0;
+    display:flex; flex-direction:column; padding:28px 0 2px 0;
     transition:margin-left .35s ease, opacity .35s ease, width .1s ease;
     z-index:70;
     font-family:'Daruma Drop One', sans-serif;
@@ -110,25 +109,25 @@
 
   .sidebar-bottom{
     position:relative; z-index:2;
-    padding:28px 24px 4px 24px; flex-shrink:0;
+    padding:28px 24px 0 24px; flex-shrink:0;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     border-top:none;
     margin-top:auto; /* keeps LOG OUT / language pinned to the bottom of the sidebar */
   }
   .sidebar-bottom label{ display:none; } /* "LANGUAGE" caption dropped to match the compact badge look */
   .lang-select{
-    padding:16px 20px; border-radius:26px; border:none;
+    padding:11px 14px; border-radius:16px; border:none;
     background:rgba(20,20,30,.4); color:#fff;
     font-family:'Daruma Drop One', sans-serif;
-    font-weight:400; font-size:18px; cursor:pointer;
+    font-weight:400; font-size:14px; cursor:pointer;
     -webkit-appearance:none; appearance:none;
     text-align:center;
   }
   .logout-btn{
     background:#FFAFAF; border:none; color:#E85454;
-    padding:18px 30px; border-radius:22px;
+    padding:11px 20px; border-radius:16px;
     font-family:'Daruma Drop One', sans-serif;
-    font-weight:400; font-size:19px; text-transform:uppercase; cursor:pointer;
+    font-weight:400; font-size:14px; text-transform:uppercase; cursor:pointer;
     white-space:nowrap;
   }
   .logout-btn:hover{ background:#ff9d9d; }
