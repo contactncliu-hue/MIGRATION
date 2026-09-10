@@ -12,6 +12,32 @@
     font-style: normal;
     font-display: swap;
   }
+  /* Sidebar-only, per-language display fonts. Korean uses KERISKEDU,
+     Vietnamese uses StreetSignSans, Chinese (Simplified) uses
+     SentyWatermelon -- everything else (EN/FR/PT) keeps Daruma Drop One.
+     The font-family NAME here is ours to pick, so it doesn't need to
+     match whatever name is baked into the font file itself. */
+  @font-face {
+    font-family: 'KERISKEDU';
+    src: url('assets/fonts/KERISKEDU_B.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'StreetSignSans';
+    src: url('assets/fonts/StreetSignSans_1.3.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'SentyWatermelon';
+    src: url('assets/fonts/SentyWatermelon.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     font-family:'Poppins', sans-serif;
@@ -44,7 +70,8 @@
     display:flex; flex-direction:column; padding:28px 0 2px 0;
     transition:margin-left .35s ease, opacity .35s ease, width .1s ease;
     z-index:70;
-    font-family:'Daruma Drop One', sans-serif;
+    --sidebar-font:'Daruma Drop One';
+    font-family:var(--sidebar-font), sans-serif;
     color:#fff;
     position:fixed; top:0; left:0;
     height:100vh;
@@ -77,7 +104,7 @@
     background:#FFF6C9; color:#2AA9F2;
     display:flex; align-items:center; justify-content:center;
     font-weight:400; font-size:22px; flex-shrink:0;
-    font-family:'Daruma Drop One', sans-serif;
+    font-family:var(--sidebar-font), sans-serif;
     position:relative; overflow:hidden;
   }
   .user-avatar.admin{ color:#B4784E; } /* brown "A" on the same pale circle */
@@ -96,16 +123,19 @@
     display:block;
     padding:14px 20px 14px 24px;
     color:#fff; text-decoration:none;
-    font-family:'Daruma Drop One', sans-serif;
+    font-family:var(--sidebar-font), sans-serif;
     font-weight:400; font-size:21px; letter-spacing:.5px;
     text-transform:uppercase;
     white-space:nowrap;
-    background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,0) 85%);
+    background-image:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,0) 85%);
+    background-repeat:no-repeat;
+    background-size:112% 100%;
+    background-position:-12px 0; /* nudges the cyan highlight slightly left */
     border-radius:0 40px 40px 0;
-    transition:background .2s ease;
+    transition:background-image .2s ease;
   }
-  .nav-link:hover{ background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.25) 90%); }
-  .nav-link.active{ background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.35) 90%); }
+  .nav-link:hover{ background-image:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.25) 90%); }
+  .nav-link.active{ background-image:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.35) 90%); }
 
   .sidebar-bottom{
     position:relative; z-index:2;
@@ -116,22 +146,27 @@
   }
   .sidebar-bottom label{ display:none; } /* "LANGUAGE" caption dropped to match the compact badge look */
   .lang-select{
-    padding:11px 14px; border-radius:16px; border:none;
+    padding:8px 14px; border-radius:16px; border:none;
     background:rgba(20,20,30,.4); color:#fff;
-    font-family:'Daruma Drop One', sans-serif;
+    font-family:var(--sidebar-font), sans-serif;
     font-weight:400; font-size:14px; cursor:pointer;
     -webkit-appearance:none; appearance:none;
     text-align:center;
   }
   .logout-btn{
     background:#FFAFAF; border:none; color:#E85454;
-    padding:11px 20px; border-radius:16px;
-    font-family:'Daruma Drop One', sans-serif;
+    padding:8px 20px; border-radius:16px;
+    font-family:var(--sidebar-font), sans-serif;
     font-weight:400; font-size:14px; text-transform:uppercase; cursor:pointer;
     white-space:nowrap;
   }
   .logout-btn:hover{ background:#ff9d9d; }
   .logout-btn:disabled{ opacity:.6; cursor:default; }
+
+  /* Per-language sidebar fonts -- everything else stays on Daruma Drop One */
+  body[data-lang="ko"] .sidebar{ --sidebar-font:'KERISKEDU'; }
+  body[data-lang="vi"] .sidebar{ --sidebar-font:'StreetSignSans'; }
+  body[data-lang="zh-CN"] .sidebar{ --sidebar-font:'SentyWatermelon'; }
 
   body.sidebar-hidden .sidebar{ margin-left:calc(-1 * var(--sidebar-w, 240px)); opacity:0; pointer-events:none; }
 
@@ -483,6 +518,7 @@
       const key = el.getAttribute('data-i18n')
       if (dict[key]) el.textContent = dict[key]
     })
+    document.body.setAttribute('data-lang', lang) // drives the sidebar's per-language font (see --sidebar-font in CSS)
     try { localStorage.setItem('zoo_lang', lang) } catch (e) { /* storage unavailable, no-op */ }
   }
 
