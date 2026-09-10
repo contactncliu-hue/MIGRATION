@@ -41,8 +41,7 @@
     z-index:70;
     font-family:'Daruma Drop One', sans-serif;
     color:#fff;
-    position:sticky; top:0;
-    align-self:flex-start; /* stop the flex row from stretching this to match main-content's height */
+    position:fixed; top:0; left:0;
     height:100vh;
     overflow:hidden; /* crops the big PNG flush to the sidebar's edges */
   }
@@ -125,7 +124,8 @@
   .sidebar-backdrop{ display:none; }
 
   /* ================= MAIN ================= */
-  .main-content{ flex:1; position:relative; min-height:100vh; overflow:hidden; }
+  .main-content{ flex:1; position:relative; min-height:100vh; overflow:hidden; margin-left:240px; transition:margin-left .35s ease; }
+  body.sidebar-hidden .main-content{ margin-left:0; }
 
   .menu-toggle{
     position:fixed; top:24px; right:32px; z-index:80;
@@ -247,6 +247,7 @@
   @media (max-width:760px){
     .sidebar{ position:fixed; inset:0 auto 0 0; z-index:70; }
     body.sidebar-hidden .sidebar{ margin-left:-240px; }
+    .main-content{ margin-left:0; }
 
     .sidebar-backdrop{
       display:none;
