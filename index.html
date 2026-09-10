@@ -35,7 +35,7 @@
   .sidebar{
     width:240px; min-width:240px;
     border-right:none;
-    display:flex; flex-direction:column; padding:28px 0 22px 0;
+    display:flex; flex-direction:column; padding:28px 0 8px 0;
     transition:margin-left .35s ease, opacity .35s ease;
     z-index:70;
     font-family:'Daruma Drop One', sans-serif;
@@ -57,22 +57,15 @@
   .sidebar-bg{
     position:absolute; inset:0;
     width:100%; height:100%;
-    object-fit:cover;
-    object-position:left bottom;
+    object-fit:contain;
+    object-position:center bottom;
     z-index:0;
     pointer-events:none;
-    /* The source PNG's illustrated characters sit toward the left/bottom
-       of its own canvas, with transparent space on the right side of that
-       SAME image -- object-fit:cover can only crop what's outside the
-       frame, it can't paint in artwork that isn't there, so that
-       transparent zone was letting the sidebar's blue show through even
-       though nothing was being "cut off". Scaling up from the left edge
-       pushes that empty margin further right, out of the visible frame,
-       without trimming any of the actual illustration. If a sliver is
-       still visible (or too much gets cropped now), nudge this scale
-       value up/down -- a full-bleed export of the art is the real fix. */
-    transform:scale(1.35);
-    transform-origin:left bottom;
+    /* Full image, nothing cropped -- if its aspect ratio doesn't exactly
+       match the sidebar's, this can leave the fallback blue visible at
+       the top or sides (that's the sidebar's own background-color
+       showing past the edges of the image, not a crop). Anchored to the
+       bottom so any gap lands at the top instead of splitting top/bottom. */
   }
 
   .welcome-block{
@@ -118,7 +111,7 @@
 
   .sidebar-bottom{
     position:relative; z-index:2;
-    padding:28px 24px 14px 24px; flex-shrink:0;
+    padding:28px 24px 4px 24px; flex-shrink:0;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     border-top:none;
     margin-top:auto; /* keeps LOG OUT / language pinned to the bottom of the sidebar */
