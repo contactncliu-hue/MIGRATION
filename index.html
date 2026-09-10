@@ -32,40 +32,39 @@
   .scene-right{ right:0; width:34vw; max-width:380px; }
 
   /* ================= SIDEBAR (new beach-themed design) ================= */
+  /* --sidebar-w is computed in JS from assets/sidebar.PNG's own natural
+     width/height at the current viewport height, so the sidebar's box is
+     always exactly the image's own aspect ratio -- not a fixed guess the
+     image then has to be forced/cropped/letterboxed into. 240px is only
+     the fallback used for one frame before JS measures the image (and if
+     JS ever fails). */
   .sidebar{
-    width:240px; min-width:240px;
+    width:var(--sidebar-w, 240px);
+    max-width:46vw;
     border-right:none;
     display:flex; flex-direction:column; padding:28px 0 8px 0;
-    transition:margin-left .35s ease, opacity .35s ease;
+    transition:margin-left .35s ease, opacity .35s ease, width .1s ease;
     z-index:70;
     font-family:'Daruma Drop One', sans-serif;
     color:#fff;
     position:fixed; top:0; left:0;
     height:100vh;
-    overflow:hidden; /* the bg image is cropped to fill this box exactly -- no scroll/no gaps */
-    /* Fallback only -- shown solely if assets/sidebar.PNG fails to load.
-       With the PNG covering the sidebar edge-to-edge below, this should
-       never actually be visible. */
+    overflow:hidden;
+    /* Fallback only -- shown for a frame before JS sizes the sidebar to
+       the image, or if the PNG fails to load entirely. */
     background-color:#2AA9F2;
   }
 
-  /* The sidebar artwork now COVERS the entire sidebar box (edge to edge,
-     cropped as needed -- not letterboxed/contained) instead of sitting as
-     a single flex item that only filled the bottom portion while solid
-     blue showed above it. It's positioned behind the nav content via
-     z-index, not stacked in the flex flow. */
+  /* The box IS the image's own aspect ratio now (see --sidebar-w above),
+     so the artwork fills it exactly -- no cropping, no letterboxed gaps,
+     no fallback color showing anywhere. It's still positioned behind the
+     nav content via z-index, not stacked in the flex flow. */
   .sidebar-bg{
     position:absolute; inset:0;
     width:100%; height:100%;
-    object-fit:contain;
-    object-position:center bottom;
+    object-fit:cover; /* box and image share the same ratio by construction; cover just absorbs any sub-pixel rounding */
     z-index:0;
     pointer-events:none;
-    /* Full image, nothing cropped -- if its aspect ratio doesn't exactly
-       match the sidebar's, this can leave the fallback blue visible at
-       the top or sides (that's the sidebar's own background-color
-       showing past the edges of the image, not a crop). Anchored to the
-       bottom so any gap lands at the top instead of splitting top/bottom. */
   }
 
   .welcome-block{
@@ -135,13 +134,13 @@
   .logout-btn:hover{ background:#ff9d9d; }
   .logout-btn:disabled{ opacity:.6; cursor:default; }
 
-  body.sidebar-hidden .sidebar{ margin-left:-240px; opacity:0; pointer-events:none; }
+  body.sidebar-hidden .sidebar{ margin-left:calc(-1 * var(--sidebar-w, 240px)); opacity:0; pointer-events:none; }
 
   /* ---------- mobile backdrop (tap outside to close the drawer) ---------- */
   .sidebar-backdrop{ display:none; }
 
   /* ================= MAIN ================= */
-  .main-content{ flex:1; position:relative; min-height:100vh; overflow:hidden; margin-left:240px; transition:margin-left .35s ease; }
+  .main-content{ flex:1; position:relative; min-height:100vh; overflow:hidden; margin-left:var(--sidebar-w, 240px); transition:margin-left .1s ease; }
   body.sidebar-hidden .main-content{ margin-left:0; }
 
   .menu-toggle{
@@ -162,10 +161,10 @@
 
   /* ---------- carousel : pinned to the real viewport (not a flow container) ---------- */
   .carousel{
-    position:fixed; top:0; left:240px; right:0; bottom:0;
+    position:fixed; top:0; left:var(--sidebar-w, 240px); right:0; bottom:0;
     z-index:1;
     overflow:hidden; /* crops the peeking side-portals flush to the bottom edge */
-    transition:left .35s ease;
+    transition:left .1s ease;
   }
   body.sidebar-hidden .carousel{ left:0; }
 
@@ -263,7 +262,7 @@
   /* ================= MOBILE ================= */
   @media (max-width:760px){
     .sidebar{ position:fixed; inset:0 auto 0 0; z-index:70; }
-    body.sidebar-hidden .sidebar{ margin-left:-240px; }
+    body.sidebar-hidden .sidebar{ margin-left:calc(-1 * var(--sidebar-w, 240px)); }
     .main-content{ margin-left:0; }
 
     .sidebar-backdrop{
@@ -429,6 +428,31 @@
   portals.forEach((el, i) => el.addEventListener('click', () => { active = i; render(); }));
 
   render();
+
+  // ---------- Sidebar width: driven by the image's own aspect ratio ----------
+  // Instead of forcing assets/sidebar.PNG into a fixed 240px box (which
+  // meant either cropping it or leaving fallback-color gaps), the sidebar's
+  // width is set here to whatever width that image would naturally be at
+  // the current viewport height -- so the box the artwork sits in always
+  // exactly matches the artwork's own proportions.
+  (function () {
+    var img = document.querySelector('.sidebar-bg')
+    if (!img) return
+
+    function applySidebarWidth() {
+      if (!img.naturalWidth || !img.naturalHeight) return
+      var ratio = img.naturalWidth / img.naturalHeight
+      var w = Math.round(window.innerHeight * ratio)
+      document.documentElement.style.setProperty('--sidebar-w', w + 'px')
+    }
+
+    if (img.complete) {
+      applySidebarWidth()
+    } else {
+      img.addEventListener('load', applySidebarWidth)
+    }
+    window.addEventListener('resize', applySidebarWidth)
+  })()
 
   // ---------- sidebar drawer (mobile: starts closed, backdrop to dismiss) ----------
   function isMobile(){ return window.matchMedia('(max-width:760px)').matches; }
