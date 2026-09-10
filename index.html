@@ -34,7 +34,10 @@
   /* ================= SIDEBAR (new beach-themed design) ================= */
   .sidebar{
     width:240px; min-width:240px;
-    background-color:#2AA9F2; /* fills behind the nav before the scrolled-to image; not a stretch of the PNG itself */
+    background-image:url('assets/sidebar.PNG');
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
     border-right:none;
     display:flex; flex-direction:column; padding:28px 0 22px 0;
     transition:margin-left .35s ease, opacity .35s ease;
@@ -43,16 +46,7 @@
     color:#fff;
     position:fixed; top:0; left:0;
     height:100vh;
-    overflow-y:auto; overflow-x:hidden; /* scroll internally to reach the full image below the nav */
-  }
-  /* Full-size, uncropped -- flows normally after the nav instead of being
-     absolute/anchored, so its entire natural height is reachable by
-     scrolling the sidebar rather than being cut off by a fixed box. */
-  .sidebar-bg{
-    display:block; flex-shrink:0;
-    width:100%; height:auto;
-    margin-top:auto;
-    pointer-events:none;
+    overflow:hidden;
   }
 
   .welcome-block{
@@ -96,7 +90,7 @@
   .nav-link.active{ background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.35) 90%); }
 
   .sidebar-bottom{
-    padding:20px 24px 24px 24px; flex-shrink:0;
+    margin-top:auto; padding:20px 24px 24px 24px; flex-shrink:0;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     border-top:none;
   }
@@ -329,8 +323,6 @@
       <a href="index.html" class="nav-link active" data-i18n="homepage">HOMEPAGE</a>
       <a href="transfer.html" class="nav-link" data-i18n="transfer">TRANSFER</a>
     </nav>
-
-    <img src="assets/sidebar.PNG" class="sidebar-bg" alt="" />
 
     <div class="sidebar-bottom">
       <button class="logout-btn" id="logoutBtn" data-i18n="logout">LOG OUT</button>
