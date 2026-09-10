@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ZOO - Homepage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Daruma+Drop+One&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -24,26 +27,86 @@
   .scene-left{ left:0; width:34vw; max-width:380px; }
   .scene-right{ right:0; width:34vw; max-width:380px; }
 
-  /* ================= SIDEBAR ================= */
+  /* ================= SIDEBAR (new beach-themed design) ================= */
   .sidebar{
-    width:240px; min-width:240px; background:#fff; border-right:1px solid #eee;
-    display:flex; flex-direction:column; padding:24px 0;
+    width:240px; min-width:240px;
+    background-color:#2AA9F2; /* fallback while the image loads / shows above it if it's short */
+    border-right:none;
+    display:flex; flex-direction:column; padding:28px 0 22px 0;
     transition:margin-left .35s ease, opacity .35s ease;
     z-index:70;
+    font-family:'Daruma Drop One', cursive;
+    color:#fff;
+    position:relative;
+    overflow:hidden; /* crops the big PNG flush to the sidebar's edges */
   }
-  .sidebar .logo-img{ width:70px; margin:0 auto 20px auto; display:block; }
-  .user-block{ display:flex; align-items:center; gap:12px; padding:0 20px 20px 20px; border-bottom:1px solid #eee; margin-bottom:12px; }
-  .user-avatar{ width:40px; height:40px; border-radius:50%; background:#3B5BDB; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; flex-shrink:0; }
-  .user-info .user-name{ font-weight:700; font-size:14px; color:#1a1a2e; }
-  .user-info .user-role{ font-size:12px; color:#888; }
-  .nav-link{ display:flex; align-items:center; gap:10px; padding:14px 20px; color:#444; text-decoration:none; font-weight:600; font-size:14px; letter-spacing:.3px; }
-  .nav-link:hover{ background:#f4f5fa; }
-  .nav-link.active{ background:#3B5BDB; color:#fff; }
-  .sidebar-bottom{ margin-top:auto; padding:16px 20px 0 20px; border-top:1px solid #eee; display:flex; flex-direction:column; gap:10px; }
-  .sidebar-bottom label{ font-size:11px; font-weight:700; color:#999; letter-spacing:.5px; }
-  .lang-select{ padding:8px 10px; border-radius:8px; border:1px solid #ddd; font-size:14px; font-weight:600; cursor:pointer; }
-  .logout-btn{ background:none; border:1.5px solid #e03131; color:#e03131; padding:10px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; }
-  .logout-btn:hover{ background:#fff0f0; }
+  /* The source PNG is large/tall -- same trick as .scene-left/.scene-right:
+     pin it to the bottom at full sidebar width and let height scale
+     naturally, so it crops at the top instead of getting squashed. */
+  .sidebar-bg{
+    position:absolute; left:0; bottom:0; z-index:0;
+    width:100%; height:auto;
+    pointer-events:none;
+  }
+  .sidebar > *:not(.sidebar-bg){ position:relative; z-index:1; }
+
+  .welcome-block{
+    display:flex; align-items:center; gap:14px;
+    padding:0 24px 30px 24px;
+  }
+  .user-avatar{
+    width:56px; height:56px; border-radius:50%;
+    background:#FFF6C9; color:#2AA9F2;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:400; font-size:22px; flex-shrink:0;
+    font-family:'Daruma Drop One', cursive;
+    position:relative; overflow:hidden;
+  }
+  .user-avatar.admin{ color:#B4784E; } /* brown "A" on the same pale circle */
+  .welcome-text{ display:flex; flex-direction:column; min-width:0; }
+  .welcome-label{
+    font-size:20px; color:#fff; letter-spacing:.5px; line-height:1.15;
+  }
+  .user-name{
+    font-size:12px; color:rgba(255,255,255,.85); margin-top:2px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .user-role{ display:none; } /* role no longer shown in the new layout */
+
+  .sidebar-nav{ display:flex; flex-direction:column; gap:24px; margin-top:6px; }
+  .nav-link{
+    display:block;
+    padding:14px 20px 14px 24px;
+    color:#fff; text-decoration:none;
+    font-family:'Daruma Drop One', cursive;
+    font-weight:400; font-size:21px; letter-spacing:.5px;
+    text-transform:uppercase;
+    background:linear-gradient(90deg, rgba(0,194,255,.85) 0%, rgba(0,194,255,0) 85%);
+    border-radius:0 40px 40px 0;
+    transition:background .2s ease;
+  }
+  .nav-link:hover{ background:linear-gradient(90deg, rgba(0,194,255,1) 0%, rgba(0,194,255,.2) 90%); }
+  .nav-link.active{ background:linear-gradient(90deg, rgba(0,194,255,1) 0%, rgba(0,194,255,.28) 90%); }
+
+  .sidebar-bottom{
+    margin-top:auto; padding:20px 24px 0 24px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    border-top:none;
+  }
+  .sidebar-bottom label{ display:none; } /* "LANGUAGE" caption dropped to match the compact badge look */
+  .lang-select{
+    padding:8px 12px; border-radius:20px; border:none;
+    background:rgba(20,20,30,.35); color:#fff;
+    font-family:'Daruma Drop One', cursive;
+    font-weight:400; font-size:13px; cursor:pointer;
+  }
+  .logout-btn{
+    background:#FFAFAF; border:none; color:#E85454;
+    padding:10px 22px; border-radius:16px;
+    font-family:'Daruma Drop One', cursive;
+    font-weight:400; font-size:15px; text-transform:uppercase; cursor:pointer;
+  }
+  .logout-btn:hover{ background:#ff9d9d; }
   .logout-btn:disabled{ opacity:.6; cursor:default; }
 
   body.sidebar-hidden .sidebar{ margin-left:-240px; opacity:0; pointer-events:none; }
@@ -239,25 +302,32 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <aside class="sidebar">
-    <img src="assets/logo.png.PNG" alt="Logo" class="logo-img" />
-    <div class="user-block">
-      <div class="user-avatar" id="user-initial">?</div>
-      <div class="user-info">
+    <img src="assets/sidebar.PNG" class="sidebar-bg" alt="" />
+    <div class="welcome-block">
+      <div class="user-avatar" id="userAvatar">
+        <span id="user-initial">?</span>
+      </div>
+      <div class="welcome-text">
+        <div class="welcome-label" data-i18n="welcome">WELCOME</div>
         <div class="user-name" id="user-name">Member</div>
-        <div class="user-role"><span data-i18n="roleLabel">Role:</span> <span id="user-role">MEMBER</span></div>
+        <span class="user-role" id="user-role">MEMBER</span>
       </div>
     </div>
-    <a href="index.html" class="nav-link active" data-i18n="homepage">HOMEPAGE</a>
-    <a href="transfer.html" class="nav-link" data-i18n="transfer">TRANSFER</a>
+
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-link active" data-i18n="homepage">HOMEPAGE</a>
+      <a href="transfer.html" class="nav-link" data-i18n="transfer">TRANSFER</a>
+    </nav>
+
     <div class="sidebar-bottom">
       <label data-i18n="language">LANGUAGE</label>
       <select class="lang-select" id="langSelect">
-        <option value="en">🇺🇸 English</option>
-        <option value="fr">🇫🇷 Français</option>
-        <option value="pt-BR">🇧🇷 Português (BR)</option>
-        <option value="vi">🇻🇳 Tiếng Việt</option>
-        <option value="ko">🇰🇷 한국어</option>
-        <option value="zh-CN">🇨🇳 中文（简体）</option>
+        <option value="en">🇺🇸 EN</option>
+        <option value="fr">🇫🇷 FR</option>
+        <option value="pt-BR">🇧🇷 PT</option>
+        <option value="vi">🇻🇳 VI</option>
+        <option value="ko">🇰🇷 KR</option>
+        <option value="zh-CN">🇨🇳 CN</option>
       </select>
       <button class="logout-btn" id="logoutBtn" data-i18n="logout">LOG OUT</button>
     </div>
@@ -340,12 +410,12 @@
   // ---------- Language switcher: translates UI labels only, never data ----------
   // (username, role value, and the event carousel artwork are left untouched)
   const translations = {
-    en:   { homepage:'HOMEPAGE', transfer:'TRANSFER', language:'LANGUAGE', logout:'LOG OUT', loggingOut:'LOGGING OUT...', roleLabel:'Role:', datesNote:'Time can be subject to change' },
-    fr:   { homepage:'ACCUEIL',  transfer:'TRANSFERT', language:'LANGUE', logout:'DÉCONNEXION', loggingOut:'DÉCONNEXION...', roleLabel:'Rôle :', datesNote:"L'heure peut être sujette à changement" },
-    'pt-BR': { homepage:'PÁGINA INICIAL', transfer:'TRANSFERÊNCIA', language:'IDIOMA', logout:'SAIR', loggingOut:'SAINDO...', roleLabel:'Função:', datesNote:'O horário pode estar sujeito a alterações' },
-    vi:   { homepage:'TRANG CHỦ', transfer:'CHUYỂN KHOẢN', language:'NGÔN NGỮ', logout:'ĐĂNG XUẤT', loggingOut:'ĐANG ĐĂNG XUẤT...', roleLabel:'Vai trò:', datesNote:'Thời gian có thể thay đổi' },
-    ko:   { homepage:'홈', transfer:'이체', language:'언어', logout:'로그아웃', loggingOut:'로그아웃 중...', roleLabel:'역할:', datesNote:'시간은 변경될 수 있습니다' },
-    'zh-CN': { homepage:'主页', transfer:'转账', language:'语言', logout:'退出登录', loggingOut:'正在退出...', roleLabel:'角色：', datesNote:'时间可能会有变动' }
+    en:   { welcome:'WELCOME', homepage:'HOMEPAGE', transfer:'TRANSFER', language:'LANGUAGE', logout:'LOG OUT', loggingOut:'LOGGING OUT...', roleLabel:'Role:', datesNote:'Time can be subject to change' },
+    fr:   { welcome:'BIENVENUE', homepage:'ACCUEIL',  transfer:'TRANSFERT', language:'LANGUE', logout:'DÉCONNEXION', loggingOut:'DÉCONNEXION...', roleLabel:'Rôle :', datesNote:"L'heure peut être sujette à changement" },
+    'pt-BR': { welcome:'BEM-VINDO', homepage:'PÁGINA INICIAL', transfer:'TRANSFERÊNCIA', language:'IDIOMA', logout:'SAIR', loggingOut:'SAINDO...', roleLabel:'Função:', datesNote:'O horário pode estar sujeito a alterações' },
+    vi:   { welcome:'CHÀO MỪNG', homepage:'TRANG CHỦ', transfer:'CHUYỂN KHOẢN', language:'NGÔN NGỮ', logout:'ĐĂNG XUẤT', loggingOut:'ĐANG ĐĂNG XUẤT...', roleLabel:'Vai trò:', datesNote:'Thời gian có thể thay đổi' },
+    ko:   { welcome:'환영합니다', homepage:'홈', transfer:'이체', language:'언어', logout:'로그아웃', loggingOut:'로그아웃 중...', roleLabel:'역할:', datesNote:'시간은 변경될 수 있습니다' },
+    'zh-CN': { welcome:'欢迎', homepage:'主页', transfer:'转账', language:'语言', logout:'退出登录', loggingOut:'正在退出...', roleLabel:'角色：', datesNote:'时间可能会有变动' }
   }
 
   const langSelect = document.getElementById('langSelect')
@@ -395,6 +465,16 @@
       const role = (profile && profile.role) ? profile.role.toUpperCase() : 'GUEST'
       const roleEl = document.getElementById('user-role')
       if (roleEl) roleEl.textContent = role
+
+      // Admins get a brown "A" on the avatar circle instead of their initial
+      const avatarEl = document.getElementById('userAvatar')
+      const initialEl = document.getElementById('user-initial')
+      if (role === 'ADMIN') {
+        avatarEl.classList.add('admin')
+        initialEl.textContent = 'A'
+      } else {
+        avatarEl.classList.remove('admin')
+      }
     }).catch(err => console.error('getUser failed:', err))
   }
 
