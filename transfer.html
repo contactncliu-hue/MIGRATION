@@ -960,11 +960,15 @@
           liveCounts[m.assigned_wing] = (liveCounts[m.assigned_wing] || 0) + 1
         })
 
-        var overrideRes = await supabaseClient.from('wing_status').select('color, percentage')
+        var overrideRes = await supabaseClient.from('wing_status').select('color, percentage, updated_by')
         if (overrideRes.error) console.error('wing_status lookup failed', overrideRes.error)
         var overrides = {}
         ;((overrideRes && overrideRes.data) || []).forEach(function (r) {
-          if (r.percentage != null) overrides[r.color] = r.percentage
+          // Only counts as a real manual override once an admin has actually
+          // set it (updated_by present) -- a percentage of 0 left over from
+          // an initial seed row (updated_by still NULL) should NOT pin the
+          // wing's count to 0 and hide the live approved-member count.
+          if (r.percentage != null && r.updated_by != null) overrides[r.color] = r.percentage
         })
 
         var capacityByColor = {}
