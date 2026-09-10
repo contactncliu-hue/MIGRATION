@@ -34,14 +34,16 @@
   /* ================= SIDEBAR (new beach-themed design) ================= */
   .sidebar{
     width:240px; min-width:240px;
-    background-color:#2AA9F2; /* fallback while the image loads / shows above it if it's short */
+    background-color:transparent; /* no solid-color extension -- the PNG shows at its own size */
     border-right:none;
     display:flex; flex-direction:column; padding:28px 0 22px 0;
     transition:margin-left .35s ease, opacity .35s ease;
     z-index:70;
     font-family:'Daruma Drop One', sans-serif;
     color:#fff;
-    position:relative;
+    position:sticky; top:0;
+    align-self:flex-start; /* stop the flex row from stretching this to match main-content's height */
+    height:100vh;
     overflow:hidden; /* crops the big PNG flush to the sidebar's edges */
   }
   /* The source PNG is large/tall -- same trick as .scene-left/.scene-right:
