@@ -34,7 +34,7 @@
   /* ================= SIDEBAR (new beach-themed design) ================= */
   .sidebar{
     width:240px; min-width:240px;
-    background-color:transparent; /* no solid-color extension -- the PNG shows at its own size */
+    background-color:#2AA9F2; /* fills behind the nav before the scrolled-to image; not a stretch of the PNG itself */
     border-right:none;
     display:flex; flex-direction:column; padding:28px 0 22px 0;
     transition:margin-left .35s ease, opacity .35s ease;
@@ -43,19 +43,20 @@
     color:#fff;
     position:fixed; top:0; left:0;
     height:100vh;
-    overflow:hidden; /* crops the big PNG flush to the sidebar's edges */
+    overflow-y:auto; overflow-x:hidden; /* scroll internally to reach the full image below the nav */
   }
-  /* The source PNG is large/tall -- same trick as .scene-left/.scene-right:
-     pin it to the bottom at full sidebar width and let height scale
-     naturally, so it crops at the top instead of getting squashed. */
+  /* Full-size, uncropped -- flows normally after the nav instead of being
+     absolute/anchored, so its entire natural height is reachable by
+     scrolling the sidebar rather than being cut off by a fixed box. */
   .sidebar-bg{
-    position:absolute; left:0; bottom:0; z-index:0;
+    display:block; flex-shrink:0;
     width:100%; height:auto;
+    margin-top:auto;
     pointer-events:none;
   }
-  .sidebar > *:not(.sidebar-bg){ position:relative; z-index:1; }
 
   .welcome-block{
+    flex-shrink:0;
     display:flex; align-items:center; gap:14px;
     padding:0 24px 30px 24px;
   }
@@ -78,7 +79,7 @@
   }
   .user-role{ display:none; } /* role no longer shown in the new layout */
 
-  .sidebar-nav{ display:flex; flex-direction:column; gap:24px; margin-top:6px; }
+  .sidebar-nav{ display:flex; flex-direction:column; gap:24px; margin-top:6px; flex-shrink:0; }
   .nav-link{
     display:block;
     padding:14px 20px 14px 24px;
@@ -95,7 +96,7 @@
   .nav-link.active{ background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.35) 90%); }
 
   .sidebar-bottom{
-    margin-top:auto; padding:20px 24px 0 24px;
+    padding:20px 24px 24px 24px; flex-shrink:0;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     border-top:none;
   }
@@ -313,7 +314,6 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <aside class="sidebar">
-    <img src="assets/sidebar.PNG" class="sidebar-bg" alt="" />
     <div class="welcome-block">
       <div class="user-avatar" id="userAvatar">
         <span id="user-initial">?</span>
@@ -329,6 +329,8 @@
       <a href="index.html" class="nav-link active" data-i18n="homepage">HOMEPAGE</a>
       <a href="transfer.html" class="nav-link" data-i18n="transfer">TRANSFER</a>
     </nav>
+
+    <img src="assets/sidebar.PNG" class="sidebar-bg" alt="" />
 
     <div class="sidebar-bottom">
       <button class="logout-btn" id="logoutBtn" data-i18n="logout">LOG OUT</button>
