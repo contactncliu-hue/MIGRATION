@@ -37,23 +37,145 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; background: #f4f5fa; overflow-x:hidden; }
 
-    /* ================= SIDEBAR ================= */
-    .sidebar { width: 240px; min-width:240px; background: #fff; border-right: 1px solid #eee; display: flex; flex-direction: column; padding: 24px 0; transition:margin-left .35s ease, opacity .35s ease; z-index:70; }
-    body.sidebar-hidden .sidebar{ margin-left:-240px; opacity:0; pointer-events:none; }
+    /* ================= SIDEBAR (beach-themed design, matches index.html — sidebar2.PNG) ================= */
+    @font-face {
+      font-family: 'Daruma Drop One';
+      src: url('assets/fonts/DarumaDropOne-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    /* Sidebar-only, per-language display fonts. Korean uses KERISKEDU,
+       Vietnamese uses StreetSignSans, Chinese (Simplified) uses
+       SentyWatermelon -- everything else (EN/FR/PT) keeps Daruma Drop One. */
+    @font-face {
+      font-family: 'KERISKEDU';
+      src: url('assets/fonts/KERISKEDU_B.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'StreetSignSans';
+      src: url('assets/fonts/StreetSignSans_1.3.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'SentyWatermelon';
+      src: url('assets/fonts/SentyWatermelon.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    /* --sidebar-w is computed in JS from assets/sidebar2.PNG's own natural
+       width/height at the current viewport height, so the sidebar's box is
+       always exactly the image's own aspect ratio. 240px is only the
+       fallback used for one frame before JS measures the image. */
+    .sidebar{
+      width:var(--sidebar-w, 240px);
+      border-right:none;
+      display:flex; flex-direction:column; padding:28px 0 2px 0;
+      transition:margin-left .35s ease, opacity .35s ease, width .1s ease;
+      z-index:70;
+      --sidebar-font:'Daruma Drop One';
+      font-family:var(--sidebar-font), sans-serif;
+      color:#fff;
+      position:fixed; top:0; left:0;
+      height:100vh;
+      overflow:hidden;
+      /* Fallback only -- shown for a frame before JS sizes the sidebar to
+         the image, or if the PNG fails to load entirely. */
+      background-color:#2AA9F2;
+    }
+
+    .sidebar-bg{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .welcome-block{
+      position:relative; z-index:2;
+      flex-shrink:0;
+      display:flex; align-items:center; gap:14px;
+      padding:0 24px 30px 24px;
+    }
+    .user-avatar{
+      width:56px; height:56px; border-radius:50%;
+      background:#FFF6C9; color:#2AA9F2;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:400; font-size:22px; flex-shrink:0;
+      font-family:var(--sidebar-font), sans-serif;
+      position:relative; overflow:hidden;
+    }
+    .user-avatar.admin{ color:#B4784E; } /* brown "A" on the same pale circle */
+    .welcome-text{ display:flex; flex-direction:column; min-width:0; }
+    .welcome-label{
+      font-size:20px; color:#fff; letter-spacing:.5px; line-height:1.15;
+    }
+    .user-name{
+      font-size:12px; color:rgba(255,255,255,.85); margin-top:2px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .user-role{ display:none; } /* role no longer shown in the new layout */
+
+    .sidebar-nav{ position:relative; z-index:2; display:flex; flex-direction:column; gap:24px; margin-top:6px; flex-shrink:0; }
+    .nav-link{
+      display:block;
+      padding:14px 20px 14px 24px;
+      color:#fff; text-decoration:none;
+      font-family:var(--sidebar-font), sans-serif;
+      font-weight:400; font-size:21px; letter-spacing:.5px;
+      text-transform:uppercase;
+      white-space:nowrap;
+      background-image:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,0) 85%);
+      background-repeat:no-repeat;
+      background-size:112% 100%;
+      background-position:-12px 0;
+      border-radius:0 40px 40px 0;
+      transition:background-image .2s ease;
+    }
+    .nav-link:hover{ background-image:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.25) 90%); }
+    .nav-link.active{ background-image:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.35) 90%); }
+
+    .sidebar-bottom{
+      position:relative; z-index:2;
+      padding:28px 24px 0 24px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border-top:none;
+      margin-top:auto; /* keeps LOG OUT / language pinned to the bottom of the sidebar */
+    }
+    .lang-select{
+      padding:8px 14px; border-radius:16px; border:none;
+      background:rgba(20,20,30,.4); color:#fff;
+      font-family:var(--sidebar-font), sans-serif;
+      font-weight:400; font-size:14px; cursor:pointer;
+      -webkit-appearance:none; appearance:none;
+      text-align:center;
+    }
+    .logout-btn{
+      background:#FFAFAF; border:none; color:#E85454;
+      padding:8px 20px; border-radius:16px;
+      font-family:var(--sidebar-font), sans-serif;
+      font-weight:400; font-size:14px; text-transform:uppercase; cursor:pointer;
+      white-space:nowrap;
+    }
+    .logout-btn:hover{ background:#ff9d9d; }
+    .logout-btn:disabled{ opacity:.6; cursor:default; }
+
+    /* Per-language sidebar fonts -- everything else stays on Daruma Drop One */
+    body[data-lang="ko"] .sidebar{ --sidebar-font:'KERISKEDU'; }
+    body[data-lang="vi"] .sidebar{ --sidebar-font:'StreetSignSans'; }
+    body[data-lang="zh-CN"] .sidebar{ --sidebar-font:'SentyWatermelon'; }
+
+    body.sidebar-hidden .sidebar{ margin-left:calc(-1 * var(--sidebar-w, 240px)); opacity:0; pointer-events:none; }
+
     .sidebar-backdrop{ display:none; }
-    .sidebar .logo-img { width: 70px; margin: 0 auto 20px auto; display: block; }
-    .user-block { display: flex; align-items: center; gap: 12px; padding: 0 20px 20px 20px; border-bottom: 1px solid #eee; margin-bottom: 12px; }
-    .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #3B5BDB; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
-    .user-info .user-name { font-weight: 700; font-size: 14px; color: #1a1a2e; }
-    .user-info .user-role { font-size: 12px; color: #888; }
-    .nav-link { display: flex; align-items: center; gap: 10px; padding: 14px 20px; color: #444; text-decoration: none; font-weight: 600; font-size: 14px; cursor: pointer; letter-spacing: 0.3px; }
-    .nav-link:hover { background: #f4f5fa; }
-    .nav-link.active { background: #3B5BDB; color: white; }
-    .sidebar-bottom { margin-top: auto; padding: 16px 20px 0 20px; border-top: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; }
-    .sidebar-bottom label { font-size: 11px; font-weight: 700; color: #999; letter-spacing: 0.5px; }
-    .lang-select { padding: 8px 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; font-weight: 600; cursor: pointer; }
-    .logout-btn { background: none; border: 1.5px solid #e03131; color: #e03131; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13px; }
-    .logout-btn:hover { background: #fff0f0; }
 
     .menu-toggle{
       position:fixed; top:24px; right:32px; z-index:80;
@@ -66,7 +188,10 @@
     body.sidebar-hidden .menu-toggle span:nth-child(3){ transform:translateY(-8px) rotate(-45deg); }
 
     @media (max-width:760px){
-      .sidebar{ position:fixed; inset:0 auto 0 0; }
+      .sidebar{ position:fixed; inset:0 auto 0 0; z-index:70; }
+      body.sidebar-hidden .sidebar{ margin-left:calc(-1 * var(--sidebar-w, 240px)); }
+      .main-content{ margin-left:0; }
+
       .sidebar-backdrop{
         display:none; position:fixed; inset:0; background:rgba(20,20,30,.4); z-index:65;
       }
@@ -74,7 +199,8 @@
     }
 
     /* ================= MAIN / HERO STAGE ================= */
-    .main-content { flex: 1; position:relative; overflow:hidden; min-height:100vh; }
+    .main-content { flex: 1; position:relative; overflow:hidden; min-height:100vh; margin-left:var(--sidebar-w, 240px); transition:margin-left .1s ease; }
+    body.sidebar-hidden .main-content{ margin-left:0; }
 
     .transfer-stage{
       position:relative;
@@ -218,15 +344,7 @@
       transition:text-shadow .12s ease;
     }
 
-    /* ---------- Solid dark-green "pressable" shadow + press animation on all action buttons ----------
-       The Migration and Check Status buttons are transparent <button> elements
-       wrapping an irregularly-shaped PNG (a plaque/ribbon graphic), so a
-       rectangular box-shadow shows up as a straight bar poking out past the
-       artwork's curved silhouette. drop-shadow follows the image's alpha
-       channel instead, so it hugs the actual shape. The genuinely rectangular
-       CSS buttons keep box-shadow, which is the right tool for them.
-       Blur radius set to 0 throughout so the shadow reads as a solid offset
-       block rather than a soft/blurred edge. */
+    /* ---------- Solid dark-green "pressable" shadow + press animation on all action buttons ---------- */
     .transfer-btn,
     .status-check-btn{
       filter:drop-shadow(0 5px 0 #14361f);
@@ -237,9 +355,6 @@
     .transfer-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
     .status-check-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
 
-    /* The green in the ticket artwork itself is baked into the PNGs (we
-       don't have source files to recolor), so lightening it is done with a
-       CSS filter on the images rather than editing the asset. */
     .transfer-btn img,
     .status-check-btn img{
       filter:brightness(1.1) saturate(1.05);
@@ -267,7 +382,6 @@
     .status-check-btn:active .status-check-label{
       text-shadow:none;
     }
-    /* Preserve the existing entrance transforms on these two (translateX centering etc.) while still allowing the press scale */
     .transfer-btn:active{ transform:translateX(-50%) translateY(0) scale(.97); }
     .status-open .transfer-btn:active{ transform:translateX(-50%) translateY(60px) scale(.93) !important; }
     .status-check-btn:active{ transform:translateX(-50%) translateY(0) scale(.97); }
@@ -383,22 +497,8 @@
     .uid-lookup-result.status-rejected{ background:#fff0f0; color:#e03131; border:1px solid #ffd6d6; }
 
     @media (max-width:760px){
-      /* A landscape scene can't both fill the full screen height AND
-         show zero horizontal crop on a portrait phone — that's a
-         geometry limit, not a bug. width:100vw (no crop at all) made
-         the whole scene tiny, pinned to a sliver at the very bottom.
-         The original desktop formula (177.7vh) went the other way and
-         filled 100% of the height, cropping the artwork down to a
-         narrow zoomed-in strip. This splits the difference: noticeably
-         bigger than the "tiny" version, without the extreme zoom. */
       .scene{ width:max(100vw, 105vh); }
 
-      /* The shared desktop rule hides BOTH the header ribbon and the
-         migration button when the card opens. The button swap
-         (migration ↔ check-status, same slot) is correct and should
-         stay — but the header must never move or hide, on mobile,
-         after its initial entrance animation. Overriding just the
-         header half of that rule back to its resting state. */
       .status-open .header-ribbon{
         opacity:1 !important;
         transform:translate(-50%, 0) !important;
@@ -409,13 +509,6 @@
       .transfer-btn{ width:23%; }
       .status-check-btn{ width:30%; }
 
-      /* Two button "slots": TOP (above the header-ribbon entirely) and
-         MIDDLE (the original top:62% spot). At rest, migration sits in
-         the TOP slot, above the "277" header. Opening the card swaps
-         them: migration drops down to the MIDDLE slot, and
-         check-status takes over the TOP slot it just vacated. This
-         overrides desktop's rule that just hides the migration button
-         outright on open — here it moves instead of disappearing. */
       .transfer-btn{
         top:-6%;
         transition:filter .16s ease, opacity .5s cubic-bezier(.22,.68,0,1.01) .15s, transform .5s cubic-bezier(.22,.68,0,1.01) .15s, top .5s cubic-bezier(.22,.68,0,1.01) .15s;
@@ -431,17 +524,6 @@
         transition:filter .16s ease, opacity .75s cubic-bezier(.22,.68,0,1.01) .1s, transform .75s cubic-bezier(.22,.68,0,1.01) .1s;
       }
 
-      /* Peeks in from the left edge, same as desktop — just at mobile's
-         width/scale. Unlike the earlier bottom-peek attempt, this is
-         exact and reliable: width (78%) is a value we set ourselves,
-         not something derived from the card image's unknown height, so
-         there's no guessing involved in how much of it shows. Widened
-         the peek itself (left:-58% instead of -67%) so more of it is
-         visible/obviously tappable at rest.
-
-         The little round "X" on the card is redundant and gone on
-         mobile — tapping the card itself already closes it (same as
-         desktop), so a second dedicated close control isn't needed. */
       .status-card{
         position:absolute; left:-58%; width:78%; top:13%; bottom:auto;
         opacity:1;
@@ -452,26 +534,12 @@
       .status-open .status-card{
         left:11%; width:78%; max-width:none; top:13%; bottom:auto;
         transform:scale(1.15);
-        /* Switching the scale origin to the card's own center once open
-           is what actually centers the grow-animation — "left center"
-           (needed for the closed peek to hug the screen edge) was
-           making it balloon out to the right only, not symmetrically. */
         transform-origin:center center;
       }
       .status-card-close{ display:none; }
       .status-row-name, .status-percent{ font-size:11px; }
       .field-row{ flex-direction:column; gap:0; }
 
-      /* Icon/bar sizes below were fixed px values tuned for desktop card
-         sizes; on a narrow mobile card they didn't shrink with everything
-         else, so the 3rd/4th row (PURPLE/BLUE) spilled past the bottom of
-         the printed card art and rendered on the plain background instead
-         (looked "cut off"/invisible). Scaling these down lets all 4 rows
-         fit inside the card. Also centering the icons against the
-         name+bar block explicitly, since the shorter mobile icon size
-         wasn't lining up with it vertically before. Left/right insets
-         are now equal (18%/18% instead of 17%/19%) so the row block
-         itself sits centered inside the card rather than skewed. */
       .status-rows{ left:18%; right:18%; top:13%; bottom:16%; gap:2px; }
       .status-row{ gap:8px; align-items:center; }
       .status-row-icon{ width:22px; height:22px; align-self:center; }
@@ -485,31 +553,37 @@
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
   <aside class="sidebar">
-    <img src="assets/logo.png.PNG" alt="Logo" class="logo-img" onerror="this.style.display='none'" />
+    <!-- Same beach-themed sidebar as index.html -- only the background
+         artwork differs (sidebar2.PNG instead of sidebar.PNG). -->
+    <img src="assets/sidebar2.PNG" class="sidebar-bg" alt="" />
 
-    <div class="user-block">
-      <div class="user-avatar" id="user-initial">?</div>
-      <div class="user-info">
+    <div class="welcome-block">
+      <div class="user-avatar" id="userAvatar">
+        <span id="user-initial">?</span>
+      </div>
+      <div class="welcome-text">
+        <div class="welcome-label" data-i18n="welcome">WELCOME</div>
         <div class="user-name" id="user-name">Guest</div>
         <div class="user-role" data-i18n="role_label">Role: <span id="user-role">GUEST</span></div>
       </div>
     </div>
 
-    <a href="index.html" class="nav-link" data-i18n="nav_home">HOMEPAGE</a>
-    <a href="transfer.html" class="nav-link active" data-i18n="nav_transfer">TRANSFER</a>
-    <a href="admin.html" class="nav-link" id="nav-admin-link" data-i18n="nav_admin" style="display:none;">ADMIN &amp; MANAGEMENT</a>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-link" data-i18n="nav_home">HOMEPAGE</a>
+      <a href="transfer.html" class="nav-link active" data-i18n="nav_transfer">TRANSFER</a>
+      <a href="admin.html" class="nav-link" id="nav-admin-link" data-i18n="nav_admin" style="display:none;">ADMIN &amp; MANAGEMENT</a>
+    </nav>
 
     <div class="sidebar-bottom">
-      <label data-i18n="lang_label">LANGUAGE</label>
-      <select class="lang-select" id="lang-select">
-        <option value="en">🇺🇸 English</option>
-        <option value="fr">🇫🇷 Français</option>
-        <option value="pt-BR">🇧🇷 Português (BR)</option>
-        <option value="vi">🇻🇳 Tiếng Việt</option>
-        <option value="ko">🇰🇷 한국어</option>
-        <option value="zh-CN">🇨🇳 中文（简体）</option>
-      </select>
       <button class="logout-btn" id="logout-btn" data-i18n="logout">LOG OUT</button>
+      <select class="lang-select" id="lang-select">
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="pt-BR">PT</option>
+        <option value="vi">VI</option>
+        <option value="ko">KR</option>
+        <option value="zh-CN">CN</option>
+      </select>
     </div>
   </aside>
 
@@ -630,6 +704,29 @@
       })
     } catch (e) { console.error('sidebar init failed', e) }
 
+    // ---------- Sidebar width: driven by the image's own aspect ratio ----------
+    // Sets --sidebar-w to whatever width assets/sidebar2.PNG would naturally
+    // be at the current viewport height, so the sidebar box always exactly
+    // matches the artwork's own proportions (same approach as index.html).
+    (function () {
+      var img = document.querySelector('.sidebar-bg')
+      if (!img) return
+
+      function applySidebarWidth() {
+        if (!img.naturalWidth || !img.naturalHeight) return
+        var ratio = img.naturalWidth / img.naturalHeight
+        var w = Math.round(window.innerHeight * ratio)
+        document.documentElement.style.setProperty('--sidebar-w', w + 'px')
+      }
+
+      if (img.complete) {
+        applySidebarWidth()
+      } else {
+        img.addEventListener('load', applySidebarWidth)
+      }
+      window.addEventListener('resize', applySidebarWidth)
+    })()
+
     // ---------- Hero entrance reveal ----------
     try {
       function playEntrance(){
@@ -655,6 +752,7 @@
     // ---------- Translations ----------
     var translations = {
       en: {
+        welcome: "WELCOME",
         nav_home: "HOMEPAGE", nav_transfer: "TRANSFER", nav_admin: "ADMIN & MANAGEMENT", lang_label: "LANGUAGE",
         logout: "LOG OUT", role_label: "Role: ",
         transfer_heading: "Migration", transfer_sub: "Send items or funds to another member.",
@@ -684,6 +782,7 @@
         status_rejected: "REJECTED"
       },
       ko: {
+        welcome: "환영합니다",
         nav_home: "홈페이지", nav_transfer: "송금", nav_admin: "관리자 및 매니지먼트", lang_label: "언어",
         logout: "로그아웃", role_label: "역할: ",
         transfer_heading: "이주", transfer_sub: "다른 멤버에게 아이템이나 자금을 보내세요.",
@@ -703,6 +802,7 @@
         wing_total_label: "합계"
       },
       'zh-CN': {
+        welcome: "欢迎",
         nav_home: "主页", nav_transfer: "转账", nav_admin: "管理与运营", lang_label: "语言",
         logout: "登出", role_label: "角色: ",
         transfer_heading: "迁移", transfer_sub: "向其他成员发送物品或资金。",
@@ -722,6 +822,7 @@
         wing_total_label: "总计"
       },
       'pt-BR': {
+        welcome: "BEM-VINDO",
         nav_home: "PÁGINA INICIAL", nav_transfer: "TRANSFERÊNCIA", nav_admin: "ADMIN E GESTÃO", lang_label: "IDIOMA",
         logout: "SAIR", role_label: "Função: ",
         transfer_heading: "Migração", transfer_sub: "Envie itens ou fundos para outro membro.",
@@ -741,6 +842,7 @@
         wing_total_label: "Total"
       },
       vi: {
+        welcome: "CHÀO MỪNG",
         nav_home: "TRANG CHỦ", nav_transfer: "CHUYỂN KHOẢN", nav_admin: "QUẢN TRỊ & QUẢN LÝ", lang_label: "NGÔN NGỮ",
         logout: "ĐĂNG XUẤT", role_label: "Vai trò: ",
         transfer_heading: "Di chuyển", transfer_sub: "Gửi vật phẩm hoặc tiền cho thành viên khác.",
@@ -760,6 +862,7 @@
         wing_total_label: "Tổng"
       },
       fr: {
+        welcome: "BIENVENUE",
         nav_home: "ACCUEIL", nav_transfer: "TRANSFERT", nav_admin: "ADMIN & GESTION", lang_label: "LANGUE",
         logout: "DÉCONNEXION", role_label: "Rôle : ",
         transfer_heading: "Migration", transfer_sub: "Envoyez des objets ou des fonds à un autre membre.",
@@ -799,6 +902,8 @@
         if (roleEl && roleEl.childNodes[0] && translations[currentLang]) {
           roleEl.childNodes[0].textContent = translations[currentLang]['role_label']
         }
+        // Drives the sidebar's per-language font (see --sidebar-font in CSS)
+        document.body.setAttribute('data-lang', currentLang)
       } catch (e) { console.error('applyTranslations failed', e) }
     }
 
@@ -815,8 +920,6 @@
     // ---------- Status card: wing seat-fill bars, driven by wing_config ----------
     // =====================================================================
 
-    // Static per-color display config (colors/icons never change; the counts
-    // and capacities come from Supabase, not from this object).
     var WING_DISPLAY = {
       RED:    { labelKey: 'wing_red',    color: '#c1442e', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA' },
       ORANGE: { labelKey: 'wing_orange', color: '#f2a90f', icon: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw' },
@@ -825,8 +928,6 @@
     }
     var WING_ORDER_FALLBACK = ['RED', 'ORANGE', 'PURPLE', 'BLUE']
 
-    // Live rows, rebuilt from Supabase every time the status card is (re)opened.
-    // Each row: { key, capacity, count, overridden }
     var statusRows = []
     var statusRowsLoaded = false
 
@@ -837,25 +938,11 @@
 
     function updateAdminNavVisibility() {
       var link = $('nav-admin-link')
-      if (link) link.style.display = isPrivileged() ? 'flex' : 'none'
+      if (link) link.style.display = isPrivileged() ? 'block' : 'none'
+      var avatarEl = $('userAvatar')
+      if (avatarEl) avatarEl.classList.toggle('admin', isPrivileged())
     }
 
-    // Pulls seat_capacity/min_score from wing_config, live member counts per
-    // wing from migration_members (assigned_wing) — counting only members
-    // whose status is 'approved' (pending/rejected members never occupy a
-    // seat) — and any manual overrides from wing_status (set elsewhere, e.g.
-    // the Admin page) — then builds statusRows from that. This popup is
-    // read-only: it displays whatever is already synced, it does not let
-    // anyone edit counts here. Display order is always forced to the
-    // canonical RED, ORANGE, PURPLE, BLUE order (this is a presentation
-    // concern, independent of whatever row order the wing_config table
-    // happens to return).
-    //
-    // NOTE on wing_status: its actual column is called `percentage`, not
-    // `count` — confirmed directly from the Supabase table schema. It
-    // stores a manually-set override value (0-100), separate from live
-    // member counts. When an override exists for a color, it takes
-    // precedence over the live-counted number from migration_members.
     async function loadWingStatus() {
       try {
         if (!supabaseClient) { console.error('loadWingStatus skipped: no supabase client'); return }
@@ -882,13 +969,8 @@
         var capacityByColor = {}
         configRows.forEach(function (r) { capacityByColor[r.color] = r.seat_capacity })
 
-        // Always render in canonical order, restricted to colors we actually
-        // have config for (falling back to the full canonical set if
-        // wing_config came back empty).
         var knownColors = configRows.length ? configRows.map(function (r) { return r.color }) : WING_ORDER_FALLBACK
         var order = WING_ORDER_FALLBACK.filter(function (c) { return knownColors.indexOf(c) !== -1 })
-        // Any colors present in the DB but not in our canonical list get
-        // appended at the end rather than silently dropped.
         knownColors.forEach(function (c) { if (order.indexOf(c) === -1) order.push(c) })
 
         statusRows = order.map(function (color) {
@@ -988,13 +1070,6 @@
     } catch (e) { console.error('status card init failed', e) }
 
     // ---------- Supabase ----------
-    // NOTE: named supabaseClient (NOT "supabase") so we never shadow/clobber
-    // window.supabase, which is the actual library object set by the CDN
-    // script below. Previously this was `var supabase = null`, and because
-    // top-level `var` declarations become properties of `window`, that line
-    // was silently overwriting window.supabase with null on every load —
-    // which is why initSupabase() always found window.supabase falsy and
-    // reported "failed to load" even when the CDN worked fine.
     var SUPABASE_URL = "https://nlqzanjivjfkftvazrvi.supabase.co"
     var SUPABASE_ANON_KEY = "sb_publishable_M3WiVkgt6yctuilI5Q0IjQ_djrAu238"
     var supabaseClient = null
@@ -1059,8 +1134,6 @@
         if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
         if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
         updateAdminNavVisibility()
-        // If the status card happens to already be open (e.g. bfcache pageshow),
-        // refresh it now that we know the user's role (affects admin controls).
         if (document.querySelector('.transfer-stage').classList.contains('status-open')) {
           refreshAndRenderStatusRows()
         }
@@ -1082,7 +1155,7 @@
       window.location.href = "login.html"
     })
 
-    // ---------- UID status lookup (now opened from the green CHECK STATUS button in the scene) ----------
+    // ---------- UID status lookup ----------
     try {
       var uidLookupOverlay = $('uid-lookup-overlay')
       var uidLookupInput = $('uid-lookup-input')
@@ -1098,7 +1171,6 @@
       }
       function closeUidLookup(){ if (uidLookupOverlay) uidLookupOverlay.classList.remove('visible') }
 
-      // The green "CHECK STATUS" ticket button in the scene opens this popup.
       on('status-check-btn', 'click', openUidLookup)
       on('uid-lookup-close-btn', 'click', closeUidLookup)
       if (uidLookupOverlay) uidLookupOverlay.addEventListener('click', function (e) { if (e.target === uidLookupOverlay) closeUidLookup() })
@@ -1135,8 +1207,6 @@
 
         if (uidLookupSearchBtn) uidLookupSearchBtn.disabled = true
         try {
-          // A UID could appear on more than one row (e.g. a resubmission),
-          // so grab the most recent one as their current status.
           var res = await supabaseClient
             .from('migration_members')
             .select('status, created_at')
