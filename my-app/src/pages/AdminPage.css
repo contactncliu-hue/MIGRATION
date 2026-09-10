@@ -1,0 +1,92 @@
+.admin-page {
+  padding: 40px 48px;
+  max-width: 1100px;
+}
+
+.page-title { font-size: 26px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; }
+.page-sub { font-size: 14px; color: #888; margin-bottom: 32px; }
+
+.gate-message {
+  background: #fff0f0; color: #e03131; border: 1px solid #ffd6d6;
+  border-radius: 12px; padding: 20px 24px; font-weight: 600; font-size: 14px;
+}
+
+.panel {
+  background: #fff; border-radius: 18px; padding: 28px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.04); margin-bottom: 28px;
+}
+.panel h2 { font-size: 18px; font-weight: 800; color: #1a1a2e; margin-bottom: 4px; }
+.panel .panel-sub { font-size: 13px; color: #888; margin-bottom: 20px; }
+
+.load-msg { font-size: 13px; color: #888; padding: 8px 0; }
+
+.wing-table { width: 100%; border-collapse: collapse; }
+.wing-table th {
+  text-align: left; font-size: 11px; font-weight: 800; color: #999;
+  letter-spacing: .5px; text-transform: uppercase; padding: 8px 10px;
+  border-bottom: 1.5px solid #eef0f7;
+}
+.wing-table td { padding: 10px; border-bottom: 1px solid #f4f5fa; vertical-align: middle; }
+.wing-swatch { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; }
+.wing-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.wing-table input[type="number"] {
+  width: 90px; padding: 8px 10px; border-radius: 8px; border: 1.5px solid #e3e3ec;
+  font-size: 13px; font-family: inherit; outline: none; transition: border-color .2s ease;
+}
+.wing-table input[type="number"]:focus { border-color: #3B5BDB; }
+.row-save-btn {
+  background: #3B5BDB; color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-weight: 700; font-size: 12px; cursor: pointer;
+  transition: opacity .15s ease; margin-right: 6px;
+}
+.row-save-btn:hover { opacity: .9; }
+.row-save-btn:disabled { opacity: .5; cursor: default; }
+.row-status { font-size: 11px; font-weight: 700; margin-left: 8px; }
+.row-status.ok { color: #2b8a3e; }
+.row-status.err { color: #e03131; }
+
+.members-toolbar { display: flex; gap: 10px; margin-bottom: 16px; }
+.members-toolbar input {
+  flex: 1; padding: 10px 14px; border-radius: 10px; border: 1.5px solid #e3e3ec;
+  font-size: 13px; font-family: inherit; outline: none;
+}
+.members-toolbar input:focus { border-color: #3B5BDB; }
+.members-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+.members-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #666; }
+.members-legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; display: inline-block; }
+.members-table-wrap { overflow-x: auto; }
+.members-table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+.members-table th {
+  text-align: left; font-size: 11px; font-weight: 800; color: #999;
+  letter-spacing: .4px; text-transform: uppercase; padding: 8px 10px;
+  border-bottom: 1.5px solid #eef0f7; white-space: nowrap;
+}
+.members-table td { padding: 10px; border-bottom: 1px solid #f4f5fa; font-size: 13px; white-space: nowrap; }
+.members-table td.group-bar-cell { border-left: 4px solid transparent; }
+.members-table tr.new-group td { border-top: 2px solid #e3e3ec; }
+.members-table select {
+  padding: 6px 10px; border-radius: 8px; border: 1.5px solid #e3e3ec;
+  font-size: 12px; font-family: inherit; outline: none; font-weight: 700;
+}
+.override-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: .3px;
+  padding: 2px 8px; border-radius: 999px; margin-left: 6px;
+}
+.override-badge.manual { background: #fff4e0; color: #c98c0c; }
+.override-badge.auto { background: #eef4e4; color: #4a8f52; }
+
+.group-tag-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: .3px;
+  padding: 2px 8px; border-radius: 999px; margin-left: 6px;
+  background: #eef0f7; color: #444;
+}
+
+.status-badge {
+  font-size: 10px; font-weight: 800; letter-spacing: .3px;
+  padding: 3px 10px; border-radius: 999px; text-transform: uppercase;
+}
+.status-badge.pending { background: #f4f5fa; color: #888; }
+.status-badge.approved { background: #eef4e4; color: #2b8a3e; }
+.status-badge.rejected { background: #fff0f0; color: #e03131; }
+
+.empty-state { font-size: 13px; color: #999; padding: 20px 0; text-align: center; }
