@@ -364,7 +364,6 @@
     .type-btn,
     .add-member-btn,
     .remove-member-btn,
-    .logout-btn,
     .faction-btn{
       box-shadow:0 5px 0 #14361f;
       transition:transform .12s ease, box-shadow .12s ease, background .2s ease, color .2s ease, border-color .2s ease;
@@ -373,7 +372,6 @@
     .type-btn:active,
     .add-member-btn:active,
     .remove-member-btn:active,
-    .logout-btn:active,
     .faction-btn:active{
       transform:scale(.97);
       box-shadow:0 2px 0 #14361f;
@@ -563,7 +561,7 @@
       </div>
       <div class="welcome-text">
         <div class="welcome-label" data-i18n="welcome">WELCOME</div>
-        <div class="user-name" id="user-name">Guest</div>
+        <div class="user-name" id="user-name">Member</div>
         <div class="user-role" data-i18n="role_label">Role: <span id="user-role">GUEST</span></div>
       </div>
     </div>
@@ -804,7 +802,7 @@
       'zh-CN': {
         welcome: "欢迎",
         nav_home: "主页", nav_transfer: "转账", nav_admin: "管理与运营", lang_label: "语言",
-        logout: "登出", role_label: "角色: ",
+        logout: "退出登录", role_label: "角色: ",
         transfer_heading: "迁移", transfer_sub: "向其他成员发送物品或资金。",
         transfer_cta: "迁移",
         type_solo: "个人转移", type_group: "团队转移",
@@ -1099,9 +1097,9 @@
         if (!supabaseClient) {
           window.zooUserId = null
           window.zooUserRole = 'GUEST'
-          if ($('user-name')) $('user-name').textContent = 'Guest'
+          if ($('user-name')) $('user-name').textContent = 'Member'
           if ($('user-role')) $('user-role').textContent = 'GUEST'
-          if ($('user-initial')) $('user-initial').textContent = 'G'
+          if ($('user-initial')) $('user-initial').textContent = '?'
           updateAdminNavVisibility()
           return
         }
@@ -1112,9 +1110,9 @@
         if (!user) {
           window.zooUserId = null
           window.zooUserRole = 'GUEST'
-          if ($('user-name')) $('user-name').textContent = 'Guest'
+          if ($('user-name')) $('user-name').textContent = 'Member'
           if ($('user-role')) $('user-role').textContent = 'GUEST'
-          if ($('user-initial')) $('user-initial').textContent = 'G'
+          if ($('user-initial')) $('user-initial').textContent = '?'
           updateAdminNavVisibility()
           return
         }
@@ -1134,6 +1132,8 @@
         if ($('user-role')) $('user-role').textContent = String(role).toUpperCase()
         if ($('user-initial')) $('user-initial').textContent = uname.charAt(0).toUpperCase()
         updateAdminNavVisibility()
+        // Admins get a brown "A" on the avatar circle instead of their initial (matches index.html)
+        if (String(role).toUpperCase() === 'ADMIN' && $('user-initial')) $('user-initial').textContent = 'A'
         if (document.querySelector('.transfer-stage').classList.contains('status-open')) {
           refreshAndRenderStatusRows()
         }
