@@ -4,10 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ZOO - Homepage</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Daruma+Drop+One&display=swap" rel="stylesheet">
 <style>
+  @font-face {
+    font-family: 'Daruma Drop One';
+    src: url('assets/fonts/DarumaDropOne-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     font-family:'Poppins', sans-serif;
@@ -35,7 +39,7 @@
     display:flex; flex-direction:column; padding:28px 0 22px 0;
     transition:margin-left .35s ease, opacity .35s ease;
     z-index:70;
-    font-family:'Daruma Drop One', cursive;
+    font-family:'Daruma Drop One', sans-serif;
     color:#fff;
     position:relative;
     overflow:hidden; /* crops the big PNG flush to the sidebar's edges */
@@ -59,7 +63,7 @@
     background:#FFF6C9; color:#2AA9F2;
     display:flex; align-items:center; justify-content:center;
     font-weight:400; font-size:22px; flex-shrink:0;
-    font-family:'Daruma Drop One', cursive;
+    font-family:'Daruma Drop One', sans-serif;
     position:relative; overflow:hidden;
   }
   .user-avatar.admin{ color:#B4784E; } /* brown "A" on the same pale circle */
@@ -78,15 +82,16 @@
     display:block;
     padding:14px 20px 14px 24px;
     color:#fff; text-decoration:none;
-    font-family:'Daruma Drop One', cursive;
+    font-family:'Daruma Drop One', sans-serif;
     font-weight:400; font-size:21px; letter-spacing:.5px;
     text-transform:uppercase;
-    background:linear-gradient(90deg, rgba(0,194,255,.85) 0%, rgba(0,194,255,0) 85%);
+    white-space:nowrap;
+    background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,0) 85%);
     border-radius:0 40px 40px 0;
     transition:background .2s ease;
   }
-  .nav-link:hover{ background:linear-gradient(90deg, rgba(0,194,255,1) 0%, rgba(0,194,255,.2) 90%); }
-  .nav-link.active{ background:linear-gradient(90deg, rgba(0,194,255,1) 0%, rgba(0,194,255,.28) 90%); }
+  .nav-link:hover{ background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.25) 90%); }
+  .nav-link.active{ background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.35) 90%); }
 
   .sidebar-bottom{
     margin-top:auto; padding:20px 24px 0 24px;
@@ -95,16 +100,19 @@
   }
   .sidebar-bottom label{ display:none; } /* "LANGUAGE" caption dropped to match the compact badge look */
   .lang-select{
-    padding:8px 12px; border-radius:20px; border:none;
-    background:rgba(20,20,30,.35); color:#fff;
-    font-family:'Daruma Drop One', cursive;
+    padding:8px 10px; border-radius:20px; border:none;
+    background:rgba(20,20,30,.4); color:#fff;
+    font-family:'Daruma Drop One', sans-serif;
     font-weight:400; font-size:13px; cursor:pointer;
+    -webkit-appearance:none; appearance:none;
+    text-align:center;
   }
   .logout-btn{
     background:#FFAFAF; border:none; color:#E85454;
-    padding:10px 22px; border-radius:16px;
-    font-family:'Daruma Drop One', cursive;
+    padding:10px 20px; border-radius:16px;
+    font-family:'Daruma Drop One', sans-serif;
     font-weight:400; font-size:15px; text-transform:uppercase; cursor:pointer;
+    white-space:nowrap;
   }
   .logout-btn:hover{ background:#ff9d9d; }
   .logout-btn:disabled{ opacity:.6; cursor:default; }
@@ -320,16 +328,15 @@
     </nav>
 
     <div class="sidebar-bottom">
-      <label data-i18n="language">LANGUAGE</label>
-      <select class="lang-select" id="langSelect">
-        <option value="en">🇺🇸 EN</option>
-        <option value="fr">🇫🇷 FR</option>
-        <option value="pt-BR">🇧🇷 PT</option>
-        <option value="vi">🇻🇳 VI</option>
-        <option value="ko">🇰🇷 KR</option>
-        <option value="zh-CN">🇨🇳 CN</option>
-      </select>
       <button class="logout-btn" id="logoutBtn" data-i18n="logout">LOG OUT</button>
+      <select class="lang-select" id="langSelect">
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="pt-BR">PT</option>
+        <option value="vi">VI</option>
+        <option value="ko">KR</option>
+        <option value="zh-CN">CN</option>
+      </select>
     </div>
   </aside>
 
