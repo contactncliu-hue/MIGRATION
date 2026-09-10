@@ -271,8 +271,6 @@
       font-family:var(--sidebar-font), sans-serif;
       font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
       color:#fffaf0;
-      text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
-      transition:text-shadow .12s ease;
     }
 
     .status-open .header-ribbon,
@@ -342,21 +340,18 @@
       font-family:var(--sidebar-font), sans-serif;
       font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
       color:#fffaf0;
-      text-shadow:0 1px 2px rgba(0,0,0,.45), 0 0 10px rgba(0,0,0,.15);
       transform:translateY(-14%);
-      transition:text-shadow .12s ease;
     }
 
-    /* ---------- Solid dark-green "pressable" shadow + press animation on all action buttons ---------- */
+    /* ---------- Press animation on all action buttons (shadows removed) ---------- */
     .transfer-btn,
     .status-check-btn{
-      filter:drop-shadow(0 5px 0 #14361f);
       transition:transform .12s ease, filter .16s ease;
     }
-    .transfer-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 0 #14361f); }
-    .status-check-btn:hover{ filter:brightness(1.06) drop-shadow(0 5px 0 #14361f); }
-    .transfer-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
-    .status-check-btn:active{ filter:brightness(.94) drop-shadow(0 2px 0 #14361f); }
+    .transfer-btn:hover{ filter:brightness(1.06); }
+    .status-check-btn:hover{ filter:brightness(1.06); }
+    .transfer-btn:active{ filter:brightness(.94); }
+    .status-check-btn:active{ filter:brightness(.94); }
 
     .transfer-btn img,
     .status-check-btn img{
@@ -368,8 +363,7 @@
     .add-member-btn,
     .remove-member-btn,
     .faction-btn{
-      box-shadow:0 5px 0 #14361f;
-      transition:transform .12s ease, box-shadow .12s ease, background .2s ease, color .2s ease, border-color .2s ease;
+      transition:transform .12s ease, background .2s ease, color .2s ease, border-color .2s ease;
     }
     .submit-btn:active,
     .type-btn:active,
@@ -377,11 +371,6 @@
     .remove-member-btn:active,
     .faction-btn:active{
       transform:scale(.97);
-      box-shadow:0 2px 0 #14361f;
-    }
-    .transfer-btn:active .btn-label,
-    .status-check-btn:active .status-check-label{
-      text-shadow:none;
     }
     .transfer-btn:active{ transform:translateX(-50%) translateY(0) scale(.97); }
     .status-open .transfer-btn:active{ transform:translateX(-50%) translateY(60px) scale(.93) !important; }
