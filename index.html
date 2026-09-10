@@ -34,7 +34,6 @@
   /* ================= SIDEBAR (new beach-themed design) ================= */
   .sidebar{
     width:240px; min-width:240px;
-    background-color:#2AA9F2;
     border-right:none;
     display:flex; flex-direction:column; padding:28px 0 22px 0;
     transition:margin-left .35s ease, opacity .35s ease;
@@ -43,16 +42,29 @@
     color:#fff;
     position:fixed; top:0; left:0;
     height:100vh;
-    overflow-y:auto; overflow-x:hidden; /* a little scroll room so nothing at the edges gets cropped */
+    overflow:hidden; /* the bg image is cropped to fill this box exactly -- no scroll/no gaps */
+    /* Fallback only -- shown solely if assets/sidebar.PNG fails to load.
+       With the PNG covering the sidebar edge-to-edge below, this should
+       never actually be visible. */
+    background-color:#2AA9F2;
   }
+
+  /* The sidebar artwork now COVERS the entire sidebar box (edge to edge,
+     cropped as needed -- not letterboxed/contained) instead of sitting as
+     a single flex item that only filled the bottom portion while solid
+     blue showed above it. It's positioned behind the nav content via
+     z-index, not stacked in the flex flow. */
   .sidebar-bg{
-    display:block; flex-shrink:0;
-    width:100%; height:auto;
-    margin-top:auto;
+    position:absolute; inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position:center bottom;
+    z-index:0;
     pointer-events:none;
   }
 
   .welcome-block{
+    position:relative; z-index:2;
     flex-shrink:0;
     display:flex; align-items:center; gap:14px;
     padding:0 24px 30px 24px;
@@ -76,7 +88,7 @@
   }
   .user-role{ display:none; } /* role no longer shown in the new layout */
 
-  .sidebar-nav{ display:flex; flex-direction:column; gap:24px; margin-top:6px; flex-shrink:0; }
+  .sidebar-nav{ position:relative; z-index:2; display:flex; flex-direction:column; gap:24px; margin-top:6px; flex-shrink:0; }
   .nav-link{
     display:block;
     padding:14px 20px 14px 24px;
@@ -93,9 +105,11 @@
   .nav-link.active{ background:linear-gradient(90deg, #00C2FF 0%, rgba(0,194,255,.35) 90%); }
 
   .sidebar-bottom{
+    position:relative; z-index:2;
     padding:28px 24px 34px 24px; flex-shrink:0;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     border-top:none;
+    margin-top:auto; /* keeps LOG OUT / language pinned to the bottom of the sidebar */
   }
   .sidebar-bottom label{ display:none; } /* "LANGUAGE" caption dropped to match the compact badge look */
   .lang-select{
@@ -311,6 +325,14 @@
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <aside class="sidebar">
+    <!-- Placed first + positioned absolute/inset:0 so it fills the ENTIRE
+         sidebar box edge-to-edge (cropped via object-fit:cover), sitting
+         behind the nav content instead of being a single flex item that
+         only covered its own bottom portion while solid blue showed above
+         it. Nothing about the buttons themselves changed -- only how this
+         background layer is sized and positioned. -->
+    <img src="assets/sidebar.PNG" class="sidebar-bg" alt="" />
+
     <div class="welcome-block">
       <div class="user-avatar" id="userAvatar">
         <span id="user-initial">?</span>
@@ -326,8 +348,6 @@
       <a href="index.html" class="nav-link active" data-i18n="homepage">HOMEPAGE</a>
       <a href="transfer.html" class="nav-link" data-i18n="transfer">TRANSFER</a>
     </nav>
-
-    <img src="assets/sidebar.PNG" class="sidebar-bg" alt="" />
 
     <div class="sidebar-bottom">
       <button class="logout-btn" id="logoutBtn" data-i18n="logout">LOG OUT</button>
