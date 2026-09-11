@@ -147,3 +147,18 @@
     inset: 0 auto 0 0;
   }
 }
+
+/**
+ * Per-language display font. Daruma Drop One has no Korean, Vietnamese or
+ * CJK glyphs, so those languages fall back to a face that covers them.
+ * Set on <html> by Sidebar.tsx.
+ */
+[data-lang='ko'] .sidebar {
+  font-family: 'KERISKEDU', var(--font-ui);
+}
+[data-lang='vi'] .sidebar {
+  font-family: 'StreetSignSans', var(--font-ui);
+}
+[data-lang='zh-CN'] .sidebar {
+  font-family: 'SentyWatermelon', var(--font-ui);
+}

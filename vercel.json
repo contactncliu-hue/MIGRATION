@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm --prefix my-app ci && npm --prefix my-app run build",
+  "outputDirectory": "my-app/dist",
+  "installCommand": "echo skip",
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+}

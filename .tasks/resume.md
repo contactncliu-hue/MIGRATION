@@ -50,6 +50,10 @@ MIGRATION 버튼 축소 재배치 · 로그인 폼 카드화 · 홈 캐러셀(�
 
 ## ⚠️ 미해결 (내가 못 고치는 것)
 
+- 🔴 **Vercel 환경변수 2개** — `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
+  없으면 화면은 뜨지만(placeholder 로 방어함) 로그인·조회가 전부 실패한다.
+  Vercel → Settings → Environment Variables. 값은 Supabase → Settings → API.
+
 - 🔴 **RLS 미확인** — 레포가 public(`contactncliu-hue/MIGRATION`)이고 `.env` 가 커밋
   `4c0d207` 히스토리에 남아 있다. 익명으로 `migration_members` 조회가 실제로 된다.
   ⇒ Supabase 대시보드 → Authentication → Policies. 안 켜져 있으면 누구나 읽고 쓴다.

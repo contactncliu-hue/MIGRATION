@@ -1,0 +1,40 @@
+/**
+ * Display fonts for the sidebar.
+ *
+ * The family NAMEs here are ours to pick — they don't have to match whatever
+ * name is baked into the font file. Latin scripts (EN/FR/PT) use Daruma Drop
+ * One; Korean, Vietnamese and Simplified Chinese each need a face that
+ * actually covers their glyphs, so the sidebar swaps by `data-lang`
+ * (see Sidebar.css / --font-game).
+ */
+@font-face {
+  font-family: 'Daruma Drop One';
+  src: url('/assets/fonts/DarumaDropOne-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'KERISKEDU';
+  src: url('/assets/fonts/KERISKEDU_B.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'StreetSignSans';
+  src: url('/assets/fonts/StreetSignSans_1.3.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SentyWatermelon';
+  src: url('/assets/fonts/SentyWatermelon.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

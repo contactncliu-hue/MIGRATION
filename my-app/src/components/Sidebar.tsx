@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../lib/auth-context'
 import { translations, languageOptions } from '../lib/translations'
@@ -18,6 +18,11 @@ export function Sidebar({ isOpen }: SidebarProps) {
 
   const dict = translations[lang]
   const displayName = profile?.displayName ?? 'Guest'
+
+  // Drives the sidebar's per-language display font (see fonts.css).
+  useEffect(() => {
+    document.documentElement.setAttribute('data-lang', lang)
+  }, [lang])
 
   function handleLangChange(next: LanguageCode) {
     setLang(next)
