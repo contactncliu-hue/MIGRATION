@@ -1,192 +1,269 @@
+/**
+ * Sidebar — a drawer on phones, a fixed rail on desktop.
+ *
+ * The old version painted a full-bleed illustration behind five items, and on
+ * a phone that illustration competed with the page's own artwork showing
+ * through beside it. Measured contrast was also failing: the nav pill was
+ * 2.07:1 white-on-cyan, and the cyan matched the illustration's sky so the
+ * active row was indistinguishable from the inactive one.
+ *
+ * Now: a darkened sky gradient carries the text, rows are rounded plates that
+ * state clearly which one is active, and the art is one cropped band at the
+ * bottom with nothing written on it.
+ */
+
 .sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
-  background-image: url('/assets/sidebar.PNG');
-  background-size: 100% 100%; /* stretches to fill exactly -- no crop, no blank space */
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  flex-direction: column;
-  padding: var(--sp-5) 0 var(--sp-3);
-  transition: margin-left 0.35s ease, opacity 0.35s ease;
-  z-index: 70;
-  font-family: var(--font-game);
-  color: var(--n-0);
+  height: 100vh;
+  height: 100dvh;
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  height: 100dvh;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-5) var(--sp-3) var(--sp-3);
   overflow: hidden;
+  font-family: var(--font-game);
+  color: var(--t-on-dark);
+  background: linear-gradient(
+    to bottom,
+    var(--c-sky-deep) 0%,
+    var(--c-sky-mid) 30%,
+    var(--c-sky) 58%
+  );
+  transition: margin-left 0.35s ease, opacity 0.35s ease;
 }
+
 .sidebar-hidden {
   margin-left: calc(var(--sidebar-w) * -1);
   opacity: 0;
   pointer-events: none;
 }
 
-.welcome-block {
+/* ── identity ─────────────────────────────────────────────────────── */
+.zoo-sb-head {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: 0 var(--sp-5) var(--sp-5);
+  padding: 0 var(--sp-2) var(--sp-4);
 }
-.user-avatar {
-  width: 38px;
-  height: 38px;
+
+.zoo-sb-avatar {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
   border-radius: 50%;
-  background: var(--c-cream);
-  color: var(--c-cyan-ink);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--fs-md);
-  flex-shrink: 0;
+  background: var(--c-cream);
+  color: var(--c-sea-ink);
+  font-size: var(--fs-lg);
 }
-.user-avatar.admin {
+.zoo-sb-avatar svg {
+  width: 26px;
+  height: 26px;
+  display: block;
+}
+.zoo-sb-avatar.is-guest {
+  background: rgba(255, 255, 255, 0.32);
+  color: var(--t-on-dark);
+}
+.zoo-sb-avatar.is-admin {
+  box-shadow: 0 0 0 2px var(--c-gold);
   color: var(--c-bronze);
 }
 
-/* Nobody signed in — a silhouette reads as "no account" where a letter
-   would read as someone's initial. */
-.user-avatar.guest {
-  background: rgba(255, 255, 255, 0.35);
-  color: var(--n-0);
-}
-.user-avatar.guest svg {
-  width: 22px;
-  height: 22px;
-  display: block;
-}
-.welcome-text {
+.zoo-sb-id {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
-/* Caption for the name below it — sized as a label, not a headline. */
-.welcome-label {
+.zoo-sb-id-cap {
   font-size: var(--fs-label);
   letter-spacing: 0.6px;
-  line-height: 1.2;
   text-transform: uppercase;
-  opacity: 0.75;
+  opacity: 0.8;
+  line-height: 1.2;
 }
-.user-name {
+.zoo-sb-id-name {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
   font-size: var(--fs-md);
-  color: var(--t-on-dark);
-  margin-top: 1px;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.zoo-sb-role {
+  flex-shrink: 0;
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-pill);
+  background: var(--c-gold);
+  color: var(--c-sea-ink);
+  font-size: var(--fs-micro);
+  font-style: normal;
+  letter-spacing: 0.4px;
+}
 
-.sidebar-nav {
+/* ── rows ─────────────────────────────────────────────────────────── */
+.zoo-sb-nav {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  flex-shrink: 0;
-}
-.nav-link {
-  display: block;
-  padding: 10px var(--sp-4) 10px var(--sp-5);
-  color: var(--n-0);
-  text-decoration: none;
-  font-size: var(--fs-md);
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  background: linear-gradient(90deg, var(--c-cyan) 0%, rgba(0, 194, 255, 0) 85%);
-  border-radius: 0 var(--r-pill) var(--r-pill) 0;
-  transition: background 0.2s ease;
-}
-.nav-link:hover {
-  background: linear-gradient(90deg, var(--c-cyan) 0%, rgba(0, 194, 255, 0.25) 90%);
-}
-.nav-link.active {
-  background: linear-gradient(90deg, var(--c-cyan) 0%, rgba(0, 194, 255, 0.35) 90%);
-}
-
-.sidebar-bottom {
-  margin-top: auto;
-  padding: var(--sp-5) var(--sp-5) var(--sp-6);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
   gap: var(--sp-2);
 }
-.lang-select {
-  flex: 0 0 auto;
-  height: var(--ctl-h-sm);
-  padding: 0 var(--sp-2);
-  border-radius: var(--r-pill);
-  border: none;
-  background: rgba(20, 20, 30, 0.4);
-  color: var(--n-0);
-  font-family: var(--font-game);
-  font-size: var(--fs-sm);
-  cursor: pointer;
-  appearance: none;
-  text-align: center;
-}
-/* A guest has no session to end — this is the way in, so it leads. */
-.login-btn {
-  flex: 1 1 auto;
-  height: var(--ctl-h-sm);
-  background: var(--c-cream);
-  border: none;
-  color: var(--c-gold-deep);
+
+.zoo-sb-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  height: var(--ctl-h-row);
   padding: 0 var(--sp-3);
-  border-radius: var(--r-pill);
-  font-family: var(--font-game);
-  font-size: var(--fs-sm);
+  border-radius: var(--r-lg);
+  text-decoration: none;
+  font-size: var(--fs-base);
   letter-spacing: 0.3px;
-  text-transform: uppercase;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.15s ease;
+  color: var(--t-on-dark);
+  background: rgba(255, 255, 255, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  transition: background 0.18s ease, transform 0.12s ease;
 }
-.login-btn:hover {
-  background: var(--c-amber-soft);
+.zoo-sb-row:active {
+  transform: scale(0.975);
 }
 
-/* Secondary action — a quiet pill, not the loudest thing on screen. */
-.logout-btn {
+/* The current page reads as a lifted white card — the old version used the
+   same cyan as the background and could not be told apart. */
+.zoo-sb-row.is-active {
+  background: var(--n-0);
+  color: var(--c-sea-ink);
+  box-shadow: 0 2px 10px rgba(6, 14, 30, 0.16);
+}
+
+.zoo-sb-row-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--t-on-dark);
+}
+.zoo-sb-row-icon svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+}
+.zoo-sb-row.is-active .zoo-sb-row-icon {
+  background: var(--c-cyan);
+  color: var(--n-0);
+}
+
+.zoo-sb-row-label {
   flex: 1 1 auto;
-  height: var(--ctl-h-sm);
-  background: var(--c-danger-plate);
-  border: none;
-  color: var(--c-danger-hover);
-  padding: 0 var(--sp-3);
-  border-radius: var(--r-pill);
-  font-family: var(--font-game);
-  font-size: var(--fs-sm);
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
-  transition: background 0.15s ease;
 }
-.logout-btn:hover {
-  background: var(--c-danger-plate-hover);
+
+.zoo-sb-rule {
+  flex-shrink: 0;
+  height: 1px;
+  margin: var(--sp-3) var(--sp-2);
+  background: rgba(255, 255, 255, 0.25);
 }
-.logout-btn:disabled {
+
+/* Language sits below the rule and a notch shorter — same family, less weight. */
+.zoo-sb-row--quiet {
+  height: var(--ctl-h-row-sm);
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+}
+.zoo-sb-row-value {
+  flex-shrink: 0;
+  font-size: var(--fs-label);
+  opacity: 0.9;
+}
+/* Transparent native select over the whole row: keeps the OS picker, which
+   is the one control users already know how to use. */
+.zoo-sb-lang {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* ── art band ─────────────────────────────────────────────────────── */
+/* Takes whatever height is left. The image is bottom-anchored and the top
+   17% fades out — that slice of the crop is empty sky, so the fade never
+   cuts across a character's face. */
+.zoo-sb-art {
+  flex: 1 1 auto;
+  min-height: 90px;
+  margin: var(--sp-3) calc(var(--sp-3) * -1) 0;
+  background-image: url('/assets/sidebar-band.webp');
+  background-size: cover;
+  background-position: 50% 100%;
+  background-repeat: no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 17%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 17%);
+}
+
+/* ── footer action ────────────────────────────────────────────────── */
+.zoo-sb-foot {
+  flex-shrink: 0;
+  padding: var(--sp-3) var(--sp-2) 0;
+}
+
+.zoo-sb-action {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: var(--r-lg);
+  font-family: var(--font-game);
+  font-size: var(--fs-base);
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.zoo-sb-action:active {
+  transform: scale(0.985);
+}
+.zoo-sb-action:disabled {
   opacity: 0.6;
   cursor: default;
 }
 
-@media (max-width: 760px) {
-  .sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-  }
+.zoo-sb-action--login {
+  background: var(--c-cream);
+  color: var(--c-gold-ink);
+}
+.zoo-sb-action--login:hover {
+  background: var(--c-amber-soft);
 }
 
-/**
- * Per-language display font. Daruma Drop One has no Korean, Vietnamese or
- * CJK glyphs, so those languages fall back to a face that covers them.
- * Set on <html> by Sidebar.tsx.
- */
+/* Signing out of a guild info site is not destructive — red overstated it. */
+.zoo-sb-action--logout {
+  background: var(--n-0);
+  color: var(--c-sea-ink);
+}
+
+/* ── per-language display font ────────────────────────────────────── */
+/* Daruma Drop One has no Korean, Vietnamese or CJK glyphs. */
 [data-lang='ko'] .sidebar {
   font-family: 'KERISKEDU', var(--font-ui);
 }
@@ -197,31 +274,49 @@
   font-family: 'SentyWatermelon', var(--font-ui);
 }
 
-/* On a phone the drawer overlays the page, so 240px ate ~64% of a 375px
-   screen and left the content barely visible behind it. */
+/* ── phones ───────────────────────────────────────────────────────── */
 @media (max-width: 760px) {
   .sidebar {
-    width: min(58vw, 226px);
+    /* Wider, not narrower: a slim drawer left 160px of the page showing, and
+       that strip is what made both illustrations fight. */
+    width: min(84vw, 320px);
     min-width: 0;
   }
   .sidebar-hidden {
-    margin-left: calc(min(58vw, 226px) * -1);
+    margin-left: calc(min(84vw, 320px) * -1);
   }
-  .nav-link {
-    padding-left: var(--sp-4);
-    font-size: var(--fs-base);
+
+  /* Rows slide in one after another so the drawer feels alive. */
+  .zoo-sb-nav .zoo-sb-row {
+    animation: zoo-sb-row-in 0.26s ease both;
   }
-  .welcome-block {
-    padding: 0 var(--sp-4) var(--sp-4);
+  .zoo-sb-nav .zoo-sb-row:nth-child(2) {
+    animation-delay: 0.04s;
   }
-  .sidebar-bottom {
-    padding: var(--sp-4) var(--sp-3) var(--sp-5);
-    gap: var(--sp-1);
+  .zoo-sb-nav .zoo-sb-row:nth-child(3) {
+    animation-delay: 0.08s;
   }
-  .login-btn,
-  .logout-btn,
-  .lang-select {
-    font-size: var(--fs-label);
-    padding: 0 var(--sp-2);
+  .zoo-sb-art {
+    animation: zoo-sb-art-in 0.4s ease 0.22s both;
+  }
+}
+
+@keyframes zoo-sb-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+@keyframes zoo-sb-art-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zoo-sb-nav .zoo-sb-row,
+  .zoo-sb-art {
+    animation: none;
   }
 }

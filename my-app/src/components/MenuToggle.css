@@ -1,0 +1,52 @@
+/**
+ * Owned here, not by a page stylesheet — every screen renders this button.
+ * It previously lived in TransferPage.css, which meant the shared control was
+ * defined by whichever page happened to be first in the bundle.
+ */
+.menu-toggle {
+  position: fixed;
+  top: var(--sp-5);
+  right: var(--sp-5);
+  z-index: 80;
+  width: var(--ctl-h-md);
+  height: var(--ctl-h-md);
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.menu-toggle span {
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-primary);
+  display: block;
+  transition: transform 0.25s ease, opacity 0.25s ease, background 0.2s ease;
+}
+
+/* Open state: bars fold into an X, and they turn white because what's behind
+   them is now the darkened scrim, not the page. */
+.menu-toggle.open span {
+  background: var(--t-on-dark);
+}
+.menu-toggle.open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.menu-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-toggle span {
+    transition: none;
+  }
+}

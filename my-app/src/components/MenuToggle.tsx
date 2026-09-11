@@ -1,3 +1,5 @@
+import './MenuToggle.css'
+
 interface MenuToggleProps {
   isOpen: boolean
   onClick: () => void

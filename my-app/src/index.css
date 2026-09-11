@@ -33,16 +33,41 @@ body {
  * backdrop becomes a tap target that closes it.
  */
 @media (max-width: 760px) {
+  /* Strong enough that the page's own artwork stops competing with the
+     drawer's. At 0.4 both illustrations stayed legible at once, which is
+     what made the screen feel noisy. */
   .sidebar-backdrop {
     display: block;
     position: fixed;
     inset: 0;
     z-index: 60;
-    background: var(--scrim);
+    background: var(--scrim-strong);
+    animation: zoo-scrim-in 0.28s ease;
+  }
+
+  /* Where blur is supported the scrim can be lighter and still separate. */
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .sidebar-backdrop {
+      background: var(--scrim-strong-glass);
+      -webkit-backdrop-filter: blur(8px) saturate(0.55);
+      backdrop-filter: blur(8px) saturate(0.55);
+    }
+  }
+
+  /* Freeze the page behind the drawer. Scoped here because index.css is the
+     one file allowed to touch bare elements. */
+  body:has(.sidebar-backdrop) {
+    overflow: hidden;
   }
 
   .main-content {
     margin-left: 0 !important;
+  }
+}
+
+@keyframes zoo-scrim-in {
+  from {
+    opacity: 0;
   }
 }
 

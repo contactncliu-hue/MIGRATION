@@ -15,6 +15,17 @@
   --c-cream: #fff6c9;         /* avatar plate */
   --c-bronze: #b4784e;        /* admin avatar glyph */
 
+  /* Drawer sky — same cyan family as --c-cyan, darkened at the top so white
+     text clears AA (header was 2.54:1 against the illustration's sky). */
+  --c-sky-deep: #0b5f96;
+  --c-sky-mid: #1a8ed0;
+  --c-sky: #26a7fd;
+
+  /* Ink for light plates. --c-gold-deep is 2.99:1 on cream — too low to
+     carry a label, so buttons use these instead. */
+  --c-sea-ink: #0c4a6e;
+  --c-gold-ink: #7a5806;
+
   /* Warm surfaces — the parchment backdrop the art sits on */
   --surface-cream: #fffaf1;   /* page gradient base */
   --surface-cream-alt: #fffaf0;
@@ -95,6 +106,10 @@
   );
   --sh-float: 0 10px 30px rgba(0, 0, 0, 0.12);
   --scrim: rgba(0, 0, 0, 0.4);
+  /* Drawer scrim — .4 left the page artwork legible behind the sidebar,
+     so both illustrations competed. */
+  --scrim-strong: rgba(6, 14, 30, 0.68);
+  --scrim-strong-glass: rgba(6, 14, 30, 0.48);
 
   /* ── Type ───────────────────────────────────────────────────────── */
   --font-game: 'Daruma Drop One', sans-serif;
@@ -122,6 +137,8 @@
   --ctl-h-md: 36px;
   --ctl-h-lg: 44px;
   --ctl-h-touch: 56px;
+  --ctl-h-row: 52px;
+  --ctl-h-row-sm: 44px;
 
   /* ── Layout ─────────────────────────────────────────────────────── */
   --sidebar-w: 240px;

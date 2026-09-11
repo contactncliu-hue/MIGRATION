@@ -26,6 +26,8 @@ export const translations: Record<LanguageCode, LanguageStrings> = {
     login: 'Log in',
     applyCta: 'Apply to migrate',
     statusCta: 'Check my status',
+    admin: 'Admin',
+    language: 'Language',
   },
   fr: {
     welcome: 'Bienvenue',
@@ -38,6 +40,8 @@ export const translations: Record<LanguageCode, LanguageStrings> = {
     login: 'Connexion',
     applyCta: 'Demander une migration',
     statusCta: 'Voir mon statut',
+    admin: 'Admin',
+    language: 'Langue',
   },
   'pt-BR': {
     welcome: 'Bem-vindo',
@@ -50,6 +54,8 @@ export const translations: Record<LanguageCode, LanguageStrings> = {
     login: 'Entrar',
     applyCta: 'Solicitar migração',
     statusCta: 'Ver meu status',
+    admin: 'Admin',
+    language: 'Idioma',
   },
   vi: {
     welcome: 'Chào mừng',
@@ -62,6 +68,8 @@ export const translations: Record<LanguageCode, LanguageStrings> = {
     login: 'Đăng nhập',
     applyCta: 'Đăng ký chuyển máy chủ',
     statusCta: 'Kiểm tra trạng thái',
+    admin: 'Quản trị',
+    language: 'Ngôn ngữ',
   },
   ko: {
     welcome: '환영합니다',
@@ -74,6 +82,8 @@ export const translations: Record<LanguageCode, LanguageStrings> = {
     login: '로그인',
     applyCta: '이주 신청하기',
     statusCta: '내 신청 상태',
+    admin: '관리',
+    language: '언어',
   },
   'zh-CN': {
     welcome: '欢迎',
@@ -86,5 +96,7 @@ export const translations: Record<LanguageCode, LanguageStrings> = {
     login: '登录',
     applyCta: '申请转服',
     statusCta: '查询申请状态',
+    admin: '管理',
+    language: '语言',
   },
 }

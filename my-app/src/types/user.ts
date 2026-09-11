@@ -23,4 +23,7 @@ export interface LanguageStrings {
   applyCta: string
   /** Home call-to-action for visitors checking an existing application. */
   statusCta: string
+  /** Admin area — was hardcoded English in the sidebar. */
+  admin: string
+  language: string
 }
