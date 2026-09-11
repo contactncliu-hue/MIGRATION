@@ -10,23 +10,25 @@
 | 도메인 상수 | `src/lib/` — wings.ts · migration.ts · admin.ts |
 | 인증 | `src/lib/auth.tsx` + `auth-context.ts`(useAuth) |
 | CSS 스코프 게이트 | `scripts/check-css-scope.mjs` — `npm run build` 가 먼저 실행 |
+| 홈 설계 문서 | `.tasks/backlog.md` (기획·태스크) · 에이전트 UX 방향은 대화 로그 |
+| 일정 데이터 | `src/lib/schedule.ts` — 이벤트 시각의 SoT. 수정은 여기 한 곳 |
 | 사고 이력·측정 | `.tasks/archive/` |
 | 별개 프로젝트 | `~/work_space/one-darkwar` — 같은 스택의 **다른** 서비스. 합치지 않기로 결정 |
 
 ## 지금 한 줄
 
-토대·화면 정리 완료(커밋 `7414877` → `d85f898` → `265a861`).
+토대·화면 정리 + HomePage 신규 구현 완료.
 인증 단일화 · 토큰 69개 · 공용 컴포넌트 10개 · 타이포 위계 교정 ·
-MIGRATION 버튼 축소 재배치 · 로그인 아트워크 복구 및 폼 카드화.
+MIGRATION 버튼 축소 재배치 · 로그인 폼 카드화 · 홈 캐러셀(날짜 축) 신규.
 색톤은 원 작업자 것을 한 톤도 바꾸지 않았다. 빌드·스코프 게이트 통과.
 
 ## 다음 1수
 
-1. **HomePage 채우기** — 텍스트 한 줄뿐인 유일한 빈 화면이다. 원본 `index.html`(25KB)
-   이식 vs 신규 설계를 사용자가 아직 고르지 않았다.
-2. **RLS 확인** — 1번보다 급하지만 내가 못 한다(대시보드 작업). 아래 룰북 참조.
-3. 번역 오류 수정 — `transfer` 가 ko "이체"/zh "转账"/vi "Chuyển khoản"(= 은행 송금).
-   서버 이주 맥락과 다르다. `src/lib/translations.ts`. 화면에 바로 보이므로 3번.
+1. **RLS 확인** — 내가 못 한다(대시보드). 홈이 익명 read 를 늘리기 전에 먼저다. 아래 참조.
+2. **에셋 경량화** — 홈 1회 로드가 32.4MB다(`실측`). `header-red` 5.7MB/4443px 를 900px 로,
+   `scene-left` 4.3MB/6000px 를 380px 로 그린다. WebP + 표시 크기 리사이즈. 체감이 가장 크다.
+3. 번역 오류 — `transfer` 가 ko "이체"/zh "转账"/vi "Chuyển khoản"(= 은행 송금).
+   서버 이주 맥락과 다르다. `src/lib/translations.ts`. 화면에 바로 보인다.
 
 ## 룰북
 
