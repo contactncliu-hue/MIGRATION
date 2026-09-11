@@ -20,7 +20,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-5);
+  /* No flex gap — each step sets its own, so the CTA and the guest link
+     read as one block instead of three evenly spaced items. */
+  gap: 0;
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -64,8 +66,7 @@
   top: 50%;
   left: 50%;
   z-index: 1;
-  width: 640px;
-  max-width: none;
+  width: min(640px, 92vw);
   opacity: 0.55;
   transform: translate(-50%, -50%) rotate(0deg);
   transform-origin: center center;
@@ -141,6 +142,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: var(--sp-6);
+  margin-bottom: var(--sp-2);
 }
 
 .flame {
@@ -213,21 +216,30 @@
   cursor: default;
 }
 
+/* Secondary path under the gold CTA — the old link blue was the one
+   cold colour on a cream-and-gold screen and read as a stray hyperlink. */
 .guest-link {
   position: relative;
   z-index: 5;
   background: none;
   border: none;
-  color: var(--c-primary);
-  font-weight: 700;
-  font-size: var(--fs-sm);
+  color: var(--c-gold);
+  font-weight: 800;
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.4;
+  padding: var(--sp-2) var(--sp-3);
   cursor: pointer;
-  letter-spacing: 0.3px;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, color 0.15s ease;
 }
 
-.guest-link:hover { text-decoration: underline; }
+.guest-link:hover {
+  opacity: 1;
+  color: var(--c-gold-deep);
+}
 
 /* ---------- LOGIN FORM ---------- */
 /* A card, not floating text — the form sits on artwork and needs its own
@@ -347,9 +359,15 @@
 .load-error.visible { display: block; }
 
 @media (max-width: 480px) {
-  .logo-wrap { width: 320px; height: 220px; margin-top: 36px; }
+  /* Optical centring: the landscape art holds the bottom, so a block sitting
+     at the exact middle reads as sagging. */
+  .stage {
+    padding-bottom: 14vh;
+  }
+
+  .logo-wrap { width: 320px; height: 220px; margin-top: 0; }
   .logo-img { width: 260px; }
-  .ring-img { width: 440px; }
+  .ring-img { width: 92vw; }
   .shark-sprite { max-width: 420px; }
   .flame { width: 72vw; min-width: 260px; max-width: 460px; top: 60vh; top: 60dvh; top: calc(var(--app-height, 100dvh) * 0.6); }
   .scene-left,
