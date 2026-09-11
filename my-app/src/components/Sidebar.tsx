@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../lib/auth-context'
 import { translations, languageOptions } from '../lib/translations'
 import type { LanguageCode } from '../types/user'
@@ -10,7 +11,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen }: SidebarProps) {
-  const { profile, isAdmin, signOut } = useAuth()
+  const { profile, isAdmin, isGuest, signOut } = useAuth()
+  const navigate = useNavigate()
   const [lang, setLang] = useState<LanguageCode>(
     (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
   )
@@ -44,12 +46,21 @@ export function Sidebar({ isOpen }: SidebarProps) {
   return (
     <aside className={`sidebar ${isOpen ? '' : 'sidebar-hidden'}`}>
       <div className="welcome-block">
-        <div className={`user-avatar ${isAdmin ? 'admin' : ''}`}>
-          <span>{isAdmin ? 'A' : initial}</span>
+        <div className={`user-avatar ${isAdmin ? 'admin' : ''} ${isGuest ? 'guest' : ''}`}>
+          {isGuest ? (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.1 0-7.5 2.3-7.5 5.2V21h15v-1.8c0-2.9-3.4-5.2-7.5-5.2Z"
+                fill="currentColor"
+              />
+            </svg>
+          ) : (
+            <span>{isAdmin ? 'A' : initial}</span>
+          )}
         </div>
         <div className="welcome-text">
-          <div className="welcome-label">{dict.welcome}</div>
-          <div className="user-name">{displayName}</div>
+          <div className="welcome-label">{isGuest ? dict.browsing : dict.welcome}</div>
+          <div className="user-name">{isGuest ? dict.guest : displayName}</div>
         </div>
       </div>
 
@@ -68,9 +79,15 @@ export function Sidebar({ isOpen }: SidebarProps) {
       </nav>
 
       <div className="sidebar-bottom">
-        <button className="logout-btn" onClick={handleLogout} disabled={loggingOut}>
-          {loggingOut ? dict.loggingOut : dict.logout}
-        </button>
+        {isGuest ? (
+          <button className="login-btn" onClick={() => navigate('/login')}>
+            {dict.login}
+          </button>
+        ) : (
+          <button className="logout-btn" onClick={handleLogout} disabled={loggingOut}>
+            {loggingOut ? dict.loggingOut : dict.logout}
+          </button>
+        )}
         <select
           className="lang-select"
           value={lang}

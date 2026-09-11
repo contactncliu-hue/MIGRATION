@@ -47,6 +47,18 @@
 .user-avatar.admin {
   color: var(--c-bronze);
 }
+
+/* Nobody signed in — a silhouette reads as "no account" where a letter
+   would read as someone's initial. */
+.user-avatar.guest {
+  background: rgba(255, 255, 255, 0.35);
+  color: var(--n-0);
+}
+.user-avatar.guest svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
 .welcome-text {
   display: flex;
   flex-direction: column;
@@ -117,6 +129,27 @@
   appearance: none;
   text-align: center;
 }
+/* A guest has no session to end — this is the way in, so it leads. */
+.login-btn {
+  flex: 1 1 auto;
+  height: var(--ctl-h-sm);
+  background: var(--c-cream);
+  border: none;
+  color: var(--c-gold-deep);
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-pill);
+  font-family: var(--font-game);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+.login-btn:hover {
+  background: var(--c-amber-soft);
+}
+
 /* Secondary action — a quiet pill, not the loudest thing on screen. */
 .logout-btn {
   flex: 1 1 auto;
@@ -162,4 +195,33 @@
 }
 [data-lang='zh-CN'] .sidebar {
   font-family: 'SentyWatermelon', var(--font-ui);
+}
+
+/* On a phone the drawer overlays the page, so 240px ate ~64% of a 375px
+   screen and left the content barely visible behind it. */
+@media (max-width: 760px) {
+  .sidebar {
+    width: min(58vw, 226px);
+    min-width: 0;
+  }
+  .sidebar-hidden {
+    margin-left: calc(min(58vw, 226px) * -1);
+  }
+  .nav-link {
+    padding-left: var(--sp-4);
+    font-size: var(--fs-base);
+  }
+  .welcome-block {
+    padding: 0 var(--sp-4) var(--sp-4);
+  }
+  .sidebar-bottom {
+    padding: var(--sp-4) var(--sp-3) var(--sp-5);
+    gap: var(--sp-1);
+  }
+  .login-btn,
+  .logout-btn,
+  .lang-select {
+    font-size: var(--fs-label);
+    padding: 0 var(--sp-2);
+  }
 }

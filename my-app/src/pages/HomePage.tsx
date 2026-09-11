@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { GuestActions } from '../components/home/GuestActions'
 import { PortalCarousel } from '../components/home/PortalCarousel'
 import './HomePage.css'
 
@@ -12,6 +13,8 @@ export function HomePage() {
       <img className="home-scene home-scene-right" src="/assets/scene-right.png" alt="" />
 
       <PortalCarousel today={today} />
+
+      <GuestActions />
 
       <div className="home-fade" />
     </div>

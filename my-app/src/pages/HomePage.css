@@ -292,6 +292,68 @@
   --home-accent-deep: #1f6b2d;
 }
 
+/* ---------- guest call to action ---------- */
+/* Sits above the indicator: the reason a visitor came should not be two taps
+   behind a hamburger menu. */
+.home-guest-actions {
+  position: absolute;
+  left: 50%;
+  bottom: calc(5% + 46px);
+  transform: translateX(-50%);
+  z-index: 47;
+  display: flex;
+  gap: var(--sp-2);
+  white-space: nowrap;
+}
+
+.home-guest-primary,
+.home-guest-secondary {
+  height: var(--ctl-h-md);
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.home-guest-primary:active,
+.home-guest-secondary:active {
+  transform: scale(0.97);
+}
+
+.home-guest-primary {
+  border: none;
+  background: var(--wing-orange);
+  color: var(--n-0);
+  box-shadow: 0 3px 0 var(--c-gold);
+}
+
+.home-guest-secondary {
+  border: 1.5px solid var(--n-300);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--n-800);
+}
+.home-guest-secondary:hover {
+  border-color: var(--c-gold);
+  color: var(--c-gold-deep);
+}
+
+@media (max-width: 760px) {
+  .home-guest-actions {
+    left: var(--sp-3);
+    right: var(--sp-3);
+    transform: none;
+    justify-content: center;
+  }
+  .home-guest-primary,
+  .home-guest-secondary {
+    flex: 1 1 0;
+    padding: 0 var(--sp-2);
+    font-size: var(--fs-label);
+  }
+}
+
 /* ---------- indicator ---------- */
 .home-dots {
   position: absolute;
