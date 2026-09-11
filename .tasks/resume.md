@@ -1,66 +1,55 @@
 # MIGRATION (zoo) — 핸드오프
 
-> 이 파일은 **덮어쓴다**. 이력은 쌓지 않는다.
-
-## 포인터
+## 📍 포인터
 
 | 무엇 | 어디 |
 |---|---|
-| 앱 루트 | `my-app/` (React 19 + TS + Vite 8 + Supabase) |
-| 디자인 SoT | `my-app/src/styles/tokens.css` — 색·타이포·간격·컨트롤 높이 |
-| 공용 UI | `my-app/src/components/ui/` — Modal·Field·FormMessage·Badge·Panel |
-| 도메인 상수 | `my-app/src/lib/wings.ts`, `lib/migration.ts`, `lib/admin.ts` |
-| 인증 | `lib/auth.tsx`(Provider) + `lib/auth-context.ts`(useAuth) |
-| 배포 | `my-app/vercel.json` — SPA rewrite (`/api/` 제외) |
-| CSS 스코프 게이트 | `my-app/scripts/check-css-scope.mjs` — `npm run build` 가 자동 실행 |
+| 앱 | `my-app/` — React 19 · TS · Vite 8 · Supabase · Vercel |
+| 디자인 SoT | `src/styles/tokens.css` — 색·타이포·간격·컨트롤 높이 |
+| 공용 UI (소유자) | `src/components/ui/` — Modal·Field·FormMessage·Badge·Panel·forms.css |
+| 도메인 상수 | `src/lib/` — wings.ts · migration.ts · admin.ts |
+| 인증 | `src/lib/auth.tsx` + `auth-context.ts`(useAuth) |
+| CSS 스코프 게이트 | `scripts/check-css-scope.mjs` — `npm run build` 가 먼저 실행 |
+| 사고 이력·측정 | `.tasks/archive/` |
 | 별개 프로젝트 | `~/work_space/one-darkwar` — 같은 스택의 **다른** 서비스. 합치지 않기로 결정 |
 
 ## 지금 한 줄
 
-토대 + 화면 정리 완료 — 인증 단일화 · 디자인 토큰 · 공용 컴포넌트 10개 · 타이포 위계 교정 ·
-MIGRATION 버튼 26%→17%(항아리 하단) · 로그인 하단 아트워크 복구 · 로그인 폼 카드화.
-CSS 전역 오염은 빌드 게이트로 막는다. 색톤은 원 작업자 것을 한 톤도 바꾸지 않았다.
+토대·화면 정리 완료(커밋 `7414877` → `d85f898` → `265a861`).
+인증 단일화 · 토큰 69개 · 공용 컴포넌트 10개 · 타이포 위계 교정 ·
+MIGRATION 버튼 축소 재배치 · 로그인 아트워크 복구 및 폼 카드화.
+색톤은 원 작업자 것을 한 톤도 바꾸지 않았다. 빌드·스코프 게이트 통과.
 
 ## 다음 1수
 
-**HomePage 채우기.** 현재 텍스트 한 줄(9줄짜리 파일)뿐이다.
-원본 `index.html`(25KB) 이식 vs 신규 설계 — 사용자 선택 대기 중.
+1. **HomePage 채우기** — 텍스트 한 줄뿐인 유일한 빈 화면이다. 원본 `index.html`(25KB)
+   이식 vs 신규 설계를 사용자가 아직 고르지 않았다.
+2. **RLS 확인** — 1번보다 급하지만 내가 못 한다(대시보드 작업). 아래 룰북 참조.
+3. 번역 오류 수정 — `transfer` 가 ko "이체"/zh "转账"/vi "Chuyển khoản"(= 은행 송금).
+   서버 이주 맥락과 다르다. `src/lib/translations.ts`. 화면에 바로 보이므로 3번.
 
 ## 룰북
 
-- 🔴 **색·크기를 페이지 CSS에 직접 쓰지 마라.** `tokens.css`에 토큰을 추가하고 `var()`로 참조한다.
-  현재 CSS 색 하드코딩 0건 · 폰트 px 하드코딩 0건(아트워크 비례용 `vw` 제외).
-- 🔴 **페이지 CSS에 전역 셀렉터(`body`, `*`, 공용 클래스명)를 쓰지 마라.**
-  Vite가 모든 CSS를 함께 번들하므로 다른 화면을 오염시킨다.
-  실제로 **세 건**이 있었다 —
-  ① `LoginPage.css`의 `body{overflow:hidden}` → 모든 화면 스크롤 잠금
-  ② `LoginPage.css`의 `.scene{pointer-events:none}` → TransferPage의 MIGRATION 버튼 클릭 불가
-  ③ `TransferPage.css`의 `.scene{opacity:0}` → 로그인 화면 배경 아트워크가 통째로 안 보임
-  `.scene` 은 **두 화면이 같은 클래스명을 서로 다른 용도로** 쓰고 있었다. 셋 다 스코프로 해결.
-  🔴 이제 **`npm run build` 가 `check-css-scope.mjs` 를 먼저 돌려 막는다** — 맨 셀렉터(`body`/`*`)와
-  파일 간 클래스 중복을 잡는다. 과거 3건을 전부 재현해 잡히는 것을 확인했다(`실측`).
-  공용 프리미티브는 `components/ui/` 가 소유하고, 페이지는 `.login-form .field` 처럼 스코프해 쓴다.
-- 권한 체크는 `useAuth()` 하나만 쓴다. 페이지에서 `supabase.auth.getUser()`를 직접 부르지 않는다.
+- 🔴 **색·크기를 페이지 CSS에 직접 쓰지 마라.** `tokens.css` 에 추가하고 `var()` 로 참조한다.
+  현재 CSS 색·폰트 px 하드코딩 0건(아트워크 비례용 `vw` 제외).
+- 🔴 **페이지 CSS에 전역 셀렉터를 쓰지 마라.** Vite 가 모든 CSS를 함께 번들한다.
+  같은 사고가 **세 번** 났다(`body{overflow:hidden}` · `.scene{pointer-events:none}` ·
+  `.scene{opacity:0}`). 이제 빌드 게이트가 막고, 과거 3건 재현으로 검증했다.
+  공용 프리미티브는 `components/ui/` 소유 — 페이지는 `.login-form .field` 처럼 스코프해 쓴다.
+- 🔴 **브라우저 도구의 `getComputedStyle` 을 믿지 마라.** `.scene` 과 `.login-form` 둘 다
+  계산값 `opacity:0` 인데 화면은 정상이었다. 두 번 다 버그로 오인해 한참 팠다.
+  ⇒ **스크린샷으로 판정한다.**
+- 헤드리스 캡처(`scratchpad/shoot.mjs`)는 React 클릭을 재현하지 못한다.
+  모달·폼은 `css` 옵션으로 상태를 강제해 찍는다.
+- 권한은 `useAuth()` 하나만 쓴다. 페이지에서 `supabase.auth.getUser()` 를 직접 부르지 않는다.
   **클라이언트 체크는 UX 게이트일 뿐 — 실제 방어선은 RLS다.**
-- 모달은 부모가 `{open && <Modal .../>}`로 조건부 렌더한다. state 리셋 effect를 두지 않는다.
+- 모달은 부모가 `{open && <Modal/>}` 로 조건부 렌더한다. state 리셋 effect 를 두지 않는다.
 - 타이포 위계: 라벨(`--fs-label`)은 그것이 설명하는 값(`--fs-md`)보다 **작다**.
 
-## ⚠️ 이 환경의 함정
+## ⚠️ 미해결 (내가 못 고치는 것)
 
-**브라우저 도구의 `getComputedStyle` 을 믿지 마라.** `.scene` 과 `.login-form` 둘 다
-계산값이 `opacity: 0` 인데 화면에는 정상 렌더됐다. 두 번 다 이걸 버그로 오인해 한참 팠다.
-⇒ **스크린샷으로 판정한다.** 계산값은 참고만.
-
-헤드리스 캡처(`scratchpad/shoot.mjs`)는 React 클릭 이벤트를 재현하지 못한다.
-모달·폼처럼 상호작용이 필요한 화면은 `css` 옵션으로 상태를 강제해 찍는다
-(예: `.intro{display:none} .login-form{opacity:1 !important}`).
-
-## ⚠️ 미해결
-
-1. 🔴 **RLS 미확인** — 레포가 public(`contactncliu-hue/MIGRATION`)이고 `.env`가 커밋 `4c0d207`
-   히스토리에 남아 있다. 익명 상태로 `migration_members` 조회가 실제로 된다(윙 카드 4행).
-   → Supabase 대시보드 → Authentication → Policies 확인 필요.
-2. 번역 오류 — `transfer`가 ko "이체" / zh "转账" / vi "Chuyển khoản" = **은행 송금** 뜻.
-   서버 이주 맥락에 안 맞는다. `lib/translations.ts`.
-3. 번들 503KB 단일 청크 — 코드 스플리팅 없음.
-4. 이 repo에 SQL/스키마 파일이 하나도 없다 — DB 구조가 코드로 추적되지 않는다.
+- 🔴 **RLS 미확인** — 레포가 public(`contactncliu-hue/MIGRATION`)이고 `.env` 가 커밋
+  `4c0d207` 히스토리에 남아 있다. 익명으로 `migration_members` 조회가 실제로 된다.
+  ⇒ Supabase 대시보드 → Authentication → Policies. 안 켜져 있으면 누구나 읽고 쓴다.
+- 이 repo 에 SQL/스키마 파일이 없다 — DB 구조가 코드로 추적되지 않는다.
+- 번들 503KB 단일 청크(코드 스플리팅 없음).
