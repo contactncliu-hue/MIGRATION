@@ -1,0 +1,37 @@
+/**
+ * Form primitives shared by every screen: Field, FormMessage, submit button.
+ * Screen-specific flourishes stay scoped in the page stylesheet.
+ */
+.field{ display:flex; flex-direction:column; gap:var(--sp-1); margin-bottom:var(--sp-3); }
+.field label{ font-size:var(--fs-label); font-weight:700; color:var(--n-600); letter-spacing:.4px; text-transform:uppercase; }
+.field input, .field textarea, .field select{
+  min-height:var(--ctl-h-md); padding:0 var(--sp-3); border-radius:var(--r-sm);
+  border:1.5px solid var(--n-300);
+  font-size:var(--fs-base); font-family:inherit; outline:none; transition:border-color .2s ease;
+  resize:vertical; background:var(--n-0);
+}
+.field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--c-primary); }
+.form-error{
+  background:var(--c-danger-bg); color:var(--c-danger); border:1px solid var(--c-danger-border);
+  border-radius:var(--r-sm); padding:var(--sp-2) var(--sp-3); font-size:var(--fs-sm); font-weight:600;
+  display:none; margin-bottom:var(--sp-3);
+}
+.form-error.visible{ display:block; }
+.form-success{
+  background:var(--c-success-bg-soft); color:var(--c-success); border:1px solid var(--c-success-border);
+  border-radius:var(--r-sm); padding:var(--sp-2) var(--sp-3); font-size:var(--fs-sm); font-weight:600;
+  display:none; margin-bottom:var(--sp-3);
+}
+.form-success.visible{ display:block; }
+
+.field-row{ display:flex; gap:12px; }
+.field-row .field{ flex:1; min-width:0; }
+
+.submit-btn{
+  width:100%; height:var(--ctl-h-lg);
+  background:var(--wing-orange); color:var(--n-0); border:none; border-radius:var(--r-md);
+  font-weight:800; font-size:var(--fs-base); letter-spacing:.4px; cursor:pointer;
+  transition:transform .12s ease, box-shadow .15s ease, opacity .2s ease;
+}
+.submit-btn:active{ transform:translateY(3px) scale(.97); }
+.submit-btn:disabled{ opacity:.7; cursor:default; }

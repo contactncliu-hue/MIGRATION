@@ -1,0 +1,17 @@
+/* One pill, six tones. Replaces .status-badge / .override-badge / .group-tag-badge. */
+.badge {
+  font-size: var(--fs-micro);
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  padding: 3px var(--sp-2);
+  border-radius: var(--r-pill);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-pending  { background: var(--n-100);        color: var(--n-600); }
+.badge-approved { background: var(--c-success-bg); color: var(--c-success); }
+.badge-rejected { background: var(--c-danger-bg);  color: var(--c-danger); }
+.badge-manual   { background: var(--c-warn-bg);    color: var(--c-warn); }
+.badge-auto     { background: var(--c-success-bg); color: var(--c-success-ink); }
+.badge-neutral  { background: var(--n-200);        color: var(--n-800); text-transform: none; }

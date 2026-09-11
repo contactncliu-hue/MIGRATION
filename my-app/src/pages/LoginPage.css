@@ -1,21 +1,8 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'Poppins', sans-serif;
-  min-height: 100vh;
-  min-height: 100dvh;
-  min-height: calc(var(--app-height, 100dvh));
-  background: linear-gradient(to top, #FFFAF1 0%, #ffffff 45%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-}
 
 .stage {
   position: relative;
   width: 100%;
+  margin: 0 auto;
   max-width: 900px;
   height: 100vh;
   height: 100dvh;
@@ -127,7 +114,9 @@ body {
   transform: translate(-50%, -64%) scale(1.2);
 }
 
-.scene {
+/* Scoped to the login stage: TransferPage has its own .scene wrapper that
+   holds real buttons, and an unscoped pointer-events:none killed them. */
+.stage .scene {
   position: fixed;
   bottom: 0;
   z-index: 0;
@@ -135,13 +124,13 @@ body {
   pointer-events: none;
 }
 
-.scene-left {
+.stage .scene-left {
   left: 0;
   width: 34vw;
   max-width: 380px;
 }
 
-.scene-right {
+.stage .scene-right {
   right: 0;
   width: 34vw;
   max-width: 380px;
@@ -201,22 +190,22 @@ body {
 .btn-login {
   position: relative;
   z-index: 5;
-  background: #f2a90f;
-  color: #fff;
+  background: var(--wing-orange);
+  color: var(--n-0);
   border: none;
-  border-radius: 14px;
-  padding: 16px 56px;
+  border-radius: var(--r-md);
+  padding: 13px 44px;
   font-weight: 800;
-  font-size: 16px;
-  letter-spacing: 0.5px;
+  font-size: var(--fs-base);
+  letter-spacing: 0.6px;
   cursor: pointer;
-  box-shadow: 0 6px 0 #c98c0c;
+  box-shadow: 0 4px 0 var(--c-gold);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-login:active {
-  transform: translateY(4px);
-  box-shadow: 0 2px 0 #c98c0c;
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--c-gold);
 }
 
 .btn-login:disabled {
@@ -229,9 +218,9 @@ body {
   z-index: 5;
   background: none;
   border: none;
-  color: #3B5BDB;
+  color: var(--c-primary);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--fs-sm);
   text-align: center;
   line-height: 1.5;
   cursor: pointer;
@@ -266,105 +255,47 @@ body {
 }
 
 .login-form h1 {
-  font-size: 20px;
+  font-size: var(--fs-lg);
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--n-900);
 }
 
-.field {
+/* Login-only variations on the shared form primitives (see ui/forms.css). */
+.login-form .field {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 
-.field label {
-  font-size: 12px;
-  font-weight: 700;
-  color: #888;
-  letter-spacing: 0.4px;
-}
-
-.field input {
+.login-form .form-error,
+.login-form .form-success {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1.5px solid #e3e3ec;
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.2s ease;
+  margin-bottom: 0;
 }
 
-.field input:focus {
-  border-color: #3B5BDB;
-}
-
-.form-error {
-  width: 100%;
-  background: #fff0f0;
-  color: #e03131;
-  border: 1px solid #ffd6d6;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  display: none;
+/* Server errors are raw strings — keep line breaks readable. */
+.login-form .form-error {
   white-space: pre-wrap;
   font-family: monospace;
 }
 
-.form-error.visible { display: block; }
-
-.form-success {
-  width: 100%;
-  background: #f0fff4;
-  color: #2b8a3e;
-  border: 1px solid #d3f9d8;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  display: none;
+/* The login CTA sits on artwork, so it carries a raised plate. */
+.login-form .submit-btn {
+  box-shadow: 0 5px 0 var(--c-gold);
 }
 
-.form-success.visible { display: block; }
-
-.submit-btn {
-  width: 100%;
-  background: #f2a90f;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  font-weight: 800;
-  font-size: 15px;
-  letter-spacing: 0.4px;
-  cursor: pointer;
-  box-shadow: 0 5px 0 #c98c0c;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
-}
-
-.submit-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #c98c0c;
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: default;
+.login-form .submit-btn:active {
+  box-shadow: 0 2px 0 var(--c-gold);
 }
 
 .back-link {
   background: none;
   border: none;
-  color: #999;
-  font-size: 13px;
+  color: var(--n-500);
+  font-size: var(--fs-sm);
   font-weight: 600;
   cursor: pointer;
 }
 
-.back-link:hover { color: #666; }
+.back-link:hover { color: var(--n-700); }
 
 .load-error {
   display: none;
@@ -374,12 +305,12 @@ body {
   transform: translateX(-50%);
   width: 90%;
   max-width: 480px;
-  background: #fff0f0;
-  color: #e03131;
-  border: 1px solid #ffd6d6;
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 13px;
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+  border: 1px solid var(--c-danger-border);
+  border-radius: var(--r-sm);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-sm);
   font-weight: 600;
   font-family: monospace;
   white-space: pre-wrap;

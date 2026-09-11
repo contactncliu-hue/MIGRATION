@@ -1,0 +1,23 @@
+/* Overlay dialog shell. Form controls inside come from forms.css. */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(20,20,30,.45);
+  z-index:100; display:none; align-items:center; justify-content:center;
+  padding:20px;
+}
+.modal-overlay.visible{ display:flex; }
+.modal-box{
+  background:var(--n-0); border-radius:18px; width:100%; max-width:440px;
+  max-height:88vh; overflow-y:auto;
+  padding:var(--sp-5); position:relative;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  animation: modalIn .35s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes modalIn{ from{opacity:0; transform:scale(.92);} to{opacity:1; transform:scale(1);} }
+.modal-close{
+  position:absolute; top:14px; right:14px;
+  background:none; border:none; font-size:18px; line-height:1; color:var(--n-500); cursor:pointer;
+  width:var(--ctl-h-sm); height:var(--ctl-h-sm); border-radius:var(--r-sm);
+}
+.modal-close:hover{ background:var(--n-100); color:var(--n-850); }
+.modal-box h2{ font-size:var(--fs-lg); font-weight:800; color:var(--n-900); margin:0 0 var(--sp-1); }
+.modal-sub{ font-size:var(--fs-sm); color:var(--n-600); margin:0 0 var(--sp-4); line-height:1.45; }

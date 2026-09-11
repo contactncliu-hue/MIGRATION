@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../lib/auth-context'
+import { Field } from '../components/ui/Field'
+import { FormMessage } from '../components/ui/FormMessage'
 import './LoginPage.css'
 
 const sharkFrames = [
@@ -16,6 +19,7 @@ function usernameToAuthEmail(username: string) {
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const { user, loading: authLoading } = useAuth()
   const [stageClasses, setStageClasses] = useState<string[]>([])
   const [showForm, setShowForm] = useState(false)
   const [sharkSrc, setSharkSrc] = useState(sharkFrames[0])
@@ -28,10 +32,8 @@ export function LoginPage() {
 
   // redirect if already logged in
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) navigate('/')
-    }).catch((err) => console.error('getUser check failed:', err))
-  }, [navigate])
+    if (!authLoading && user) navigate('/')
+  }, [authLoading, user, navigate])
 
   function addStageClass(cls: string) {
     setStageClasses((prev) => (prev.includes(cls) ? prev : [...prev, cls]))
@@ -142,35 +144,29 @@ export function LoginPage() {
         <img src="/assets/logo.png.PNG" className="form-logo" alt="ZOO" />
         <h1>Welcome back</h1>
 
-        {error && <div className="form-error visible">{error}</div>}
+        <FormMessage tone="error">{error}</FormMessage>
 
-        <div className="field">
-          <label htmlFor="username">Username</label>
-          <input
-            ref={usernameRef}
-            type="text"
-            id="username"
-            autoComplete="username"
-            minLength={3}
-            pattern="[A-Za-z0-9_\-]+"
-            title="Letters, numbers, - and _ only"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
+        <Field
+          label="Username"
+          ref={usernameRef}
+          type="text"
+          autoComplete="username"
+          minLength={3}
+          pattern="[A-Za-z0-9_\-]+"
+          title="Letters, numbers, - and _ only"
+          required
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
 
-        <div className="field">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+        <Field
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
         <button type="submit" className="submit-btn" disabled={submitting}>
           {submitting ? 'LOGGING IN...' : 'LOG IN'}

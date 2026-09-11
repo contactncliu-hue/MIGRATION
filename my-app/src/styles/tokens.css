@@ -1,0 +1,121 @@
+/**
+ * Design tokens — single source of truth for color, radius, shadow, type.
+ *
+ * Values were extracted verbatim from the existing page CSS, so adopting the
+ * tokens is a no-op visually. Change a value here, not in a page stylesheet.
+ */
+:root {
+  /* ── Brand / game artwork tone (Login, Transfer, Sidebar) ───────── */
+  --c-cyan: #00c2ff;          /* sidebar nav highlight */
+  --c-cyan-bright: #00d8ff;
+  --c-cyan-ink: #2aa9f2;      /* avatar glyph */
+  --c-gold: #c98c0c;          /* emphasis text */
+  --c-gold-deep: #b8860b;
+  --c-gold-bright: #f2a90f;
+  --c-cream: #fff6c9;         /* avatar plate */
+  --c-bronze: #b4784e;        /* admin avatar glyph */
+
+  /* Warm surfaces — the parchment backdrop the art sits on */
+  --surface-cream: #fffaf1;   /* page gradient base */
+  --surface-cream-alt: #fffaf0;
+  --surface-amber: #fff8ea;
+  --surface-amber-alt: #fff8e6;
+  --surface-blush: #fff0ec;
+  --c-amber-soft: #ffe6a3;
+
+  /* ── Wing colors (domain) ───────────────────────────────────────── */
+  --wing-red: #c1442e;
+  --wing-orange: #f2a90f;
+  --wing-purple: #8b5cf6;
+  --wing-blue: #3b82f6;
+
+  /* ── Semantic ───────────────────────────────────────────────────── */
+  --c-primary: #3b5bdb;       /* buttons, focus ring */
+  --c-accent: #8900ff;        /* violet emphasis */
+  --c-teal: #0ca678;          /* group-bar cycle */
+  --c-magenta: #c2255c;       /* group-bar cycle */
+  --c-blue-deep: #1971c2;     /* group-bar cycle */
+  --c-mint: #a3f0b0;          /* capacity reached */
+  --c-peach: #ffd9a0;         /* capacity remaining */
+
+  --c-success: #2b8a3e;
+  --c-success-ink: #4a8f52;
+  --c-success-bg: #eef4e4;
+  --c-success-bg-soft: #f0fff4;
+  --c-success-border: #d3f9d8;
+
+  --c-danger: #e03131;
+  --c-danger-hover: #e85454;
+  --c-danger-bg: #fff0f0;
+  --c-danger-border: #ffd6d6;
+  --c-danger-plate: #ffafaf;  /* logout button face */
+  --c-danger-plate-hover: #ff9d9d;
+
+  --c-warn: var(--c-gold);
+  --c-warn-bg: #fff4e0;
+
+  /* ── Neutrals ───────────────────────────────────────────────────── */
+  --n-0: #fff;
+  --n-50: #fafbff;
+  --n-100: #f4f5fa;
+  --n-200: #eef0f7;
+  --n-250: #e9eaf2;
+  --n-300: #e3e3ec;
+  --n-400: #d8dae6;
+  --n-500: #999;
+  --n-600: #888;
+  --n-700: #666;
+  --n-800: #444;
+  --n-850: #333;
+  --n-900: #1a1a2e;
+
+  /* ── Text ───────────────────────────────────────────────────────── */
+  --t-strong: var(--n-900);
+  --t-muted: var(--n-600);
+  --t-faint: var(--n-500);
+  --t-on-dark: var(--n-0);
+  --t-on-dark-soft: rgba(255, 255, 255, 0.85);
+
+  /* ── Radius ─────────────────────────────────────────────────────── */
+  --r-xs: 3px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-pill: 999px;
+
+  /* ── Elevation ──────────────────────────────────────────────────── */
+  --sh-panel: 0 2px 10px rgba(0, 0, 0, 0.04);
+  --sh-float: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --scrim: rgba(0, 0, 0, 0.4);
+
+  /* ── Type ───────────────────────────────────────────────────────── */
+  --font-game: 'Daruma Drop One', sans-serif;
+  --font-ui: system-ui, 'Segoe UI', Roboto, -apple-system, sans-serif;
+
+  /* Type scale. Labels sit below the value they describe, never above it. */
+  --fs-micro: 10px;   /* badges, legends */
+  --fs-label: 11px;   /* field labels, captions */
+  --fs-sm: 12px;      /* secondary buttons, table cells */
+  --fs-base: 13px;    /* body */
+  --fs-md: 15px;      /* primary nav, names */
+  --fs-lg: 18px;      /* panel headings */
+  --fs-xl: 22px;      /* page title */
+
+  /* ── Spacing ────────────────────────────────────────────────────── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+
+  /* ── Controls ───────────────────────────────────────────────────── */
+  --ctl-h-sm: 30px;
+  --ctl-h-md: 36px;
+  --ctl-h-lg: 44px;
+
+  /* ── Layout ─────────────────────────────────────────────────────── */
+  --sidebar-w: 240px;
+  --bp-mobile: 760px;
+}
