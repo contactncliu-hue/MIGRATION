@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/check-css-scope.mjs && tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:css": "node scripts/check-css-scope.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",

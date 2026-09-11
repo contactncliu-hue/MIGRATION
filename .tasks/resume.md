@@ -12,13 +12,14 @@
 | 도메인 상수 | `my-app/src/lib/wings.ts`, `lib/migration.ts`, `lib/admin.ts` |
 | 인증 | `lib/auth.tsx`(Provider) + `lib/auth-context.ts`(useAuth) |
 | 배포 | `my-app/vercel.json` — SPA rewrite (`/api/` 제외) |
+| CSS 스코프 게이트 | `my-app/scripts/check-css-scope.mjs` — `npm run build` 가 자동 실행 |
 | 별개 프로젝트 | `~/work_space/one-darkwar` — 같은 스택의 **다른** 서비스. 합치지 않기로 결정 |
 
 ## 지금 한 줄
 
 토대 + 화면 정리 완료 — 인증 단일화 · 디자인 토큰 · 공용 컴포넌트 10개 · 타이포 위계 교정 ·
-MIGRATION 버튼 26%→17%(항아리 하단) · 로그인 하단 아트워크 복구 및 확대.
-색톤은 원 작업자 것을 한 톤도 바꾸지 않았다.
+MIGRATION 버튼 26%→17%(항아리 하단) · 로그인 하단 아트워크 복구 · 로그인 폼 카드화.
+CSS 전역 오염은 빌드 게이트로 막는다. 색톤은 원 작업자 것을 한 톤도 바꾸지 않았다.
 
 ## 다음 1수
 
@@ -36,10 +37,23 @@ MIGRATION 버튼 26%→17%(항아리 하단) · 로그인 하단 아트워크 �
   ② `LoginPage.css`의 `.scene{pointer-events:none}` → TransferPage의 MIGRATION 버튼 클릭 불가
   ③ `TransferPage.css`의 `.scene{opacity:0}` → 로그인 화면 배경 아트워크가 통째로 안 보임
   `.scene` 은 **두 화면이 같은 클래스명을 서로 다른 용도로** 쓰고 있었다. 셋 다 스코프로 해결.
+  🔴 이제 **`npm run build` 가 `check-css-scope.mjs` 를 먼저 돌려 막는다** — 맨 셀렉터(`body`/`*`)와
+  파일 간 클래스 중복을 잡는다. 과거 3건을 전부 재현해 잡히는 것을 확인했다(`실측`).
+  공용 프리미티브는 `components/ui/` 가 소유하고, 페이지는 `.login-form .field` 처럼 스코프해 쓴다.
 - 권한 체크는 `useAuth()` 하나만 쓴다. 페이지에서 `supabase.auth.getUser()`를 직접 부르지 않는다.
   **클라이언트 체크는 UX 게이트일 뿐 — 실제 방어선은 RLS다.**
 - 모달은 부모가 `{open && <Modal .../>}`로 조건부 렌더한다. state 리셋 effect를 두지 않는다.
 - 타이포 위계: 라벨(`--fs-label`)은 그것이 설명하는 값(`--fs-md`)보다 **작다**.
+
+## ⚠️ 이 환경의 함정
+
+**브라우저 도구의 `getComputedStyle` 을 믿지 마라.** `.scene` 과 `.login-form` 둘 다
+계산값이 `opacity: 0` 인데 화면에는 정상 렌더됐다. 두 번 다 이걸 버그로 오인해 한참 팠다.
+⇒ **스크린샷으로 판정한다.** 계산값은 참고만.
+
+헤드리스 캡처(`scratchpad/shoot.mjs`)는 React 클릭 이벤트를 재현하지 못한다.
+모달·폼처럼 상호작용이 필요한 화면은 `css` 옵션으로 상태를 강제해 찍는다
+(예: `.intro{display:none} .login-form{opacity:1 !important}`).
 
 ## ⚠️ 미해결
 

@@ -230,13 +230,21 @@
 .guest-link:hover { text-decoration: underline; }
 
 /* ---------- LOGIN FORM ---------- */
+/* A card, not floating text — the form sits on artwork and needs its own
+   surface to stay readable and to read as a single object. */
 .login-form {
   position: absolute;
-  width: 320px;
+  width: 360px;
+  max-width: calc(100vw - var(--sp-6));
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 18px;
+  align-items: stretch;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  background: var(--n-0);
+  border: 1px solid var(--n-200);
+  border-radius: var(--r-lg);
+  box-shadow: 0 18px 50px rgba(20, 20, 30, 0.10), 0 2px 6px rgba(20, 20, 30, 0.04);
   opacity: 0;
   transform: translateY(14px);
   pointer-events: none;
@@ -250,14 +258,28 @@
 }
 
 .login-form img.form-logo {
-  width: 140px;
-  margin-bottom: 4px;
+  width: 132px;
+  align-self: center;
+  margin-bottom: calc(var(--sp-1) * -1);
 }
 
 .login-form h1 {
+  margin: 0 0 var(--sp-2);
   font-size: var(--fs-lg);
   font-weight: 800;
   color: var(--n-900);
+  text-align: center;
+}
+
+/* Separates the identity block (logo + greeting) from the inputs. */
+.login-form h1::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 2px;
+  margin: var(--sp-3) auto 0;
+  border-radius: var(--r-pill);
+  background: var(--wing-orange);
 }
 
 /* Login-only variations on the shared form primitives (see ui/forms.css). */
@@ -286,7 +308,12 @@
   box-shadow: 0 2px 0 var(--c-gold);
 }
 
+.login-form .submit-btn {
+  margin-top: var(--sp-1);
+}
+
 .back-link {
+  align-self: center;
   background: none;
   border: none;
   color: var(--n-500);

@@ -163,14 +163,13 @@
   filter:brightness(1.1) saturate(1.05);
 }
 
-.submit-btn,
+/* Transfer-owned controls only — .submit-btn belongs to ui/forms.css. */
 .type-btn,
 .add-member-btn,
 .remove-member-btn,
 .faction-btn{
   transition:transform .12s ease, background .2s ease, color .2s ease, border-color .2s ease;
 }
-.submit-btn:active,
 .type-btn:active,
 .add-member-btn:active,
 .remove-member-btn:active,
@@ -282,7 +281,6 @@
   }
   .status-card-close{ display:none; }
   .status-row-name, .status-percent{ font-size:var(--fs-label); }
-  .field-row{ flex-direction:column; gap:0; }
 
   .status-rows{ left:18%; right:18%; top:13%; bottom:16%; gap:2px; }
   .status-row{ gap:8px; align-items:center; }

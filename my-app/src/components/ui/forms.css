@@ -35,3 +35,12 @@
 }
 .submit-btn:active{ transform:translateY(3px) scale(.97); }
 .submit-btn:disabled{ opacity:.7; cursor:default; }
+
+/* Two-column field rows collapse on narrow screens. Lives here, not in a
+   page stylesheet — .field-row is owned by this file. */
+@media (max-width: 760px) {
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
