@@ -408,12 +408,16 @@
   .home-stage {
     height: auto;
     min-height: 100dvh;
-    --portal-w: 88vw;
-    --portal-h: 116vw;
-    --portal-offset: 150px;
+    /* Width-led on a phone: the arch must fit across, and its height follows
+       the artwork's own 1640:2156. */
+    --portal-w: min(86vw, 330px);
+    --portal-h: calc(var(--portal-w) / 0.7607);
+    --portal-offset: calc(var(--portal-w) * 0.62);
   }
+  /* Lifted off the bottom edge so the card sits in the middle of the screen
+     instead of hugging the fold, and clear of the guest actions below. */
   .home-portal {
-    max-width: 390px;
+    bottom: 19%;
   }
   .home-portal.is-left,
   .home-portal.is-right {

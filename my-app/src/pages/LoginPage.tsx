@@ -126,6 +126,14 @@ export function LoginPage() {
           />
           <img src="/assets/logo.png.PNG" className="logo-img" alt="ZOO" />
         </div>
+        {/* Names the place. Without it the screen is a logo and two buttons,
+            and a first-time visitor cannot tell what they arrived at. */}
+        <p className="login-tagline">
+          <span>Server</span>
+          <b>277</b>
+          <span>Migration Hub</span>
+        </p>
+
         <img src="/assets/flame-b.png.png" className="flame flame-left" alt="" />
         <img src="/assets/flame-a.png" className="flame flame-right" alt="" />
         <div className="btn-flame-wrap">

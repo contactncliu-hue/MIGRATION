@@ -137,12 +137,41 @@
   max-width: 600px;
 }
 
+/* Identity line under the wordmark. */
+.login-tagline {
+  position: relative;
+  z-index: 5;
+  margin: calc(var(--sp-1) * -1) 0 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-label);
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--n-700);
+  white-space: nowrap;
+}
+
+.login-tagline span {
+  opacity: 0.65;
+}
+
+.login-tagline b {
+  font-family: var(--font-game);
+  font-size: var(--fs-lg);
+  font-weight: 400;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: var(--c-gold);
+}
+
 .btn-flame-wrap {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: var(--sp-6);
+  margin-top: var(--sp-5);
   margin-bottom: var(--sp-2);
 }
 
