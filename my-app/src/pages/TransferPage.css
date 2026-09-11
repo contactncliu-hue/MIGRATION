@@ -9,7 +9,7 @@
 /* ================= MAIN / HERO STAGE ================= */
 .transfer-stage{
   position:relative;
-  width:100%; height:100vh;
+  width:100%; height:100vh; height:100dvh;
   overflow:hidden;
   background:linear-gradient(to top, var(--surface-cream) 0%, var(--n-0) 45%);
 }
