@@ -134,9 +134,7 @@ export function LoginPage() {
           </button>
         </div>
         <button className="guest-link" onClick={handleGuest}>
-          PROCEED
-          <br />
-          AS GUEST
+          PROCEED AS GUEST
         </button>
       </div>
 

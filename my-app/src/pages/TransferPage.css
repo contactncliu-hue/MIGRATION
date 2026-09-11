@@ -14,7 +14,9 @@
   background:linear-gradient(to top, var(--surface-cream) 0%, var(--n-0) 45%);
 }
 
-.scene{
+/* Scoped: LoginPage also uses .scene for its backdrop images, and an
+   unscoped opacity:0 here left that screen with no artwork at all. */
+.transfer-stage .scene{
   position:absolute; left:50%; bottom:0;
   width:max(100vw, 177.7vh);
   aspect-ratio:2560/1451;
@@ -22,7 +24,7 @@
   opacity:0;
   transition:opacity 1.4s ease;
 }
-.stage-ready .scene{ opacity:1; }
+.transfer-stage.stage-ready .scene{ opacity:1; }
 
 .deco-bg{
   position:absolute; inset:0;
@@ -58,8 +60,9 @@
   z-index:20; pointer-events:none;
 }
 
+/* Sits low in the jar so the artwork inside it stays visible. */
 .transfer-btn{
-  position:absolute; left:50%; top:62%; width:26%;
+  position:absolute; left:50%; top:78%; width:17%;
   z-index:30;
   border:none; cursor:pointer; padding:0;
   background:transparent;
@@ -72,7 +75,7 @@
 .transfer-btn .btn-label{
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
-  font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
+  font-weight:800; font-size:1.05vw; letter-spacing:.06vw;
   color:var(--surface-cream-alt);
 }
 
@@ -126,7 +129,7 @@
 .status-total{ font-size:var(--fs-sm); font-weight:800; text-align:right; letter-spacing:.3px; margin-top:2px; }
 
 .status-check-btn{
-  position:absolute; left:50%; top:62%; width:16%;
+  position:absolute; left:50%; top:78%; width:14%;
   z-index:32;
   border:none; cursor:pointer; padding:0; background:transparent;
   opacity:0; pointer-events:none;
@@ -140,7 +143,7 @@
 .status-check-btn img{ width:100%; display:block; }
 .status-check-label{
   position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-weight:800; font-size:1.6vw; letter-spacing:.08vw;
+  font-weight:800; font-size:1.05vw; letter-spacing:.06vw;
   color:var(--surface-cream-alt);
   transform:translateY(-14%);
 }
@@ -238,7 +241,7 @@
 .uid-lookup-result.status-rejected{ background:var(--c-danger-bg); color:var(--c-danger); border:1px solid var(--c-danger-border); }
 
 @media (max-width:760px){
-  .scene{ width:max(100vw, 105vh); }
+  .transfer-stage .scene{ width:max(100vw, 105vh); }
 
   .status-open .header-ribbon{
     opacity:1 !important;

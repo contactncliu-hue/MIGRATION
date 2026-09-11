@@ -16,8 +16,9 @@
 
 ## 지금 한 줄
 
-토대 정리 완료 — 인증 단일화 · 디자인 토큰 69개 · 공용 컴포넌트 10개 · 타이포 위계 교정.
-색톤은 원 작업자 것을 그대로 유지. 빌드 통과, 린트 경고 2건(오탐).
+토대 + 화면 정리 완료 — 인증 단일화 · 디자인 토큰 · 공용 컴포넌트 10개 · 타이포 위계 교정 ·
+MIGRATION 버튼 26%→17%(항아리 하단) · 로그인 하단 아트워크 복구 및 확대.
+색톤은 원 작업자 것을 한 톤도 바꾸지 않았다.
 
 ## 다음 1수
 
@@ -30,8 +31,11 @@
   현재 CSS 색 하드코딩 0건 · 폰트 px 하드코딩 0건(아트워크 비례용 `vw` 제외).
 - 🔴 **페이지 CSS에 전역 셀렉터(`body`, `*`, 공용 클래스명)를 쓰지 마라.**
   Vite가 모든 CSS를 함께 번들하므로 다른 화면을 오염시킨다.
-  실제로 두 건이 있었다 — `LoginPage.css`의 `body{overflow:hidden}`(모든 화면 스크롤 잠금)과
-  `.scene{pointer-events:none}`(TransferPage의 MIGRATION 버튼 클릭 불가). 둘 다 스코프로 해결.
+  실제로 **세 건**이 있었다 —
+  ① `LoginPage.css`의 `body{overflow:hidden}` → 모든 화면 스크롤 잠금
+  ② `LoginPage.css`의 `.scene{pointer-events:none}` → TransferPage의 MIGRATION 버튼 클릭 불가
+  ③ `TransferPage.css`의 `.scene{opacity:0}` → 로그인 화면 배경 아트워크가 통째로 안 보임
+  `.scene` 은 **두 화면이 같은 클래스명을 서로 다른 용도로** 쓰고 있었다. 셋 다 스코프로 해결.
 - 권한 체크는 `useAuth()` 하나만 쓴다. 페이지에서 `supabase.auth.getUser()`를 직접 부르지 않는다.
   **클라이언트 체크는 UX 게이트일 뿐 — 실제 방어선은 RLS다.**
 - 모달은 부모가 `{open && <Modal .../>}`로 조건부 렌더한다. state 리셋 effect를 두지 않는다.
