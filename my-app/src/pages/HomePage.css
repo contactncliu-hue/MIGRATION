@@ -222,6 +222,13 @@
   text-align: right;
 }
 
+/* Mobile-only twin of .home-schedule-note (see the mobile media query for
+   its position rules) — hidden by default so desktop, which keeps the
+   note inside the card, is unaffected. */
+.home-top-note {
+  display: none;
+}
+
 .home-portal-red {
   --home-accent: var(--wing-red);
   --home-accent-deep: #9c3323;
@@ -451,6 +458,7 @@
      that button's CSS isn't in this file, so this is an estimate.
   */
   .home-top-note {
+    display: block;
     position: absolute;
     top: var(--sp-5);
     left: 0;
