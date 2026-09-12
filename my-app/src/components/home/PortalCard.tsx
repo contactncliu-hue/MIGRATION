@@ -9,12 +9,6 @@ interface PortalCardProps {
   onSelect: () => void
 }
 
-/**
- * One day of the schedule, painted on its arch artwork.
- *
- * The times live in the DOM rather than in the artwork, so the schedule can
- * be corrected without an image editor and stays readable to screen readers.
- */
 export function PortalCard({ day, position, onSelect }: PortalCardProps) {
   const isCenter = position === 'center'
 
@@ -42,15 +36,14 @@ export function PortalCard({ day, position, onSelect }: PortalCardProps) {
         <ul className="home-schedule-list">
           {day.events.map((event) => (
             <li className="home-schedule-row" key={event.key}>
-              <img className="home-schedule-icon" src={EVENT_ICONS[event.key]} alt="" />
-              <span className="home-schedule-label">{event.label}</span>
-              <span className="home-schedule-times">
+              <img className="home-schedule-icon" src={EVENT_ICONS[event.key]} alt={event.label} />
+              <div className="home-schedule-times">
                 {event.times.map((t) => (
                   <span className="home-time-pill" key={t}>
                     {t}
                   </span>
                 ))}
-              </span>
+              </div>
             </li>
           ))}
         </ul>
