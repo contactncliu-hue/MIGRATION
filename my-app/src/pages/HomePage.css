@@ -165,8 +165,6 @@
   top: 40%;
   z-index: 15;
   opacity: 0;
-  display: flex;
-  flex-direction: column;
   transition: opacity 1s ease 0.25s;
   pointer-events: none;
 }
@@ -214,15 +212,14 @@
 }
 
 .home-schedule-note {
-  order: -1;
-  margin: 0 0 var(--sp-3);
+  margin: var(--sp-3) 0 0;
   font-size: var(--fs-micro);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: var(--n-800);
   opacity: 0.7;
-  text-align: center;
+  text-align: right;
 }
 
 .home-portal-red {
@@ -347,6 +344,9 @@
     --portal-w: min(96vw, 380px);
     --portal-h: calc(var(--portal-w) / 0.7607);
     --portal-offset: calc(var(--portal-w) * 0.62);
+  }
+  .home-portal {
+    bottom: 19%;
   }
   .home-portal.is-left,
   .home-portal.is-right {
