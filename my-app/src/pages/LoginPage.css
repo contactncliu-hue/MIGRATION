@@ -17,6 +17,8 @@
   height: 100dvh;
   overflow: hidden;
   background: linear-gradient(to top, var(--surface-cream) 0%, var(--n-0) 45%);
+  /* Local geometry — not global tokens, these only mean something here. */
+  /* Height-led: the arch must fit the viewport, width follows its 1640:2156. */
   --portal-h: min(820px, 88vh);
   --portal-w: calc(var(--portal-h) * 0.7607);
   --portal-offset: calc(var(--portal-w) * 0.97);
@@ -79,6 +81,8 @@
 }
 
 /* ---------- portal card ---------- */
+/* 680:894 matches the arch artwork's own 1640:2156, so object-fit:contain
+   fills the box exactly and nothing floats below it. */
 .home-portal {
   position: absolute;
   left: 50%;
@@ -99,10 +103,10 @@
   z-index: 10;
 }
 .home-portal.is-left {
-  transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.82);
+  transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.7);
 }
 .home-portal.is-right {
-  transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.82);
+  transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.7);
 }
 
 .home-portal-arch {
@@ -115,7 +119,6 @@
   pointer-events: none;
 }
 
-/* Header art (the arch backdrop / logo scene) — centered. */
 .home-portal-header {
   position: absolute;
   left: 50%;
@@ -124,16 +127,10 @@
   max-width: 900px;
   z-index: 14;
   opacity: 0;
-  transform: translate(calc(-50% + 8px), 40px);
+  transform: translate(-49%, 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
-.home-portal.is-center .home-portal-header {
-  opacity: 1;
-  transform: translate(calc(-50% + 8px), 0);
-}
-
-/* Title art (the day-name wordmark) — nudged left. */
 .home-portal-title {
   position: absolute;
   left: 50%;
@@ -142,22 +139,51 @@
   max-width: 355px;
   z-index: 16;
   opacity: 0;
-  transform: translate(calc(-50% - 20px), 40px);
+  transform: translate(-48%, 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
-.home-portal.is-center .home-portal-title {
-  opacity: 1;
-  transform: translate(calc(-50% - 20px), 0);
-}
-
 .home-portal-header img,
 .home-portal-title img {
   width: 100%;
   display: block;
 }
+.home-portal.is-center .home-portal-header {
+  opacity: 1;
+  transform: translate(-49%, 0);
+}
+.home-portal.is-center .home-portal-title {
+  opacity: 1;
+  transform: translate(-48%, 0);
+}
+
+/* Day name on the sliver of a peeking card — turns dead colour into a label. */
+.home-portal-edge-label {
+  position: absolute;
+  top: 34%;
+  z-index: 18;
+  font-size: var(--fs-label);
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--n-800);
+  writing-mode: vertical-rl;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.home-portal.is-left .home-portal-edge-label {
+  right: 12%;
+  opacity: 0.85;
+}
+.home-portal.is-right .home-portal-edge-label {
+  left: 12%;
+  transform: rotate(180deg);
+  opacity: 0.85;
+}
 
 /* ---------- schedule inside the arch ---------- */
+/* The arch is a frame drawn around empty space; this fills it. */
 .home-schedule {
   position: absolute;
   left: 19%;
@@ -173,6 +199,29 @@
   pointer-events: auto;
 }
 
+.home-schedule-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1.5px solid rgba(68, 68, 68, 0.18);
+  margin-bottom: var(--sp-3);
+}
+.home-schedule-day {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: var(--n-900);
+  letter-spacing: 0.3px;
+}
+.home-schedule-date {
+  font-size: var(--fs-label);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--n-800);
+}
+
 .home-schedule-list {
   list-style: none;
   margin: 0;
@@ -183,15 +232,22 @@
 }
 .home-schedule-row {
   display: grid;
-  grid-template-columns: 64px 1fr;
+  grid-template-columns: 34px 1fr auto;
   align-items: center;
   gap: var(--sp-2);
 }
 .home-schedule-icon {
-  width: 64px;
-  height: 64px;
+  width: 34px;
+  height: 34px;
   object-fit: contain;
-  margin-left: 6px;
+}
+.home-schedule-label {
+  font-size: var(--fs-label);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  /* Pastel arch behind it — anything lighter than n-800 fails contrast. */
+  color: var(--n-800);
 }
 .home-schedule-times {
   display: flex;
@@ -222,6 +278,7 @@
   text-align: right;
 }
 
+/* Each day's pills pick up its own portal colour. */
 .home-portal-red {
   --home-accent: var(--wing-red);
   --home-accent-deep: #9c3323;
@@ -236,6 +293,8 @@
 }
 
 /* ---------- guest call to action ---------- */
+/* Sits above the indicator: the reason a visitor came should not be two taps
+   behind a hamburger menu. */
 .home-guest-actions {
   position: absolute;
   left: 50%;
@@ -281,17 +340,10 @@
 }
 
 @media (max-width: 760px) {
-  /* Moved from hugging the bottom edge to sitting just below the
-     relocated "server time" note near the top of the screen, and
-     narrowed instead of spanning the full width. Nudge `top` to match
-     wherever .home-top-note actually lands once it's in the markup. */
   .home-guest-actions {
-    top: calc(var(--sp-5) + 34px);
-    bottom: auto;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    width: min(64%, 260px);
+    left: var(--sp-3);
+    right: var(--sp-3);
+    transform: none;
     justify-content: center;
   }
   .home-guest-primary,
@@ -331,6 +383,14 @@
   background: var(--c-gold);
   transform: scale(1.25);
 }
+.home-dots-label {
+  margin-left: var(--sp-1);
+  font-size: var(--fs-label);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--n-800);
+}
 
 .home-fade {
   position: absolute;
@@ -348,39 +408,26 @@
   .home-stage {
     height: auto;
     min-height: 100dvh;
-    --portal-w: min(96vw, 380px);
+    /* Width-led on a phone: the arch must fit across, and its height follows
+       the artwork's own 1640:2156. */
+    --portal-w: min(86vw, 330px);
     --portal-h: calc(var(--portal-w) / 0.7607);
     --portal-offset: calc(var(--portal-w) * 0.62);
   }
+  /* Lifted off the bottom edge so the card sits in the middle of the screen
+     instead of hugging the fold, and clear of the guest actions below. */
   .home-portal {
     bottom: 19%;
-  }
-  /* Only the selected card magnetizes to the very bottom of the screen —
-     the two side cards keep resting at 19% like before. */
-  .home-portal.is-center {
-    bottom: 0;
   }
   .home-portal.is-left,
   .home-portal.is-right {
     transform-origin: top center;
   }
   .home-portal.is-left {
-    transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.85);
+    transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.8);
   }
   .home-portal.is-right {
-    transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.85);
-  }
-  .home-portal.is-left::after,
-  .home-portal.is-right::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 30%;
-    background: linear-gradient(to bottom, transparent 0%, var(--surface-cream) 90%);
-    pointer-events: none;
-    z-index: 12;
+    transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.8);
   }
   .home-arrow {
     width: var(--ctl-h-touch);
@@ -390,87 +437,39 @@
     transform: none;
     color: var(--c-primary);
   }
-
-  /* Center (selected) portal only: the arch backdrop and title art were
-     inheriting the desktop's left-nudged offsets, which is why the
-     selected card looked off-center on mobile while the two side cards
-     (which don't render this content) looked fine. Re-center both here
-     and give the title its own small rightward nudge instead of the
-     desktop's -20px left nudge. */
-  .home-portal-header {
-    top: -4%;
-    width: 172%;
-    transform: translate(-50%, 40px);
+  .home-arrow-prev {
+    left: var(--sp-2);
   }
-  .home-portal.is-center .home-portal-header {
-    transform: translate(-50%, 0);
+  .home-arrow-next {
+    right: var(--sp-2);
   }
-  .home-portal-title {
-    left: 50%;
-    transform: translate(calc(-50% + 8px), 40px);
-  }
-  .home-portal.is-center .home-portal-title {
-    transform: translate(calc(-50% + 8px), 0);
-  }
-
   .home-schedule {
     left: 14%;
     right: 14%;
-    top: 48%;
-    display: flex;
-    flex-direction: column;
+    top: 34%;
   }
   .home-schedule-row {
-    grid-template-columns: 48px 1fr;
+    grid-template-columns: 26px 1fr auto;
   }
   .home-schedule-icon {
-    width: 48px;
-    height: 48px;
-    margin-left: 4px;
+    width: 26px;
+    height: 26px;
   }
   .home-time-pill {
     min-width: 50px;
   }
-
-  /* This element now lives outside the card (see .home-top-note below),
-     so hide the old in-card copy instead of just re-ordering it. */
-  .home-schedule-note {
+  .home-portal-edge-label {
     display: none;
-  }
-
-  /* "Server time · subject to change", relocated to the top of the
-     screen, level with the sidebar/hamburger button. IMPORTANT: this
-     only works if the note's markup is moved out from under
-     .home-portal — that ancestor has a `transform`, which traps any
-     absolutely-positioned descendant and drags it around with the
-     slide/scale animation. Move it to be a sibling of
-     .home-guest-actions / .home-dots (a direct child of .home-stage or
-     .home-carousel) and swap its class from .home-schedule-note to
-     .home-top-note. Nudge `top` to match your sidebar button exactly —
-     that button's CSS isn't in this file, so this is an estimate.
-  */
-  .home-top-note {
-    position: absolute;
-    top: var(--sp-5);
-    left: 0;
-    right: 0;
-    z-index: 48;
-    text-align: center;
-    font-size: var(--fs-micro);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--n-800);
-    opacity: 0.7;
-    pointer-events: none;
   }
 }
 
+/* Long eases are the whole character of this screen — but not for everyone. */
 @media (prefers-reduced-motion: reduce) {
   .home-portal,
   .home-portal-title,
   .home-portal-header,
-  .home-schedule {
+  .home-schedule,
+  .home-portal-edge-label {
     transition-duration: 0.01ms;
   }
 }
