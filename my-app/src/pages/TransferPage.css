@@ -72,6 +72,23 @@
   color:var(--surface-cream-alt);
 }
 
+/* Same per-language display-font swap the sidebar uses (see Sidebar.css) —
+   hooked to the shared [data-lang] attribute on <html>, scoped to just
+   these two button labels. Forms (.submit-btn, Field, etc.) intentionally
+   left out, as asked. */
+[data-lang='ko'] .transfer-btn .btn-label,
+[data-lang='ko'] .status-check-label{
+  font-family: 'KERISKEDU', var(--font-ui);
+}
+[data-lang='vi'] .transfer-btn .btn-label,
+[data-lang='vi'] .status-check-label{
+  font-family: 'StreetSignSans', var(--font-ui);
+}
+[data-lang='zh-CN'] .transfer-btn .btn-label,
+[data-lang='zh-CN'] .status-check-label{
+  font-family: 'SentyWatermelon', var(--font-ui);
+}
+
 .status-open .header-ribbon,
 .status-open .transfer-btn{
   opacity:0 !important;
