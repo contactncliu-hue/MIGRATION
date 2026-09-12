@@ -8,57 +8,14 @@ export interface WingRow {
   count: number
 }
 
-// TODO: the Blue link supplied was identical to Purple's (same filename,
-// same token) — almost certainly a copy/paste slip. Swap in the real Blue
-// asset URL here once you have it; everything else about the row will
-// keep working unchanged.
 const WING_ICONS: Record<WingColor, string> = {
   RED: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7770.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzAucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg2OCwiZXhwIjoxODIwMzA5ODY4fQ.jgYM18S1iupAzLHn1UCdOcVjHO1lxZiI6iAtRonVyLdp4-OODXY9Rov7ARaeH_g-CE-wXgaDMNPU0sgOwmOTVA',
   ORANGE: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7771.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzEucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3Mzg4OSwiZXhwIjoxODIwMzA5ODg5fQ.emdybSoepVaHA0AEFKPX4QmfQzEuWzJTjKvqIMIFEgBuZlHMqZIR9FZ5nFYvLeUBPV_qtiUcIogyNkG4xvVkZw',
   PURPLE: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ',
-  BLUE: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7772.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzIucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc3MzkxMCwiZXhwIjoxODIwMzA5OTEwfQ.OaTGQLieD6dNqdyWw08E6Qt9iN1jX9FVOjCGP3uK4SVpLRmqGj5QealsdDuWQs7z_THagYgriNgtCyZLVPkgFQ',
+  BLUE: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7773.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzMucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTI1NTg3MywiZXhwIjoxODIwNzkxODczfQ.u3V-_ced-1XdvSTO_cjvKJgCp9XfsCNDf6qVuJfpfslhL1SRY0PPbkyDPa-GsjhK8kSg2f5N4BTzyIeFKLG9yg',
 }
 
-/**
- * TEMPORARY DIAGNOSTIC — not the real icon markup.
- *
- * Wraps the icon in a visible dashed box (so a 0x0-sized or invisible
- * element still shows up on screen) and swaps to a bright red "ERR" box
- * if the image itself fails to load. Once we know which case we're in,
- * this should be replaced with a plain <img className="status-row-icon">
- * again.
- */
-function WingIcon({ src, wingKey }: { src: string; wingKey: string }) {
-  const [failed, setFailed] = useState(false)
 
-  return (
-    <div
-      style={{
-        width: 36,
-        height: 36,
-        flexShrink: 0,
-        border: '2px dashed magenta',
-        boxSizing: 'border-box',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: failed ? '#e11d48' : 'transparent',
-      }}
-    >
-      {failed ? (
-        <span style={{ color: '#fff', fontSize: 8, fontWeight: 800 }}>ERR</span>
-      ) : (
-        <img
-          className="status-row-icon"
-          src={src}
-          alt={wingKey}
-          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-          onError={() => setFailed(true)}
-        />
-      )}
-    </div>
-  )
-}
 
 /**
  * Slide-out card showing how full each wing is.
@@ -137,7 +94,12 @@ export function WingStatusCard({ open, onToggle, onClose }: {
 
           return (
             <div className="status-row" key={row.key}>
-              <WingIcon src={WING_ICONS[row.key]} wingKey={row.key} />
+              <img
+                className="status-row-icon"
+                src={WING_ICONS[row.key]}
+                alt=""
+                style={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }}
+              />
               <div className="status-row-body">
                 <div className="status-row-top">
                   <span className="status-row-name">{disp.label}</span>
