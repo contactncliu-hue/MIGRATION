@@ -291,7 +291,7 @@
     left: 50%;
     right: auto;
     transform: translateX(-50%);
-    width: min(64%, 260px);
+    width: min(48%, 220px);
     justify-content: center;
   }
   .home-guest-primary,
@@ -398,8 +398,8 @@
      and give the title its own small rightward nudge instead of the
      desktop's -20px left nudge. */
   .home-portal-header {
-    top: -4%;
-    width: 172%;
+    top: -2%;
+    width: 108%;
     transform: translate(-50%, 40px);
   }
   .home-portal.is-center .home-portal-header {
@@ -407,16 +407,16 @@
   }
   .home-portal-title {
     left: 50%;
-    transform: translate(calc(-50% + 8px), 40px);
+    transform: translate(-50%, 40px);
   }
   .home-portal.is-center .home-portal-title {
-    transform: translate(calc(-50% + 8px), 0);
+    transform: translate(-50%, 0);
   }
 
   .home-schedule {
     left: 14%;
     right: 14%;
-    top: 48%;
+    top: 40%;
     display: flex;
     flex-direction: column;
   }
