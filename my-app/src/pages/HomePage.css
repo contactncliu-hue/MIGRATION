@@ -281,10 +281,17 @@
 }
 
 @media (max-width: 760px) {
+  /* Moved from hugging the bottom edge to sitting just below the
+     relocated "server time" note near the top of the screen, and
+     narrowed instead of spanning the full width. Nudge `top` to match
+     wherever .home-top-note actually lands once it's in the markup. */
   .home-guest-actions {
-    left: var(--sp-3);
-    right: var(--sp-3);
-    transform: none;
+    top: calc(var(--sp-5) + 34px);
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(64%, 260px);
     justify-content: center;
   }
   .home-guest-primary,
@@ -348,6 +355,11 @@
   .home-portal {
     bottom: 19%;
   }
+  /* Only the selected card magnetizes to the very bottom of the screen —
+     the two side cards keep resting at 19% like before. */
+  .home-portal.is-center {
+    bottom: 0;
+  }
   .home-portal.is-left,
   .home-portal.is-right {
     transform-origin: top center;
@@ -404,7 +416,7 @@
   .home-schedule {
     left: 14%;
     right: 14%;
-    top: 42%;
+    top: 48%;
     display: flex;
     flex-direction: column;
   }
@@ -420,12 +432,37 @@
     min-width: 50px;
   }
 
-  /* "Server time · subject to change" moves above the schedule list
-     instead of trailing below it. */
+  /* This element now lives outside the card (see .home-top-note below),
+     so hide the old in-card copy instead of just re-ordering it. */
   .home-schedule-note {
-    order: -1;
-    margin: 0 0 var(--sp-3);
+    display: none;
+  }
+
+  /* "Server time · subject to change", relocated to the top of the
+     screen, level with the sidebar/hamburger button. IMPORTANT: this
+     only works if the note's markup is moved out from under
+     .home-portal — that ancestor has a `transform`, which traps any
+     absolutely-positioned descendant and drags it around with the
+     slide/scale animation. Move it to be a sibling of
+     .home-guest-actions / .home-dots (a direct child of .home-stage or
+     .home-carousel) and swap its class from .home-schedule-note to
+     .home-top-note. Nudge `top` to match your sidebar button exactly —
+     that button's CSS isn't in this file, so this is an estimate.
+  */
+  .home-top-note {
+    position: absolute;
+    top: var(--sp-5);
+    left: 0;
+    right: 0;
+    z-index: 48;
     text-align: center;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--n-800);
+    opacity: 0.7;
+    pointer-events: none;
   }
 }
 
