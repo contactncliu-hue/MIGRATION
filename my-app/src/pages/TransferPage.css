@@ -68,6 +68,7 @@
 .transfer-btn .btn-label{
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-game);
   font-weight:800; font-size:1.05vw; letter-spacing:.06vw;
   color:var(--surface-cream-alt);
 }
@@ -153,6 +154,7 @@
 .status-check-btn img{ width:100%; display:block; }
 .status-check-label{
   position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-game);
   font-weight:800; font-size:1.05vw; letter-spacing:.06vw;
   color:var(--surface-cream-alt);
   transform:translateY(-14%);
