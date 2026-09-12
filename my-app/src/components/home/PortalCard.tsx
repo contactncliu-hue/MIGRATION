@@ -40,9 +40,6 @@ export function PortalCard({ day, position, today, onSelect }: PortalCardProps) 
         <img src={`/assets/title-${day.color}.PNG`} alt="" loading={isCenter ? 'eager' : 'lazy'} />
       </div>
 
-      {/* Peeking cards show only their day name, turned to read vertically. */}
-      <span className="home-portal-edge-label">{label}</span>
-
       <div className="home-schedule">
         <div className="home-schedule-head">
           <span className="home-schedule-day">{label}</span>
