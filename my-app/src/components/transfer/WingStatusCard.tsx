@@ -20,6 +20,47 @@ const WING_ICONS: Record<WingColor, string> = {
 }
 
 /**
+ * TEMPORARY DIAGNOSTIC — not the real icon markup.
+ *
+ * Wraps the icon in a visible dashed box (so a 0x0-sized or invisible
+ * element still shows up on screen) and swaps to a bright red "ERR" box
+ * if the image itself fails to load. Once we know which case we're in,
+ * this should be replaced with a plain <img className="status-row-icon">
+ * again.
+ */
+function WingIcon({ src, wingKey }: { src: string; wingKey: string }) {
+  const [failed, setFailed] = useState(false)
+
+  return (
+    <div
+      style={{
+        width: 36,
+        height: 36,
+        flexShrink: 0,
+        border: '2px dashed magenta',
+        boxSizing: 'border-box',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: failed ? '#e11d48' : 'transparent',
+      }}
+    >
+      {failed ? (
+        <span style={{ color: '#fff', fontSize: 8, fontWeight: 800 }}>ERR</span>
+      ) : (
+        <img
+          className="status-row-icon"
+          src={src}
+          alt={wingKey}
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          onError={() => setFailed(true)}
+        />
+      )}
+    </div>
+  )
+}
+
+/**
  * Slide-out card showing how full each wing is.
  *
  * A row's count is the number of approved members, unless an admin has pinned
@@ -96,7 +137,7 @@ export function WingStatusCard({ open, onToggle, onClose }: {
 
           return (
             <div className="status-row" key={row.key}>
-              <img className="status-row-icon" src={WING_ICONS[row.key]} alt="" />
+              <WingIcon src={WING_ICONS[row.key]} wingKey={row.key} />
               <div className="status-row-body">
                 <div className="status-row-top">
                   <span className="status-row-name">{disp.label}</span>
