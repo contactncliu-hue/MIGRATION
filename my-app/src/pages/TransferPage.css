@@ -1,4 +1,3 @@
-
 /* ================= MAIN / HERO STAGE ================= */
 .transfer-stage{
   position:relative;
@@ -157,7 +156,7 @@
   font-family:var(--font-game);
   font-weight:800; font-size:1.05vw; letter-spacing:.06vw;
   color:var(--surface-cream-alt);
-  transform:translateY(-14%);
+  transform:translateY(-6%);
 }
 
 /* ---------- Press animation on all action buttons ---------- */
@@ -290,27 +289,27 @@
   }
 
   .status-card{
-    position:absolute; left:-58%; width:78%; top:13%; bottom:auto;
+    position:absolute; left:-65%; width:88%; top:13%; bottom:auto;
     opacity:1;
     transform:scale(.9);
     transform-origin:left center;
     transition:left .5s cubic-bezier(.22,.68,0,1.01), transform .5s cubic-bezier(.22,.68,0,1.01);
   }
   .status-open .status-card{
-    left:11%; width:78%; max-width:none; top:13%; bottom:auto;
-    transform:scale(1.02);
+    left:6%; width:88%; max-width:none; top:13%; bottom:auto;
+    transform:scale(1.08);
     transform-origin:center center;
   }
   .status-card-close{ display:none; }
-  .status-row-name, .status-percent{ font-size:8px; }
+  .status-row-name, .status-percent{ font-size:9px; }
 
   .status-rows{ left:18%; right:18%; top:11%; bottom:10%; gap:1px; }
   .status-row{ gap:5px; align-items:center; }
-  .status-row-icon{ width:16px !important; height:16px !important; align-self:center; }
+  .status-row-icon{ width:18px !important; height:18px !important; align-self:center; }
   .status-row-top{ margin-bottom:1px; }
-  .status-bar-track{ height:5px; }
+  .status-bar-track{ height:6px; }
 
   /* Fifth line added below the four wing rows — kept small so it doesn't
      push the card past the button sitting underneath it. */
-  .status-total{ font-size:7px; margin-top:0; }
+  .status-total{ font-size:8px; margin-top:0; }
 }
