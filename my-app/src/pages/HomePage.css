@@ -378,16 +378,35 @@
     transform: none;
     color: var(--c-primary);
   }
-  .home-arrow-prev {
-    left: var(--sp-2);
+
+  /* Center (selected) portal only: the arch backdrop and title art were
+     inheriting the desktop's left-nudged offsets, which is why the
+     selected card looked off-center on mobile while the two side cards
+     (which don't render this content) looked fine. Re-center both here
+     and give the title its own small rightward nudge instead of the
+     desktop's -20px left nudge. */
+  .home-portal-header {
+    top: -4%;
+    width: 172%;
+    transform: translate(-50%, 40px);
   }
-  .home-arrow-next {
-    right: var(--sp-2);
+  .home-portal.is-center .home-portal-header {
+    transform: translate(-50%, 0);
   }
+  .home-portal-title {
+    left: 50%;
+    transform: translate(calc(-50% + 8px), 40px);
+  }
+  .home-portal.is-center .home-portal-title {
+    transform: translate(calc(-50% + 8px), 0);
+  }
+
   .home-schedule {
     left: 14%;
     right: 14%;
     top: 42%;
+    display: flex;
+    flex-direction: column;
   }
   .home-schedule-row {
     grid-template-columns: 48px 1fr;
@@ -399,6 +418,14 @@
   }
   .home-time-pill {
     min-width: 50px;
+  }
+
+  /* "Server time · subject to change" moves above the schedule list
+     instead of trailing below it. */
+  .home-schedule-note {
+    order: -1;
+    margin: 0 0 var(--sp-3);
+    text-align: center;
   }
 }
 
