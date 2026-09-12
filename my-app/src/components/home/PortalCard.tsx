@@ -1,4 +1,4 @@
-import { EVENT_ICONS, dayDate, dayLabel, type ScheduleDay } from '../../lib/schedule'
+import { EVENT_ICONS, type ScheduleDay } from '../../lib/schedule'
 
 type Position = 'center' | 'left' | 'right'
 
@@ -15,15 +15,13 @@ interface PortalCardProps {
  * The times live in the DOM rather than in the artwork, so the schedule can
  * be corrected without an image editor and stays readable to screen readers.
  */
-export function PortalCard({ day, position, today, onSelect }: PortalCardProps) {
+export function PortalCard({ day, position, onSelect }: PortalCardProps) {
   const isCenter = position === 'center'
-  const label = dayLabel(day.offset)
 
   return (
     <div
       className={`home-portal home-portal-${day.color} is-${position}`}
       role="tabpanel"
-      aria-label={label}
       aria-hidden={!isCenter}
       onClick={isCenter ? undefined : onSelect}
     >
@@ -41,11 +39,6 @@ export function PortalCard({ day, position, today, onSelect }: PortalCardProps) 
       </div>
 
       <div className="home-schedule">
-        <div className="home-schedule-head">
-          <span className="home-schedule-day">{label}</span>
-          <span className="home-schedule-date">{dayDate(day.offset, today)}</span>
-        </div>
-
         <ul className="home-schedule-list">
           {day.events.map((event) => (
             <li className="home-schedule-row" key={event.key}>
