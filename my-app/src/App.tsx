@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { RequireAdmin } from './components/RequireAdmin'
-import { AuthProvider } from './lib/auth-context'
+import { AuthProvider } from './lib/auth'
 import { HomePage } from './pages/HomePage'
 import { TransferPage } from './pages/TransferPage'
 import { LoginPage } from './pages/LoginPage'
