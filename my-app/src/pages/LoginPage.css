@@ -1,422 +1,476 @@
+/**
+ * Home — a three-up cover flow over the next three days of server events.
+ *
+ * Geometry and easing are carried over from the original vanilla build so the
+ * motion feels identical. Two deliberate departures:
+ *   · every class is `.home-` prefixed — the original reused .scene/.carousel
+ *     names that other screens already own, which is what caused three
+ *     cross-screen bugs (see .tasks/resume.md rulebook)
+ *   · nothing is position:fixed — Layout drives .main-content with an inline
+ *     margin-left, so fixed children would drift when the sidebar toggles
+ */
 
-.stage {
+.home-stage {
   position: relative;
   width: 100%;
-  margin: 0 auto;
-  max-width: 900px;
   height: 100vh;
   height: 100dvh;
-  height: calc(var(--app-height, 100dvh));
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(to top, var(--surface-cream) 0%, var(--n-0) 45%);
+  --portal-h: min(820px, 88vh);
+  --portal-w: calc(var(--portal-h) * 0.7607);
+  --portal-offset: calc(var(--portal-w) * 0.97);
 }
 
-/* ---------- INTRO (logo + flames + ring) ---------- */
-.intro {
-  position: relative;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  /* No flex gap — each step sets its own, so the CTA and the guest link
-     read as one block instead of three evenly spaced items. */
-  gap: 0;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.intro.hidden {
-  opacity: 0;
-  transform: scale(0.94);
-  pointer-events: none;
-}
-
-.logo-wrap {
-  position: relative;
-  width: 460px;
-  height: 320px;
-  margin-top: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.logo-img {
-  position: relative;
-  z-index: 5;
-  width: 380px;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.08));
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.stage.launching .logo-img {
-  animation: logoPulse 1s ease-in-out 1;
-}
-
-@keyframes logoPulse {
-  0%   { transform: scale(1); }
-  35%  { transform: scale(1.1); }
-  60%  { transform: scale(0.98); }
-  100% { transform: scale(1); }
-}
-
-.ring-img {
+/* ---------- corner scenery ---------- */
+.home-scene {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  width: min(640px, 92vw);
-  opacity: 0.55;
-  transform: translate(-50%, -50%) rotate(0deg);
-  transform-origin: center center;
-  transition: opacity 0.6s ease;
-  pointer-events: none;
-  animation: ringSpin 11s linear infinite, ringPulse 2.6s ease-in-out infinite;
-}
-
-@keyframes ringSpin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes ringPulse {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 1; }
-}
-
-.shark-sprite {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 3;
-  width: 155%;
-  max-width: 620px;
-  height: auto;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.10));
-  transition: opacity 0.2s ease, transform 0.16s ease-out;
-}
-
-.stage.shark-active .shark-sprite {
-  opacity: 1;
-}
-
-.stage.chomp .shark-sprite {
-  z-index: 6;
-}
-
-.shark-sprite.frame-2 {
-  transform: translate(-50%, -57%) scale(1.1);
-}
-
-.shark-sprite.frame-3 {
-  transform: translate(-50%, -64%) scale(1.2);
-}
-
-/* Scoped to the login stage: TransferPage has its own .scene wrapper that
-   holds real buttons, and an unscoped pointer-events:none killed them. */
-.stage .scene {
-  position: fixed;
   bottom: 0;
-  z-index: 0;
+  z-index: 2;
+  width: 42vw;
+  max-width: 600px;
   height: auto;
   pointer-events: none;
 }
-
-.stage .scene-left {
+.home-scene-left {
   left: 0;
-  width: 42vw;
-  max-width: 600px;
 }
-
-.stage .scene-right {
+.home-scene-right {
   right: 0;
-  width: 42vw;
-  max-width: 600px;
 }
 
-/* Identity line under the wordmark. */
-.login-tagline {
-  position: relative;
-  z-index: 5;
-  margin: calc(var(--sp-1) * -1) 0 0;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-size: var(--fs-label);
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--n-700);
-  white-space: nowrap;
+/* ---------- carousel ---------- */
+.home-carousel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
 }
 
-.login-tagline span {
-  opacity: 0.65;
-}
-
-.login-tagline b {
-  font-family: var(--font-game);
-  font-size: var(--fs-lg);
-  font-weight: 400;
-  letter-spacing: 1px;
+.home-arrow {
+  position: absolute;
+  top: 62%;
+  transform: translateY(-50%);
+  z-index: 45;
+  width: var(--ctl-h-lg);
+  height: var(--ctl-h-lg);
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--n-800);
+  font-size: 26px;
+  font-weight: 700;
   line-height: 1;
-  color: var(--c-gold);
-}
-
-.btn-flame-wrap {
-  position: relative;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: var(--sp-5);
-  margin-bottom: var(--sp-2);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.home-arrow:hover {
+  background: var(--c-veil-hover);
+  color: var(--n-900);
+}
+.home-arrow-prev {
+  left: var(--sp-5);
+}
+.home-arrow-next {
+  right: var(--sp-5);
 }
 
-.flame {
-  position: fixed;
-  top: 60vh;
-  top: 60dvh;
-  top: calc(var(--app-height, 100dvh) * 0.6);
-  z-index: 1;
-  width: 60vw;
-  min-width: 380px;
-  max-width: 840px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1.1s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.flame-left {
-  left: 0;
-  width: 82vw;
-  max-width: 1140px;
-  transform: translate(-132%, -50%) rotate(-3deg);
-}
-
-.flame-right {
-  right: 0;
-  transform: translate(103%, -50%) rotate(-3deg);
-}
-
-.stage.launching .flame-left {
-  opacity: 1;
-  transform: translate(-42%, -44%) rotate(-3deg);
-}
-
-.stage.launching .flame-right {
-  opacity: 1;
-  transform: translate(23%, -44%) rotate(-3deg);
-}
-
-.stage.fading .flame,
-.stage.fading .shark-sprite,
-.stage.fading .ring-img {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-/* ---------- Buttons ---------- */
-.btn-login {
-  position: relative;
-  z-index: 5;
-  background: var(--wing-orange);
-  color: var(--n-0);
-  border: none;
-  border-radius: var(--r-md);
-  padding: 13px 44px;
-  font-weight: 800;
-  font-size: var(--fs-base);
-  letter-spacing: 0.6px;
+/* ---------- portal card ---------- */
+.home-portal {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: var(--portal-w);
+  height: var(--portal-h);
+  transition: transform 1.1s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 0.9s ease;
   cursor: pointer;
-  box-shadow: 0 4px 0 var(--c-gold);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-
-.btn-login:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 var(--c-gold);
-}
-
-.btn-login:disabled {
-  opacity: 0.6;
+.home-portal.is-center {
+  transform: translateX(-50%) scale(1);
+  z-index: 20;
   cursor: default;
 }
-
-/* Secondary path under the gold CTA — the old link blue was the one
-   cold colour on a cream-and-gold screen and read as a stray hyperlink. */
-.guest-link {
-  position: relative;
-  z-index: 5;
-  background: none;
-  border: none;
-  color: var(--c-gold);
-  font-weight: 800;
-  font-size: var(--fs-label);
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  text-align: center;
-  line-height: 1.4;
-  padding: var(--sp-2) var(--sp-3);
-  cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 0.15s ease, color 0.15s ease;
+.home-portal.is-left,
+.home-portal.is-right {
+  transform-origin: bottom center;
+  z-index: 10;
+}
+.home-portal.is-left {
+  transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.82);
+}
+.home-portal.is-right {
+  transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.82);
 }
 
-.guest-link:hover {
-  opacity: 1;
-  color: var(--c-gold-deep);
-}
-
-/* ---------- LOGIN FORM ---------- */
-/* A card, not floating text — the form sits on artwork and needs its own
-   surface to stay readable and to read as a single object. */
-.login-form {
+.home-portal-arch {
   position: absolute;
-  width: 360px;
-  max-width: calc(100vw - var(--sp-6));
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--sp-3);
-  padding: var(--sp-5);
-  background: var(--n-0);
-  border: 1px solid var(--n-200);
-  border-radius: var(--r-lg);
-  box-shadow: 0 18px 50px rgba(20, 20, 30, 0.10), 0 2px 6px rgba(20, 20, 30, 0.04);
-  opacity: 0;
-  transform: translateY(14px);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
   pointer-events: none;
-  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-.login-form.visible {
+/* Header art (the arch backdrop / logo scene) — centered. */
+.home-portal-header {
+  position: absolute;
+  left: 50%;
+  top: -6%;
+  width: 155%;
+  max-width: 900px;
+  z-index: 14;
+  opacity: 0;
+  transform: translate(calc(-50% + 8px), 40px);
+  transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
+  pointer-events: none;
+}
+.home-portal.is-center .home-portal-header {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(calc(-50% + 8px), 0);
+}
+
+/* Title art (the day-name wordmark) — nudged left. */
+.home-portal-title {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 57%;
+  max-width: 355px;
+  z-index: 16;
+  opacity: 0;
+  transform: translate(calc(-50% - 20px), 40px);
+  transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
+  pointer-events: none;
+}
+.home-portal.is-center .home-portal-title {
+  opacity: 1;
+  transform: translate(calc(-50% - 20px), 0);
+}
+
+.home-portal-header img,
+.home-portal-title img {
+  width: 100%;
+  display: block;
+}
+
+/* ---------- schedule inside the arch ---------- */
+.home-schedule {
+  position: absolute;
+  left: 19%;
+  right: 19%;
+  top: 40%;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 1s ease 0.25s;
+  pointer-events: none;
+}
+.home-portal.is-center .home-schedule {
+  opacity: 1;
   pointer-events: auto;
 }
 
-.login-form img.form-logo {
-  width: 132px;
-  align-self: center;
-  margin-bottom: calc(var(--sp-1) * -1);
+.home-schedule-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.home-schedule-row {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.home-schedule-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-left: 6px;
+}
+.home-schedule-times {
+  display: flex;
+  gap: var(--sp-1);
 }
 
-.login-form h1 {
-  margin: 0 0 var(--sp-2);
-  font-size: var(--fs-lg);
-  font-weight: 800;
-  color: var(--n-900);
-  text-align: center;
-}
-
-/* Separates the identity block (logo + greeting) from the inputs. */
-.login-form h1::after {
-  content: '';
-  display: block;
-  width: 32px;
-  height: 2px;
-  margin: var(--sp-3) auto 0;
+.home-time-pill {
+  min-width: 58px;
+  padding: 3px var(--sp-2);
   border-radius: var(--r-pill);
-  background: var(--wing-orange);
-}
-
-/* Login-only variations on the shared form primitives (see ui/forms.css). */
-.login-form .field {
-  width: 100%;
-}
-
-.login-form .form-error,
-.login-form .form-success {
-  width: 100%;
-  margin-bottom: 0;
-}
-
-/* Server errors are raw strings — keep line breaks readable. */
-.login-form .form-error {
-  white-space: pre-wrap;
-  font-family: monospace;
-}
-
-/* The login CTA sits on artwork, so it carries a raised plate. */
-.login-form .submit-btn {
-  box-shadow: 0 5px 0 var(--c-gold);
-}
-
-.login-form .submit-btn:active {
-  box-shadow: 0 2px 0 var(--c-gold);
-}
-
-.login-form .submit-btn {
-  margin-top: var(--sp-1);
-}
-
-.back-link {
-  align-self: center;
-  background: none;
-  border: none;
-  color: var(--n-500);
+  text-align: center;
   font-size: var(--fs-sm);
-  font-weight: 600;
-  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: var(--n-0);
+  background: var(--home-accent);
+  box-shadow: 0 2px 0 var(--home-accent-deep);
 }
 
-.back-link:hover { color: var(--n-700); }
+.home-schedule-note {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--n-800);
+  opacity: 0.7;
+  text-align: right;
+}
 
-.load-error {
-  display: none;
+.home-portal-red {
+  --home-accent: var(--wing-red);
+  --home-accent-deep: #9c3323;
+}
+.home-portal-purple {
+  --home-accent: var(--wing-purple);
+  --home-accent-deep: #6d43c8;
+}
+.home-portal-green {
+  --home-accent: var(--c-success);
+  --home-accent-deep: #1f6b2d;
+}
+
+/* ---------- guest call to action ---------- */
+.home-guest-actions {
   position: absolute;
-  top: 24px;
   left: 50%;
+  bottom: calc(5% + 46px);
   transform: translateX(-50%);
-  width: 90%;
-  max-width: 480px;
-  background: var(--c-danger-bg);
-  color: var(--c-danger);
-  border: 1px solid var(--c-danger-border);
-  border-radius: var(--r-sm);
-  padding: var(--sp-3) var(--sp-4);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  font-family: monospace;
-  white-space: pre-wrap;
-  z-index: 20;
+  z-index: 47;
+  display: flex;
+  gap: var(--sp-2);
+  white-space: nowrap;
 }
 
-.load-error.visible { display: block; }
+.home-guest-primary,
+.home-guest-secondary {
+  height: var(--ctl-h-md);
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.home-guest-primary:active,
+.home-guest-secondary:active {
+  transform: scale(0.97);
+}
 
-@media (max-width: 480px) {
-  /* Optical centring: the landscape art holds the bottom, so a block sitting
-     at the exact middle reads as sagging. */
-  .stage {
-    padding-bottom: 14vh;
+.home-guest-primary {
+  border: none;
+  background: var(--wing-orange);
+  color: var(--n-0);
+  box-shadow: 0 3px 0 var(--c-gold);
+}
+
+.home-guest-secondary {
+  border: 1.5px solid var(--n-300);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--n-800);
+}
+.home-guest-secondary:hover {
+  border-color: var(--c-gold);
+  color: var(--c-gold-deep);
+}
+
+@media (max-width: 760px) {
+  /* Moved from hugging the bottom edge to sitting just below the
+     relocated "server time" note near the top of the screen, and
+     narrowed instead of spanning the full width. Nudge `top` to match
+     wherever .home-top-note actually lands once it's in the markup. */
+  .home-guest-actions {
+    top: calc(var(--sp-5) + 34px);
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(64%, 260px);
+    justify-content: center;
   }
+  .home-guest-primary,
+  .home-guest-secondary {
+    flex: 1 1 0;
+    padding: 0 var(--sp-2);
+    font-size: var(--fs-label);
+  }
+}
 
-  .logo-wrap { width: 320px; height: 220px; margin-top: 0; }
-  .logo-img { width: 260px; }
-  .ring-img { width: 92vw; }
-  .shark-sprite { max-width: 420px; }
-  .flame { width: 72vw; min-width: 260px; max-width: 460px; top: 60vh; top: 60dvh; top: calc(var(--app-height, 100dvh) * 0.6); }
-  .scene-left,
-  .scene-right { width: 62vw; max-width: 340px; }
-  .scene-left {
-    left: -2vw;
+/* ---------- indicator ---------- */
+.home-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 5%;
+  transform: translateX(-50%);
+  z-index: 46;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 10px rgba(20, 20, 30, 0.08);
+}
+.home-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--n-500);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.home-dot.is-active {
+  background: var(--c-gold);
+  transform: scale(1.25);
+}
+
+.home-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 9%;
+  z-index: 25;
+  pointer-events: none;
+  background: var(--grad-bottom-fade);
+}
+
+/* ---------- narrow screens ---------- */
+@media (max-width: 760px) {
+  .home-stage {
+    height: auto;
+    min-height: 100dvh;
+    --portal-w: min(96vw, 380px);
+    --portal-h: calc(var(--portal-w) / 0.7607);
+    --portal-offset: calc(var(--portal-w) * 0.62);
+  }
+  .home-portal {
+    bottom: 19%;
+  }
+  /* Only the selected card magnetizes to the very bottom of the screen —
+     the two side cards keep resting at 19% like before. */
+  .home-portal.is-center {
     bottom: 0;
   }
-  .scene-right {
-    width: 70vw;
-    max-width: 360px;
-    transform: translateY(-8%);
+  .home-portal.is-left,
+  .home-portal.is-right {
+    transform-origin: top center;
   }
-  .flame-left { width: 92vw; max-width: 600px; transform: translate(-132%, -50%) rotate(-3deg); }
-  .stage.launching .flame-left { transform: translate(-42%, -44%) rotate(-3deg); }
-  .stage.launching .flame-right { transform: translate(23%, -44%) rotate(-3deg); }
-  .login-form { width: 88%; }
+  .home-portal.is-left {
+    transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.85);
+  }
+  .home-portal.is-right {
+    transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.85);
+  }
+  .home-portal.is-left::after,
+  .home-portal.is-right::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 30%;
+    background: linear-gradient(to bottom, transparent 0%, var(--surface-cream) 90%);
+    pointer-events: none;
+    z-index: 12;
+  }
+  .home-arrow {
+    width: var(--ctl-h-touch);
+    height: var(--ctl-h-touch);
+    top: auto;
+    bottom: 76px;
+    transform: none;
+    color: var(--c-primary);
+  }
+
+  /* Center (selected) portal only: the arch backdrop and title art were
+     inheriting the desktop's left-nudged offsets, which is why the
+     selected card looked off-center on mobile while the two side cards
+     (which don't render this content) looked fine. Re-center both here
+     and give the title its own small rightward nudge instead of the
+     desktop's -20px left nudge. */
+  .home-portal-header {
+    top: -4%;
+    width: 172%;
+    transform: translate(-50%, 40px);
+  }
+  .home-portal.is-center .home-portal-header {
+    transform: translate(-50%, 0);
+  }
+  .home-portal-title {
+    left: 50%;
+    transform: translate(calc(-50% + 8px), 40px);
+  }
+  .home-portal.is-center .home-portal-title {
+    transform: translate(calc(-50% + 8px), 0);
+  }
+
+  .home-schedule {
+    left: 14%;
+    right: 14%;
+    top: 48%;
+    display: flex;
+    flex-direction: column;
+  }
+  .home-schedule-row {
+    grid-template-columns: 48px 1fr;
+  }
+  .home-schedule-icon {
+    width: 48px;
+    height: 48px;
+    margin-left: 4px;
+  }
+  .home-time-pill {
+    min-width: 50px;
+  }
+
+  /* This element now lives outside the card (see .home-top-note below),
+     so hide the old in-card copy instead of just re-ordering it. */
+  .home-schedule-note {
+    display: none;
+  }
+
+  /* "Server time · subject to change", relocated to the top of the
+     screen, level with the sidebar/hamburger button. IMPORTANT: this
+     only works if the note's markup is moved out from under
+     .home-portal — that ancestor has a `transform`, which traps any
+     absolutely-positioned descendant and drags it around with the
+     slide/scale animation. Move it to be a sibling of
+     .home-guest-actions / .home-dots (a direct child of .home-stage or
+     .home-carousel) and swap its class from .home-schedule-note to
+     .home-top-note. Nudge `top` to match your sidebar button exactly —
+     that button's CSS isn't in this file, so this is an estimate.
+  */
+  .home-top-note {
+    position: absolute;
+    top: var(--sp-5);
+    left: 0;
+    right: 0;
+    z-index: 48;
+    text-align: center;
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--n-800);
+    opacity: 0.7;
+    pointer-events: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shark-sprite { transition-duration: 0.1s; }
-  .flame, .shark-sprite, .ring-img, .intro, .login-form { transition-duration: 0.1s; }
+  .home-portal,
+  .home-portal-title,
+  .home-portal-header,
+  .home-schedule {
+    transition-duration: 0.01ms;
+  }
 }
