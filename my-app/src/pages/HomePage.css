@@ -398,12 +398,12 @@
      and give the title its own small rightward nudge instead of the
      desktop's -20px left nudge. */
   .home-portal-header {
-    top: -2%;
+    top: -5%;
     width: 108%;
-    transform: translate(-50%, 40px);
+    transform: translate(calc(-50% + 6px), 40px);
   }
   .home-portal.is-center .home-portal-header {
-    transform: translate(-50%, 0);
+    transform: translate(calc(-50% + 6px), 0);
   }
   .home-portal-title {
     left: 50%;
@@ -421,11 +421,11 @@
     flex-direction: column;
   }
   .home-schedule-row {
-    grid-template-columns: 48px 1fr;
+    grid-template-columns: 56px 1fr;
   }
   .home-schedule-icon {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     margin-left: 4px;
   }
   .home-time-pill {
