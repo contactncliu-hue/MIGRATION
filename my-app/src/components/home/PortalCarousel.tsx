@@ -41,6 +41,11 @@ export function PortalCarousel({ today }: { today: Date }) {
         if (Math.abs(dx) >= SWIPE_THRESHOLD) step(dx < 0 ? 1 : -1)
       }}
     >
+      {/* Mobile-only: desktop keeps this note inside the card
+          (.home-schedule-note). Hidden by default in CSS, shown only
+          under the mobile media query — see .home-top-note. */}
+      <p className="home-top-note">Server time · subject to change</p>
+
       <button
         type="button"
         className="home-arrow home-arrow-prev"
