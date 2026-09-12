@@ -406,11 +406,12 @@
     transform: translate(calc(-50% + 6px), 0);
   }
   .home-portal-title {
+    top: 6%;
     left: 50%;
-    transform: translate(-50%, 40px);
+    transform: translate(calc(-50% - 4px), 40px);
   }
   .home-portal.is-center .home-portal-title {
-    transform: translate(-50%, 0);
+    transform: translate(calc(-50% - 4px), 0);
   }
 
   .home-schedule {
