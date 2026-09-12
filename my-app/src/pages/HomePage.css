@@ -259,6 +259,7 @@
   height: var(--ctl-h-md);
   padding: 0 var(--sp-4);
   border-radius: var(--r-pill);
+  font-family: var(--font-game);
   font-size: var(--fs-sm);
   font-weight: 800;
   letter-spacing: 0.4px;
@@ -268,6 +269,22 @@
 .home-guest-primary:active,
 .home-guest-secondary:active {
   transform: scale(0.97);
+}
+
+/* Same per-language display-font swap the sidebar uses (see Sidebar.css) —
+   hooked to the shared [data-lang] attribute on <html>. Scoped to just
+   these two buttons; no forms live on this page. */
+[data-lang='ko'] .home-guest-primary,
+[data-lang='ko'] .home-guest-secondary {
+  font-family: 'KERISKEDU', var(--font-ui);
+}
+[data-lang='vi'] .home-guest-primary,
+[data-lang='vi'] .home-guest-secondary {
+  font-family: 'StreetSignSans', var(--font-ui);
+}
+[data-lang='zh-CN'] .home-guest-primary,
+[data-lang='zh-CN'] .home-guest-secondary {
+  font-family: 'SentyWatermelon', var(--font-ui);
 }
 
 .home-guest-primary {
