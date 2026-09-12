@@ -279,15 +279,19 @@
   }
   .status-open .status-card{
     left:11%; width:78%; max-width:none; top:13%; bottom:auto;
-    transform:scale(1.15);
+    transform:scale(1.02);
     transform-origin:center center;
   }
   .status-card-close{ display:none; }
-  .status-row-name, .status-percent{ font-size:var(--fs-label); }
+  .status-row-name, .status-percent{ font-size:8px; }
 
-  .status-rows{ left:18%; right:18%; top:13%; bottom:16%; gap:2px; }
-  .status-row{ gap:8px; align-items:center; }
-  .status-row-icon{ width:22px !important; height:22px !important; align-self:center; }
-  .status-row-top{ margin-bottom:2px; }
-  .status-bar-track{ height:7px; }
+  .status-rows{ left:18%; right:18%; top:11%; bottom:10%; gap:1px; }
+  .status-row{ gap:5px; align-items:center; }
+  .status-row-icon{ width:16px !important; height:16px !important; align-self:center; }
+  .status-row-top{ margin-bottom:1px; }
+  .status-bar-track{ height:5px; }
+
+  /* Fifth line added below the four wing rows — kept small so it doesn't
+     push the card past the button sitting underneath it. */
+  .status-total{ font-size:7px; margin-top:0; }
 }
