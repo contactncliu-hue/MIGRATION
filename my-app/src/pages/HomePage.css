@@ -115,6 +115,7 @@
   pointer-events: none;
 }
 
+/* Header art (the arch backdrop / logo scene) — untouched, stays centered. */
 .home-portal-header {
   position: absolute;
   left: 50%;
@@ -123,10 +124,16 @@
   max-width: 900px;
   z-index: 14;
   opacity: 0;
-  transform: translate(calc(-50% + 20px), 40px);
+  transform: translate(-50%, 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
+.home-portal.is-center .home-portal-header {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Title art (the day-name wordmark) — nudged left. */
 .home-portal-title {
   position: absolute;
   left: 50%;
@@ -135,22 +142,19 @@
   max-width: 355px;
   z-index: 16;
   opacity: 0;
-  transform: translate(calc(-50% + 50px), 40px);
+  transform: translate(calc(-50% - 20px), 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
+.home-portal.is-center .home-portal-title {
+  opacity: 1;
+  transform: translate(calc(-50% - 20px), 0);
+}
+
 .home-portal-header img,
 .home-portal-title img {
   width: 100%;
   display: block;
-}
-.home-portal.is-center .home-portal-header {
-  opacity: 1;
-  transform: translate(calc(-50% + 20px), 0);
-}
-.home-portal.is-center .home-portal-title {
-  opacity: 1;
-  transform: translate(calc(-50% + 50px), 0);
 }
 
 /* ---------- schedule inside the arch ---------- */
@@ -179,13 +183,13 @@
 }
 .home-schedule-row {
   display: grid;
-  grid-template-columns: 44px 1fr;
+  grid-template-columns: 64px 1fr;
   align-items: center;
   gap: var(--sp-2);
 }
 .home-schedule-icon {
-  width: 44px;
-  height: 44px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
   margin-left: 6px;
 }
@@ -374,11 +378,11 @@
     top: 34%;
   }
   .home-schedule-row {
-    grid-template-columns: 34px 1fr;
+    grid-template-columns: 48px 1fr;
   }
   .home-schedule-icon {
-    width: 34px;
-    height: 34px;
+    width: 48px;
+    height: 48px;
     margin-left: 4px;
   }
   .home-time-pill {
