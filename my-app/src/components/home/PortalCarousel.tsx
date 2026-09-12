@@ -86,7 +86,6 @@ export function PortalCarousel({ today }: { today: Date }) {
             onClick={() => setActive(i)}
           />
         ))}
-        <span className="home-dots-label">{dayLabel(SCHEDULE[active].offset)}</span>
       </div>
     </div>
   )
