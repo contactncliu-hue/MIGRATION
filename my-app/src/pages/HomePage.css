@@ -103,10 +103,10 @@
   z-index: 10;
 }
 .home-portal.is-left {
-  transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.7);
+  transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.82);
 }
 .home-portal.is-right {
-  transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.7);
+  transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.82);
 }
 
 .home-portal-arch {
@@ -127,7 +127,7 @@
   max-width: 900px;
   z-index: 14;
   opacity: 0;
-  transform: translate(-50%, 40px);
+  transform: translate(calc(-50% + 4px), 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
@@ -139,7 +139,7 @@
   max-width: 355px;
   z-index: 16;
   opacity: 0;
-  transform: translate(-50%, 40px);
+  transform: translate(calc(-50% + 4px), 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
@@ -150,11 +150,11 @@
 }
 .home-portal.is-center .home-portal-header {
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: translate(calc(-50% + 4px), 0);
 }
 .home-portal.is-center .home-portal-title {
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: translate(calc(-50% + 4px), 0);
 }
 
 /* ---------- schedule inside the arch ---------- */
@@ -174,64 +174,35 @@
   pointer-events: auto;
 }
 
-.home-schedule-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--sp-2);
-  padding-bottom: var(--sp-2);
-  border-bottom: 1.5px solid rgba(68, 68, 68, 0.18);
-  margin-bottom: var(--sp-3);
-}
-.home-schedule-day {
-  font-size: var(--fs-lg);
-  font-weight: 800;
-  color: var(--n-900);
-  letter-spacing: 0.3px;
-}
-.home-schedule-date {
-  font-size: var(--fs-label);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--n-800);
-}
-
 .home-schedule-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: var(--sp-4);
 }
 .home-schedule-row {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
+  display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--sp-3);
 }
 .home-schedule-icon {
-  width: 44px;
-  height: 44px;
+  width: 76px;
+  height: 76px;
   object-fit: contain;
-  margin-left: 6px;
-}
-.home-schedule-label {
-  font-size: var(--fs-label);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  /* Pastel arch behind it — anything lighter than n-800 fails contrast. */
-  color: var(--n-800);
+  flex-shrink: 0;
 }
 .home-schedule-times {
   display: flex;
-  gap: var(--sp-1);
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
 }
 
 .home-time-pill {
-  min-width: 58px;
+  width: 100%;
+  min-width: 0;
   padding: 3px var(--sp-2);
   border-radius: var(--r-pill);
   text-align: center;
@@ -359,14 +330,6 @@
   background: var(--c-gold);
   transform: scale(1.25);
 }
-.home-dots-label {
-  margin-left: var(--sp-1);
-  font-size: var(--fs-label);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--n-800);
-}
 
 .home-fade {
   position: absolute;
@@ -400,10 +363,10 @@
     transform-origin: top center;
   }
   .home-portal.is-left {
-    transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.8);
+    transform: translate(calc(-50% - var(--portal-offset)), 0) scale(0.85);
   }
   .home-portal.is-right {
-    transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.8);
+    transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.85);
   }
   .home-arrow {
     width: var(--ctl-h-touch);
@@ -424,16 +387,9 @@
     right: 14%;
     top: 34%;
   }
-  .home-schedule-row {
-    grid-template-columns: 34px 1fr auto;
-  }
   .home-schedule-icon {
-    width: 34px;
-    height: 34px;
-    margin-left: 4px;
-  }
-  .home-time-pill {
-    min-width: 50px;
+    width: 56px;
+    height: 56px;
   }
 }
 
