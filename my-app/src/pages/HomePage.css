@@ -135,7 +135,7 @@
   max-width: 355px;
   z-index: 16;
   opacity: 0;
-  transform: translate(calc(-50% + 20px), 40px);
+  transform: translate(calc(-50% + 50px), 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
@@ -150,7 +150,7 @@
 }
 .home-portal.is-center .home-portal-title {
   opacity: 1;
-  transform: translate(calc(-50% + 20px), 0);
+  transform: translate(calc(-50% + 50px), 0);
 }
 
 /* ---------- schedule inside the arch ---------- */
