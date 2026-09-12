@@ -118,10 +118,7 @@ export function WingStatusCard({ open, onToggle, onClose }: {
         })}
 
         {rows.length > 0 && (
-          <div
-            className="status-total"
-            style={{ color: totalCount >= totalCapacity ? 'var(--c-mint)' : 'var(--c-peach)' }}
-          >
+          <div className="status-total" style={{ color: '#F2A93B' }}>
             Total: {totalCount}/{totalCapacity}
           </div>
         )}
