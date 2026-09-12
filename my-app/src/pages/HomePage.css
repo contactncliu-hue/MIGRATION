@@ -127,7 +127,7 @@
   max-width: 900px;
   z-index: 14;
   opacity: 0;
-  transform: translate(-49%, 40px);
+  transform: translate(-50%, 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
@@ -139,7 +139,7 @@
   max-width: 355px;
   z-index: 16;
   opacity: 0;
-  transform: translate(-48%, 40px);
+  transform: translate(-50%, 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
@@ -150,36 +150,11 @@
 }
 .home-portal.is-center .home-portal-header {
   opacity: 1;
-  transform: translate(-49%, 0);
+  transform: translate(-50%, 0);
 }
 .home-portal.is-center .home-portal-title {
   opacity: 1;
-  transform: translate(-48%, 0);
-}
-
-/* Day name on the sliver of a peeking card — turns dead colour into a label. */
-.home-portal-edge-label {
-  position: absolute;
-  top: 34%;
-  z-index: 18;
-  font-size: var(--fs-label);
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--n-800);
-  writing-mode: vertical-rl;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-  pointer-events: none;
-}
-.home-portal.is-left .home-portal-edge-label {
-  right: 12%;
-  opacity: 0.85;
-}
-.home-portal.is-right .home-portal-edge-label {
-  left: 12%;
-  transform: rotate(180deg);
-  opacity: 0.85;
+  transform: translate(-50%, 0);
 }
 
 /* ---------- schedule inside the arch ---------- */
@@ -232,14 +207,15 @@
 }
 .home-schedule-row {
   display: grid;
-  grid-template-columns: 34px 1fr auto;
+  grid-template-columns: 44px 1fr auto;
   align-items: center;
   gap: var(--sp-2);
 }
 .home-schedule-icon {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
+  margin-left: 6px;
 }
 .home-schedule-label {
   font-size: var(--fs-label);
@@ -449,17 +425,15 @@
     top: 34%;
   }
   .home-schedule-row {
-    grid-template-columns: 26px 1fr auto;
+    grid-template-columns: 34px 1fr auto;
   }
   .home-schedule-icon {
-    width: 26px;
-    height: 26px;
+    width: 34px;
+    height: 34px;
+    margin-left: 4px;
   }
   .home-time-pill {
     min-width: 50px;
-  }
-  .home-portal-edge-label {
-    display: none;
   }
 }
 
@@ -468,8 +442,7 @@
   .home-portal,
   .home-portal-title,
   .home-portal-header,
-  .home-schedule,
-  .home-portal-edge-label {
+  .home-schedule {
     transition-duration: 0.01ms;
   }
 }
