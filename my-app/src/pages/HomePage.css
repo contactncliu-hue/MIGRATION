@@ -17,8 +17,6 @@
   height: 100dvh;
   overflow: hidden;
   background: linear-gradient(to top, var(--surface-cream) 0%, var(--n-0) 45%);
-  /* Local geometry — not global tokens, these only mean something here. */
-  /* Height-led: the arch must fit the viewport, width follows its 1640:2156. */
   --portal-h: min(820px, 88vh);
   --portal-w: calc(var(--portal-h) * 0.7607);
   --portal-offset: calc(var(--portal-w) * 0.97);
@@ -81,8 +79,6 @@
 }
 
 /* ---------- portal card ---------- */
-/* 680:894 matches the arch artwork's own 1640:2156, so object-fit:contain
-   fills the box exactly and nothing floats below it. */
 .home-portal {
   position: absolute;
   left: 50%;
@@ -127,7 +123,7 @@
   max-width: 900px;
   z-index: 14;
   opacity: 0;
-  transform: translate(calc(-50% + 4px), 40px);
+  transform: translate(calc(-50% + 20px), 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
@@ -139,7 +135,7 @@
   max-width: 355px;
   z-index: 16;
   opacity: 0;
-  transform: translate(calc(-50% + 4px), 40px);
+  transform: translate(calc(-50% + 20px), 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
@@ -150,15 +146,14 @@
 }
 .home-portal.is-center .home-portal-header {
   opacity: 1;
-  transform: translate(calc(-50% + 4px), 0);
+  transform: translate(calc(-50% + 20px), 0);
 }
 .home-portal.is-center .home-portal-title {
   opacity: 1;
-  transform: translate(calc(-50% + 4px), 0);
+  transform: translate(calc(-50% + 20px), 0);
 }
 
 /* ---------- schedule inside the arch ---------- */
-/* The arch is a frame drawn around empty space; this fills it. */
 .home-schedule {
   position: absolute;
   left: 19%;
@@ -180,29 +175,27 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-}
-.home-schedule-row {
-  display: flex;
-  align-items: center;
   gap: var(--sp-3);
 }
+.home-schedule-row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  gap: var(--sp-2);
+}
 .home-schedule-icon {
-  width: 76px;
-  height: 76px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
-  flex-shrink: 0;
+  margin-left: 6px;
 }
 .home-schedule-times {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
+  gap: var(--sp-1);
 }
 
 .home-time-pill {
-  width: 100%;
-  min-width: 0;
+  min-width: 58px;
   padding: 3px var(--sp-2);
   border-radius: var(--r-pill);
   text-align: center;
@@ -225,7 +218,6 @@
   text-align: right;
 }
 
-/* Each day's pills pick up its own portal colour. */
 .home-portal-red {
   --home-accent: var(--wing-red);
   --home-accent-deep: #9c3323;
@@ -240,8 +232,6 @@
 }
 
 /* ---------- guest call to action ---------- */
-/* Sits above the indicator: the reason a visitor came should not be two taps
-   behind a hamburger menu. */
 .home-guest-actions {
   position: absolute;
   left: 50%;
@@ -347,14 +337,10 @@
   .home-stage {
     height: auto;
     min-height: 100dvh;
-    /* Width-led on a phone: the arch must fit across, and its height follows
-       the artwork's own 1640:2156. */
     --portal-w: min(86vw, 330px);
     --portal-h: calc(var(--portal-w) / 0.7607);
     --portal-offset: calc(var(--portal-w) * 0.62);
   }
-  /* Lifted off the bottom edge so the card sits in the middle of the screen
-     instead of hugging the fold, and clear of the guest actions below. */
   .home-portal {
     bottom: 19%;
   }
@@ -387,13 +373,19 @@
     right: 14%;
     top: 34%;
   }
+  .home-schedule-row {
+    grid-template-columns: 34px 1fr;
+  }
   .home-schedule-icon {
-    width: 56px;
-    height: 56px;
+    width: 34px;
+    height: 34px;
+    margin-left: 4px;
+  }
+  .home-time-pill {
+    min-width: 50px;
   }
 }
 
-/* Long eases are the whole character of this screen — but not for everyone. */
 @media (prefers-reduced-motion: reduce) {
   .home-portal,
   .home-portal-title,
