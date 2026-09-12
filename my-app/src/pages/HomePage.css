@@ -124,13 +124,13 @@
   max-width: 900px;
   z-index: 14;
   opacity: 0;
-  transform: translate(calc(-50% - 15px), 40px);
+  transform: translate(-50%, 40px);
   transition: transform 1.6s cubic-bezier(0.22, 0.68, 0, 1.01), opacity 1.3s ease;
   pointer-events: none;
 }
 .home-portal.is-center .home-portal-header {
   opacity: 1;
-  transform: translate(calc(-50% - 15px), 0);
+  transform: translate(-50%, 0);
 }
 
 /* Title art (the day-name wordmark) — nudged left. */
