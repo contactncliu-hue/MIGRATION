@@ -115,7 +115,7 @@
   pointer-events: none;
 }
 
-/* Header art (the arch backdrop / logo scene) — untouched, stays centered. */
+/* Header art (the arch backdrop / logo scene) — centered. */
 .home-portal-header {
   position: absolute;
   left: 50%;
@@ -341,7 +341,7 @@
   .home-stage {
     height: auto;
     min-height: 100dvh;
-    --portal-w: min(86vw, 330px);
+    --portal-w: min(96vw, 380px);
     --portal-h: calc(var(--portal-w) / 0.7607);
     --portal-offset: calc(var(--portal-w) * 0.62);
   }
@@ -357,6 +357,18 @@
   }
   .home-portal.is-right {
     transform: translate(calc(-50% + var(--portal-offset)), 0) scale(0.85);
+  }
+  .home-portal.is-left::after,
+  .home-portal.is-right::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 30%;
+    background: linear-gradient(to bottom, transparent 0%, var(--surface-cream) 90%);
+    pointer-events: none;
+    z-index: 12;
   }
   .home-arrow {
     width: var(--ctl-h-touch);
@@ -375,7 +387,7 @@
   .home-schedule {
     left: 14%;
     right: 14%;
-    top: 34%;
+    top: 42%;
   }
   .home-schedule-row {
     grid-template-columns: 48px 1fr;
