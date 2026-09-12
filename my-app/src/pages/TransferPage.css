@@ -1,5 +1,4 @@
 
-
 /* ================= MAIN / HERO STAGE ================= */
 .transfer-stage{
   position:relative;
@@ -152,9 +151,15 @@
 .transfer-btn:active{ filter:brightness(.94); }
 .status-check-btn:active{ filter:brightness(.94); }
 
+/* Solid (non-blurred) drop-shadow in the brand teal. These are image
+   buttons with transparent surrounds, so a plain box-shadow would draw a
+   rectangle behind the whole element instead of hugging the button's
+   actual ribbon/hexagon silhouette — filter:drop-shadow follows the
+   image's alpha channel instead, which box-shadow can't do. Applies to
+   both desktop and mobile since it's outside any media query. */
 .transfer-btn img,
 .status-check-btn img{
-  filter:brightness(1.1) saturate(1.05);
+  filter:brightness(1.1) saturate(1.05) drop-shadow(0 4px 0 #77A99A);
 }
 
 /* Transfer-owned controls only — .submit-btn belongs to ui/forms.css. */
@@ -243,8 +248,12 @@
 
   .transfer-btn .btn-label{ font-size:3.4vw; }
   .status-check-label{ font-size:3.4vw; }
-  .transfer-btn{ width:23%; }
-  .status-check-btn{ width:30%; }
+
+  /* Both buttons pulled in slightly; CHECK STATUS a bit more than
+     MIGRATION, as asked. Text size is set independently above via vw
+     units, so it's untouched by these width changes. */
+  .transfer-btn{ width:20%; }
+  .status-check-btn{ width:24%; }
 
   .transfer-btn{
     top:-6%;
