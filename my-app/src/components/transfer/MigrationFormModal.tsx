@@ -97,7 +97,17 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
       setSuccess('Migration request sent!')
       setTimeout(onClose, 1200)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.')
+      } catch (err) {
+  const message =
+    err instanceof Error
+      ? err.message
+      : typeof err === 'object' && err !== null && 'message' in err
+        ? String((err as { message: unknown }).message)
+        : 'Something went wrong.'
+  setError(message)
+} finally {
+  setSubmitting(false)
+}
     } finally {
       setSubmitting(false)
     }
