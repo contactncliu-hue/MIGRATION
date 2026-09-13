@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth-context'
 import { translations, languageOptions } from '../lib/translations'
 import type { LanguageCode } from '../types/user'
@@ -33,9 +33,17 @@ function RowIcon({ path, filled }: { path: string; filled?: boolean }) {
   )
 }
 
+// Transfer gets its own sidebar art; every other route keeps the default
+// image set in Sidebar.css on .zoo-sb-art. Add more entries here if other
+// pages ever need their own.
+const SIDEBAR_ART_BY_ROUTE: Record<string, string> = {
+  '/transfer': '/assets/sidebar2.PNG',
+}
+
 export function Sidebar({ isOpen }: SidebarProps) {
   const { profile, isAdmin, isGuest, signOut } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [lang, setLang] = useState<LanguageCode>(
     () => (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
   )
@@ -45,6 +53,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
   const displayName = profile?.displayName ?? dict.guest
   const initial = displayName.charAt(0).toUpperCase()
   const currentLang = languageOptions.find((o) => o.code === lang)?.label ?? 'English'
+  const sidebarArtImage = SIDEBAR_ART_BY_ROUTE[location.pathname]
 
   // Drives the per-language display font (see styles/fonts.css).
   useEffect(() => {
@@ -135,8 +144,14 @@ export function Sidebar({ isOpen }: SidebarProps) {
         </select>
       </label>
 
-      {/* Decorative only — no text sits on it, so it can be cropped freely. */}
-      <div className="zoo-sb-art" aria-hidden="true" />
+      {/* Decorative only — no text sits on it, so it can be cropped freely.
+          Falls back to Sidebar.css's default background-image when the
+          current route has no entry in SIDEBAR_ART_BY_ROUTE. */}
+      <div
+        className="zoo-sb-art"
+        aria-hidden="true"
+        style={sidebarArtImage ? { backgroundImage: `url('${sidebarArtImage}')` } : undefined}
+      />
 
       <div className="zoo-sb-foot">
         {isGuest ? (
