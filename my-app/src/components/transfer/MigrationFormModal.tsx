@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { translations } from '../../lib/translations'
 import {
   FACTION_LETTERS,
   emptyMember,
@@ -10,6 +11,7 @@ import {
 import { Modal } from '../ui/Modal'
 import { Field, FieldRow } from '../ui/Field'
 import { FormMessage } from '../ui/FormMessage'
+import type { LanguageCode } from '../../types/user'
 
 interface MigrationFormModalProps {
   onClose: () => void
@@ -19,6 +21,9 @@ const ROLE_OPTIONS = Array.from({ length: 10 }, (_, i) => `i${i + 1}`)
 
 /** Solo or group migration request form. Owns its own draft state. */
 export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
+  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
+  const dict = translations[lang] ?? translations.en
+
   const [transferType, setTransferType] = useState<TransferType>('solo')
   const [allianceTag, setAllianceTag] = useState('')
   const [members, setMembers] = useState<MemberDraft[]>([emptyMember()])
@@ -51,7 +56,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
     setSuccess('')
 
     if (transferType === 'group' && !allianceTag.trim()) {
-      setError('Please fill in every field for every member.')
+      setError(dict.errorFillAllianceTag)
       return
     }
 
@@ -61,9 +66,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
         !m.killcount || !m.faction || !m.role || !m.f1Power
     )
     if (missing) {
-      setError(
-        'Please fill in every field for every member (Migration Score and F2 Power are the only optional ones).'
-      )
+      setError(dict.errorFillAllFields)
       return
     }
 
@@ -116,8 +119,8 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
     <Modal
       open
       onClose={onClose}
-      title="Migration"
-      subtitle="Send items or funds to another member."
+      title={dict.migrationModalTitle}
+      subtitle={dict.migrationModalSubtitle}
     >
       <div className="transfer-type-toggle">
         <button
@@ -125,23 +128,23 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
           className={`type-btn ${!isGroup ? 'active' : ''}`}
           onClick={() => handleTypeChange('solo')}
         >
-          Solo Transfer
+          {dict.soloTransferBtn}
         </button>
         <button
           type="button"
           className={`type-btn ${isGroup ? 'active' : ''}`}
           onClick={() => handleTypeChange('group')}
         >
-          Group Transfer
+          {dict.groupTransferBtn}
         </button>
       </div>
 
       <form onSubmit={handleSubmit}>
         {isGroup && (
           <Field
-            label="Group Name"
+            label={dict.groupNameLabel}
             type="text"
-            placeholder="e.g. ONE"
+            placeholder={dict.groupNamePlaceholder}
             value={allianceTag}
             onChange={(e) => setAllianceTag(e.target.value)}
           />
@@ -151,21 +154,21 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
           <div className="member-row" key={idx}>
             {isGroup && (
               <div className="member-row-header">
-                <span>MEMBER #{idx + 1}</span>
+                <span>{dict.memberLabel.toUpperCase()} #{idx + 1}</span>
                 {members.length > 1 && (
                   <button
                     type="button"
                     className="remove-member-btn"
                     onClick={() => removeMember(idx)}
                   >
-                    Remove
+                    {dict.removeMember}
                   </button>
                 )}
               </div>
             )}
 
             <Field
-              label="UID"
+              label={dict.uidLabel}
               type="text"
               inputMode="numeric"
               maxLength={21}
@@ -175,7 +178,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
               }
             />
             <Field
-              label="Username"
+              label={dict.usernameLabel}
               type="text"
               value={m.username}
               onChange={(e) => updateMember(idx, { username: e.target.value })}
@@ -183,25 +186,25 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
 
             <FieldRow>
               <Field
-                label="Previous Alliance"
+                label={dict.prevAllianceLabel}
                 type="text"
                 value={m.prevAlliance}
                 onChange={(e) => updateMember(idx, { prevAlliance: e.target.value })}
               />
               <Field
-                label="Previous Server"
+                label={dict.prevServerLabel}
                 type="text"
-                placeholder="e.g. S1"
+                placeholder={dict.prevServerPlaceholder}
                 value={m.prevServer}
                 onChange={(e) => updateMember(idx, { prevServer: e.target.value })}
               />
             </FieldRow>
 
             <Field
-              label="Kill Count"
+              label={dict.killCountLabel}
               type="text"
               inputMode="numeric"
-              placeholder="e.g. 13"
+              placeholder={dict.killCountPlaceholder}
               value={m.killcount ? `${m.killcount}M` : ''}
               onChange={(e) =>
                 updateMember(idx, { killcount: e.target.value.replace(/[^0-9]/g, '') })
@@ -210,7 +213,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
 
             <FieldRow className="faction-role-row">
               <div className="faction-picker">
-                <label>Faction</label>
+                <label>{dict.faction}</label>
                 <button
                   type="button"
                   className="faction-btn"
@@ -220,7 +223,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
                   <span className="faction-letter">{FACTION_LETTERS[m.faction]}</span>
                 </button>
               </div>
-              <Field label="Role">
+              <Field label={dict.roleLabel}>
                 <select
                   value={m.role}
                   onChange={(e) => updateMember(idx, { role: e.target.value })}
@@ -236,14 +239,14 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
             </FieldRow>
 
             <Field
-              label="Migration Score (optional)"
+              label={dict.migrationScoreLabel}
               type="text"
               inputMode="numeric"
               value={m.migrationScore}
               onChange={(e) => updateMember(idx, { migrationScore: e.target.value })}
             />
             <Field
-              label="F1 Power"
+              label={dict.f1PowerLabel}
               type="text"
               inputMode="numeric"
               required
@@ -251,7 +254,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
               onChange={(e) => updateMember(idx, { f1Power: e.target.value })}
             />
             <Field
-              label="F2 Power (optional)"
+              label={dict.f2PowerLabel}
               type="text"
               inputMode="numeric"
               value={m.f2Power}
@@ -266,7 +269,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
             className="add-member-btn"
             onClick={() => setMembers((prev) => [...prev, emptyMember()])}
           >
-            + Add Member
+            {dict.addMemberBtn}
           </button>
         )}
 
@@ -274,7 +277,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
         <FormMessage tone="success">{success}</FormMessage>
 
         <button type="submit" className="submit-btn" disabled={submitting}>
-          {submitting ? 'SENDING...' : 'SEND'}
+          {submitting ? dict.sendingLabel : dict.sendLabel}
         </button>
       </form>
     </Modal>
