@@ -3,6 +3,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './lib/auth'
+import { LanguageProvider } from './lib/language-context'
 import App from './App'
 
 class ErrorBoundary extends React.Component<
@@ -31,9 +32,11 @@ class ErrorBoundary extends React.Component<
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
     <AuthProvider>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
+      <LanguageProvider>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </LanguageProvider>
     </AuthProvider>
   </BrowserRouter>
 )
