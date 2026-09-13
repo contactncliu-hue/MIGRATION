@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { WING_ORDER, WING_DISPLAY, type WingColor } from '../../lib/wings'
+import { translations } from '../../lib/translations'
+import type { LanguageCode } from '../../types/user'
 
 export interface WingRow {
   key: WingColor
@@ -15,8 +17,6 @@ const WING_ICONS: Record<WingColor, string> = {
   BLUE: 'https://nlqzanjivjfkftvazrvi.supabase.co/storage/v1/object/sign/assets/IMG_7773.png?token=eyJraWQiOiI5NmIyZWE5MC0yYjdiLTQ5MTktYmY3NC1kMGE4YTQzYjU1ZTAiLCJhbGciOiJIUzUxMiJ9.eyJ1cmwiOiJhc3NldHMvSU1HXzc3NzMucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTI1NTg3MywiZXhwIjoxODIwNzkxODczfQ.u3V-_ced-1XdvSTO_cjvKJgCp9XfsCNDf6qVuJfpfslhL1SRY0PPbkyDPa-GsjhK8kSg2f5N4BTzyIeFKLG9yg',
 }
 
-
-
 /**
  * Slide-out card showing how full each wing is.
  *
@@ -28,6 +28,16 @@ export function WingStatusCard({ open, onToggle, onClose }: {
   onToggle: () => void
   onClose: () => void
 }) {
+  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
+  const dict = translations[lang] ?? translations.en
+
+  const WING_LABELS: Record<WingColor, string> = {
+    RED: dict.wingRed,
+    ORANGE: dict.wingOrange,
+    PURPLE: dict.wingPurple,
+    BLUE: dict.wingBlue,
+  }
+
   const [rows, setRows] = useState<WingRow[]>([])
 
   async function load() {
@@ -81,7 +91,7 @@ export function WingStatusCard({ open, onToggle, onClose }: {
           e.stopPropagation()
           onClose()
         }}
-        aria-label="Close"
+        aria-label={dict.closeLabel}
       >
         &times;
       </button>
@@ -102,7 +112,7 @@ export function WingStatusCard({ open, onToggle, onClose }: {
               />
               <div className="status-row-body">
                 <div className="status-row-top">
-                  <span className="status-row-name">{disp.label}</span>
+                  <span className="status-row-name">{WING_LABELS[row.key]}</span>
                   <span className="status-percent">
                     {row.count}/{row.capacity}
                   </span>
@@ -120,7 +130,7 @@ export function WingStatusCard({ open, onToggle, onClose }: {
 
         {rows.length > 0 && (
           <div className="status-total" style={{ color: '#F2A93B' }}>
-            Total: {totalCount}/{totalCapacity}
+            {dict.total}: {totalCount}/{totalCapacity}
           </div>
         )}
       </div>
