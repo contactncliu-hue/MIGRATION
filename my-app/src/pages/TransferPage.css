@@ -156,7 +156,7 @@
   font-family:var(--font-game);
   font-weight:800; font-size:1.05vw; letter-spacing:.06vw;
   color:var(--surface-cream-alt);
-  transform:translateY(-8%);
+  transform:translateY(-14%);
 }
 
 /* ---------- Press animation on all action buttons ---------- */
@@ -265,7 +265,7 @@
   }
 
   .transfer-btn .btn-label{ font-size:3.4vw; }
-  .status-check-label{ font-size:3.4vw; }
+  .status-check-label{ font-size:3.4vw; transform:translateY(-4%); }
 
   /* Both buttons pulled in slightly; CHECK STATUS a bit more than
      MIGRATION, as asked. Text size is set independently above via vw
@@ -287,6 +287,7 @@
     top:-6%;
     transition:filter .16s ease, opacity .75s cubic-bezier(.22,.68,0,1.01) .1s, transform .75s cubic-bezier(.22,.68,0,1.01) .1s;
   }
+  .status-open .status-check-btn{ top:79%; }
 
   .status-card{
     position:absolute; left:-65%; width:88%; top:13%; bottom:auto;
