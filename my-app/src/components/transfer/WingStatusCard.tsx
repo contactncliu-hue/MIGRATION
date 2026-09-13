@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { WING_ORDER, WING_DISPLAY, type WingColor } from '../../lib/wings'
-import { translations } from '../../lib/translations'
-import type { LanguageCode } from '../../types/user'
+import { useLanguage } from '../../lib/language-context'
 
 export interface WingRow {
   key: WingColor
@@ -28,8 +27,7 @@ export function WingStatusCard({ open, onToggle, onClose }: {
   onToggle: () => void
   onClose: () => void
 }) {
-  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
-  const dict = translations[lang] ?? translations.en
+  const { dict } = useLanguage()
 
   const WING_LABELS: Record<WingColor, string> = {
     RED: dict.wingRed,
