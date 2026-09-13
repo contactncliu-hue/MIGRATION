@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { translations } from '../../lib/translations'
+import { useLanguage } from '../../lib/language-context'
 import { Modal } from '../ui/Modal'
 import { Field } from '../ui/Field'
 import { FormMessage } from '../ui/FormMessage'
-import type { LanguageCode } from '../../types/user'
 
 interface UidLookupModalProps {
   onClose: () => void
@@ -12,8 +11,7 @@ interface UidLookupModalProps {
 
 /** Lets a member check their own migration status by UID, without signing in. */
 export function UidLookupModal({ onClose }: UidLookupModalProps) {
-  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
-  const dict = translations[lang] ?? translations.en
+  const { dict } = useLanguage()
 
   const [uid, setUid] = useState('')
   const [error, setError] = useState('')
