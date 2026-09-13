@@ -2,18 +2,22 @@ import { useEffect, useState } from 'react'
 import { MigrationFormModal } from '../components/transfer/MigrationFormModal'
 import { UidLookupModal } from '../components/transfer/UidLookupModal'
 import { WingStatusCard } from '../components/transfer/WingStatusCard'
+import { translations } from '../lib/translations'
+import type { LanguageCode } from '../types/user'
 import './TransferPage.css'
 
 export function TransferPage() {
+  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
+  const dict = translations[lang] ?? translations.en
+
   const [stageReady, setStageReady] = useState(false)
   const [statusOpen, setStatusOpen] = useState(false)
   const [migrationOpen, setMigrationOpen] = useState(false)
   const [lookupOpen, setLookupOpen] = useState(false)
 
-  // One tick after mount so the entrance transitions actually animate.
   useEffect(() => {
-    const t = setTimeout(() => setStageReady(true), 30)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setStageReady(true), 30)
+    return () => clearTimeout(timer)
   }, [])
 
   const stageClass = [
@@ -40,12 +44,12 @@ export function TransferPage() {
 
         <button className="transfer-btn" onClick={() => setMigrationOpen(true)}>
           <img src="/assets/transfer-button.PNG" alt="" />
-          <span className="btn-label">MIGRATION</span>
+          <span className="btn-label">{dict.migrationBtnLabel}</span>
         </button>
 
         <button className="status-check-btn" onClick={() => setLookupOpen(true)}>
           <img src="/assets/transfer-status-button.PNG" alt="" />
-          <span className="status-check-label">CHECK STATUS</span>
+          <span className="status-check-label">{dict.checkStatusBtnLabel}</span>
         </button>
       </div>
 
@@ -55,7 +59,6 @@ export function TransferPage() {
         onClose={() => setStatusOpen(false)}
       />
 
-      {/* Mounted only while open so each visit starts from a clean form. */}
       {migrationOpen && <MigrationFormModal onClose={() => setMigrationOpen(false)} />}
       {lookupOpen && <UidLookupModal onClose={() => setLookupOpen(false)} />}
     </div>
