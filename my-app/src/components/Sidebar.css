@@ -223,6 +223,18 @@
   mask-image: linear-gradient(to bottom, transparent 0%, #000 17%);
 }
 
+/* Transfer's art (sidebar2.PNG) is a different source image with its own
+   native proportions, so `cover` alone crops/zooms it differently than the
+   default band even though the rule is identical. This gives it its own
+   size/position to tune independently -- adjust these two values by eye
+   until the characters read at the same scale as the default band. Start
+   here and nudge; there's no way to compute the right number without
+   seeing the actual asset. */
+.zoo-sb-art--transfer {
+  background-size: cover;
+  background-position: 50% 100%;
+}
+
 /* ── footer action ────────────────────────────────────────────────── */
 .zoo-sb-foot {
   flex-shrink: 0;
