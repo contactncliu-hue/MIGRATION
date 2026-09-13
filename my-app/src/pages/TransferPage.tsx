@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react'
 import { MigrationFormModal } from '../components/transfer/MigrationFormModal'
 import { UidLookupModal } from '../components/transfer/UidLookupModal'
 import { WingStatusCard } from '../components/transfer/WingStatusCard'
-import { translations } from '../lib/translations'
-import type { LanguageCode } from '../types/user'
+import { useLanguage } from '../lib/language-context'
 import './TransferPage.css'
 
 export function TransferPage() {
-  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
-  const dict = translations[lang] ?? translations.en
+  const { dict } = useLanguage()
 
   const [stageReady, setStageReady] = useState(false)
   const [statusOpen, setStatusOpen] = useState(false)
