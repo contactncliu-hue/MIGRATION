@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { translations } from '../../lib/translations'
+import { useLanguage } from '../../lib/language-context'
 import {
   FACTION_LETTERS,
   emptyMember,
@@ -11,7 +11,6 @@ import {
 import { Modal } from '../ui/Modal'
 import { Field, FieldRow } from '../ui/Field'
 import { FormMessage } from '../ui/FormMessage'
-import type { LanguageCode } from '../../types/user'
 
 interface MigrationFormModalProps {
   onClose: () => void
@@ -21,8 +20,7 @@ const ROLE_OPTIONS = Array.from({ length: 10 }, (_, i) => `i${i + 1}`)
 
 /** Solo or group migration request form. Owns its own draft state. */
 export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
-  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
-  const dict = translations[lang] ?? translations.en
+  const { dict } = useLanguage()
 
   const [transferType, setTransferType] = useState<TransferType>('solo')
   const [allianceTag, setAllianceTag] = useState('')
