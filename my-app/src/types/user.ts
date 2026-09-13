@@ -26,4 +26,36 @@ export interface LanguageStrings {
   /** Admin area — was hardcoded English in the sidebar. */
   admin: string
   language: string
+
+  // --- Transfer / migration page ---
+  /** Notice above the hero art: server time may differ, subject to change. */
+  serverTimeNotice: string
+  /** Label on the main image button that opens the migration form. */
+  migrationBtnLabel: string
+  /** Label on the button that opens the status card. */
+  checkStatusBtnLabel: string
+  /** Wing/faction color names shown in the status card rows. */
+  wingRed: string
+  wingOrange: string
+  wingPurple: string
+  wingBlue: string
+  /** "Total" line at the bottom of the status card. */
+  total: string
+  /** Solo/Group toggle on the migration form. */
+  soloType: string
+  groupType: string
+  /** Alliance tag field label, shown only for group applications. */
+  allianceTag: string
+  /** Faction picker label on each member row. */
+  faction: string
+  addMember: string
+  removeMember: string
+  /** Header label on each member row (e.g. "Member 1"). */
+  memberLabel: string
+  uidLabel: string
+  uidPlaceholder: string
+  /** Result states shown after a UID status lookup. */
+  statusPending: string
+  statusApproved: string
+  statusRejected: string
 }
