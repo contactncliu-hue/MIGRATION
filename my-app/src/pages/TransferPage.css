@@ -156,7 +156,7 @@
   font-family:var(--font-game);
   font-weight:800; font-size:1.05vw; letter-spacing:.06vw;
   color:var(--surface-cream-alt);
-  transform:translateY(0%);
+  transform:translateY(-8%);
 }
 
 /* ---------- Press animation on all action buttons ---------- */
@@ -287,7 +287,6 @@
     top:-6%;
     transition:filter .16s ease, opacity .75s cubic-bezier(.22,.68,0,1.01) .1s, transform .75s cubic-bezier(.22,.68,0,1.01) .1s;
   }
-  .status-open .status-check-btn{ top:80%; }
 
   .status-card{
     position:absolute; left:-65%; width:88%; top:13%; bottom:auto;
