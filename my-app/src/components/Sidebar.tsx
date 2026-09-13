@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth-context'
-import { translations, languageOptions } from '../lib/translations'
+import { useLanguage } from '../lib/language-context'
+import { languageOptions } from '../lib/translations'
 import type { LanguageCode } from '../types/user'
 import './Sidebar.css'
 
@@ -42,14 +43,11 @@ const SIDEBAR_ART_BY_ROUTE: Record<string, string> = {
 
 export function Sidebar({ isOpen }: SidebarProps) {
   const { profile, isAdmin, isGuest, signOut } = useAuth()
+  const { lang, dict, setLang } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
-  const [lang, setLang] = useState<LanguageCode>(
-    () => (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
-  )
   const [loggingOut, setLoggingOut] = useState(false)
 
-  const dict = translations[lang]
   const displayName = profile?.displayName ?? dict.guest
   const initial = displayName.charAt(0).toUpperCase()
   const currentLang = languageOptions.find((o) => o.code === lang)?.label ?? 'English'
@@ -58,16 +56,6 @@ export function Sidebar({ isOpen }: SidebarProps) {
   // position, since `cover` crops differently per image depending on its
   // own native proportions -- the shared rule can't compensate for that.
   const artModifierClass = sidebarArtImage ? 'zoo-sb-art--transfer' : ''
-
-  // Drives the per-language display font (see styles/fonts.css).
-  useEffect(() => {
-    document.documentElement.setAttribute('data-lang', lang)
-  }, [lang])
-
-  function handleLangChange(next: LanguageCode) {
-    setLang(next)
-    localStorage.setItem('zoo_lang', next)
-  }
 
   async function handleLogout() {
     setLoggingOut(true)
@@ -138,7 +126,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
           className="zoo-sb-lang"
           value={lang}
           aria-label={dict.language}
-          onChange={(e) => handleLangChange(e.target.value as LanguageCode)}
+          onChange={(e) => setLang(e.target.value as LanguageCode)}
         >
           {languageOptions.map((opt) => (
             <option key={opt.code} value={opt.code}>
