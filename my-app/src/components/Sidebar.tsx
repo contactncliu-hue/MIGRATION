@@ -54,6 +54,10 @@ export function Sidebar({ isOpen }: SidebarProps) {
   const initial = displayName.charAt(0).toUpperCase()
   const currentLang = languageOptions.find((o) => o.code === lang)?.label ?? 'English'
   const sidebarArtImage = SIDEBAR_ART_BY_ROUTE[location.pathname]
+  // Lets Sidebar.css give this specific image its own background-size/
+  // position, since `cover` crops differently per image depending on its
+  // own native proportions -- the shared rule can't compensate for that.
+  const artModifierClass = sidebarArtImage ? 'zoo-sb-art--transfer' : ''
 
   // Drives the per-language display font (see styles/fonts.css).
   useEffect(() => {
@@ -148,7 +152,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
           Falls back to Sidebar.css's default background-image when the
           current route has no entry in SIDEBAR_ART_BY_ROUTE. */}
       <div
-        className="zoo-sb-art"
+        className={`zoo-sb-art ${artModifierClass}`}
         aria-hidden="true"
         style={sidebarArtImage ? { backgroundImage: `url('${sidebarArtImage}')` } : undefined}
       />
