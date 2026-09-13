@@ -1,217 +1,86 @@
-import type { LanguageCode, LanguageStrings } from '../types/user'
+export type UserRole = 'admin' | 'member' | 'guest'
 
-export const languageOptions: { code: LanguageCode; label: string }[] = [
-  { code: 'en', label: 'English' },
-  { code: 'fr', label: 'Français' },
-  { code: 'pt-BR', label: 'Português (BR)' },
-  { code: 'vi', label: 'Tiếng Việt' },
-  { code: 'ko', label: '한국어' },
-  { code: 'zh-CN', label: '中文' },
-]
+export interface UserProfile {
+  displayName: string
+  role: UserRole
+}
 
-export const translations: Record<LanguageCode, LanguageStrings> = {
-  en: {
-    welcome: 'Welcome',
-    homepage: 'Homepage',
-    transfer: 'Transfer',
-    logout: 'Log out',
-    loggingOut: 'Logging out...',
-    guest: 'Guest',
-    browsing: 'Browsing as guest',
-    login: 'Log in',
-    applyCta: 'Apply to migrate',
-    statusCta: 'Check your status',
-    admin: 'Admin',
-    language: 'Language',
-    serverTimeNotice: 'Time can be subject to change',
-    migrationBtnLabel: 'MIGRATION',
-    checkStatusBtnLabel: 'CHECK STATUS',
-    wingRed: 'Red Wing',
-    wingOrange: 'Orange Wing',
-    wingPurple: 'Purple Wing',
-    wingBlue: 'Blue Wing',
-    total: 'Total',
-    soloType: 'Solo',
-    groupType: 'Group',
-    allianceTag: 'Alliance Tag',
-    faction: 'Faction',
-    addMember: 'Add member',
-    removeMember: 'Remove',
-    memberLabel: 'Member',
-    uidLabel: 'UID',
-    uidPlaceholder: 'Enter your UID',
-    statusPending: 'Pending',
-    statusApproved: 'Approved',
-    statusRejected: 'Rejected',
-  },
-  fr: {
-    welcome: 'Bienvenue',
-    homepage: 'Accueil',
-    transfer: 'Transfert',
-    logout: 'Déconnexion',
-    loggingOut: 'Déconnexion...',
-    guest: 'Invité',
-    browsing: 'Navigation en tant qu\'invité',
-    login: 'Connexion',
-    applyCta: 'Demander un transfert',
-    statusCta: 'Vérifier votre statut',
-    admin: 'Admin',
-    language: 'Langue',
-    serverTimeNotice: 'L\'heure peut être sujette à changement',
-    migrationBtnLabel: 'MIGRATION',
-    checkStatusBtnLabel: 'VÉRIFIER LE STATUT',
-    wingRed: 'Aile Rouge',
-    wingOrange: 'Aile Orange',
-    wingPurple: 'Aile Violette',
-    wingBlue: 'Aile Bleue',
-    total: 'Total',
-    soloType: 'Solo',
-    groupType: 'Groupe',
-    allianceTag: 'Tag d\'alliance',
-    faction: 'Faction',
-    addMember: 'Ajouter un membre',
-    removeMember: 'Retirer',
-    memberLabel: 'Membre',
-    uidLabel: 'UID',
-    uidPlaceholder: 'Entrez votre UID',
-    statusPending: 'En attente',
-    statusApproved: 'Approuvé',
-    statusRejected: 'Rejeté',
-  },
-  'pt-BR': {
-    welcome: 'Bem-vindo',
-    homepage: 'Início',
-    transfer: 'Transferência',
-    logout: 'Sair',
-    loggingOut: 'Saindo...',
-    guest: 'Convidado',
-    browsing: 'Navegando como convidado',
-    login: 'Entrar',
-    applyCta: 'Solicitar transferência',
-    statusCta: 'Verificar seu status',
-    admin: 'Admin',
-    language: 'Idioma',
-    serverTimeNotice: 'O horário pode estar sujeito a alterações',
-    migrationBtnLabel: 'MIGRAÇÃO',
-    checkStatusBtnLabel: 'VERIFICAR STATUS',
-    wingRed: 'Ala Vermelha',
-    wingOrange: 'Ala Laranja',
-    wingPurple: 'Ala Roxa',
-    wingBlue: 'Ala Azul',
-    total: 'Total',
-    soloType: 'Solo',
-    groupType: 'Grupo',
-    allianceTag: 'Tag da Aliança',
-    faction: 'Facção',
-    addMember: 'Adicionar membro',
-    removeMember: 'Remover',
-    memberLabel: 'Membro',
-    uidLabel: 'UID',
-    uidPlaceholder: 'Digite seu UID',
-    statusPending: 'Pendente',
-    statusApproved: 'Aprovado',
-    statusRejected: 'Rejeitado',
-  },
-  vi: {
-    welcome: 'Chào mừng',
-    homepage: 'Trang chủ',
-    transfer: 'Chuyển khoản',
-    logout: 'Đăng xuất',
-    loggingOut: 'Đang đăng xuất...',
-    guest: 'Khách',
-    browsing: 'Đang duyệt với tư cách khách',
-    login: 'Đăng nhập',
-    applyCta: 'Đăng ký di chuyển',
-    statusCta: 'Kiểm tra trạng thái',
-    admin: 'Quản trị',
-    language: 'Ngôn ngữ',
-    serverTimeNotice: 'Thời gian có thể thay đổi',
-    migrationBtnLabel: 'DI CHUYỂN',
-    checkStatusBtnLabel: 'KIỂM TRA TRẠNG THÁI',
-    wingRed: 'Cánh Đỏ',
-    wingOrange: 'Cánh Cam',
-    wingPurple: 'Cánh Tím',
-    wingBlue: 'Cánh Xanh',
-    total: 'Tổng cộng',
-    soloType: 'Đơn lẻ',
-    groupType: 'Nhóm',
-    allianceTag: 'Thẻ Liên minh',
-    faction: 'Phe',
-    addMember: 'Thêm thành viên',
-    removeMember: 'Xóa',
-    memberLabel: 'Thành viên',
-    uidLabel: 'UID',
-    uidPlaceholder: 'Nhập UID của bạn',
-    statusPending: 'Đang chờ',
-    statusApproved: 'Đã duyệt',
-    statusRejected: 'Bị từ chối',
-  },
-  ko: {
-    welcome: '환영합니다',
-    homepage: '홈페이지',
-    transfer: '이체',
-    logout: '로그아웃',
-    loggingOut: '로그아웃 중...',
-    guest: '게스트',
-    browsing: '게스트로 둘러보는 중',
-    login: '로그인',
-    applyCta: '이주 신청',
-    statusCta: '상태 확인',
-    admin: '관리자',
-    language: '언어',
-    serverTimeNotice: '시간은 변경될 수 있습니다',
-    migrationBtnLabel: '이주',
-    checkStatusBtnLabel: '상태 확인',
-    wingRed: '레드 윙',
-    wingOrange: '오렌지 윙',
-    wingPurple: '퍼플 윙',
-    wingBlue: '블루 윙',
-    total: '합계',
-    soloType: '개인',
-    groupType: '그룹',
-    allianceTag: '연맹 태그',
-    faction: '진영',
-    addMember: '멤버 추가',
-    removeMember: '제거',
-    memberLabel: '멤버',
-    uidLabel: 'UID',
-    uidPlaceholder: 'UID를 입력하세요',
-    statusPending: '대기 중',
-    statusApproved: '승인됨',
-    statusRejected: '거부됨',
-  },
-  'zh-CN': {
-    welcome: '欢迎',
-    homepage: '首页',
-    transfer: '转账',
-    logout: '登出',
-    loggingOut: '正在登出...',
-    guest: '访客',
-    browsing: '以访客身份浏览',
-    login: '登录',
-    applyCta: '申请迁移',
-    statusCta: '查看状态',
-    admin: '管理员',
-    language: '语言',
-    serverTimeNotice: '时间可能会有变动',
-    migrationBtnLabel: '迁移',
-    checkStatusBtnLabel: '检查状态',
-    wingRed: '红翼',
-    wingOrange: '橙翼',
-    wingPurple: '紫翼',
-    wingBlue: '蓝翼',
-    total: '总计',
-    soloType: '单人',
-    groupType: '团队',
-    allianceTag: '联盟标签',
-    faction: '阵营',
-    addMember: '添加成员',
-    removeMember: '移除',
-    memberLabel: '成员',
-    uidLabel: 'UID',
-    uidPlaceholder: '请输入您的UID',
-    statusPending: '待处理',
-    statusApproved: '已批准',
-    statusRejected: '已拒绝',
-  },
+export type LanguageCode = 'en' | 'fr' | 'pt-BR' | 'vi' | 'ko' | 'zh-CN'
+
+export interface LanguageStrings {
+  welcome: string
+  homepage: string
+  /** Server migration — not a money transfer. */
+  transfer: string
+  logout: string
+  loggingOut: string
+  /** Shown instead of a name when nobody is signed in. */
+  guest: string
+  /** Caption above "Guest" — explains what viewing as a guest means. */
+  browsing: string
+  login: string
+  /** Home call-to-action for visitors who came to apply. */
+  applyCta: string
+  /** Home call-to-action for visitors checking an existing application. */
+  statusCta: string
+  /** Admin area — was hardcoded English in the sidebar. */
+  admin: string
+  language: string
+
+  // --- Transfer / migration page ---
+  serverTimeNotice: string
+  migrationBtnLabel: string
+  checkStatusBtnLabel: string
+  wingRed: string
+  wingOrange: string
+  wingPurple: string
+  wingBlue: string
+  total: string
+  soloType: string
+  groupType: string
+  allianceTag: string
+  faction: string
+  addMember: string
+  removeMember: string
+  memberLabel: string
+  uidLabel: string
+  uidPlaceholder: string
+  statusPending: string
+  statusApproved: string
+  statusRejected: string
+
+  // --- Migration form modal ---
+  migrationModalTitle: string
+  migrationModalSubtitle: string
+  soloTransferBtn: string
+  groupTransferBtn: string
+  groupNameLabel: string
+  groupNamePlaceholder: string
+  usernameLabel: string
+  prevAllianceLabel: string
+  prevServerLabel: string
+  prevServerPlaceholder: string
+  killCountLabel: string
+  killCountPlaceholder: string
+  roleLabel: string
+  migrationScoreLabel: string
+  f1PowerLabel: string
+  f2PowerLabel: string
+  addMemberBtn: string
+  errorFillAllianceTag: string
+  errorFillAllFields: string
+  sendingLabel: string
+  sendLabel: string
+
+  // --- UID lookup modal ---
+  checkStatusModalTitle: string
+  checkStatusModalSubtitle: string
+  uidPlaceholderExample: string
+  errorEnterUid: string
+  errorNoRequestFound: string
+  searchingLabel: string
+  searchLabel: string
+
+  // --- Wing status card ---
+  closeLabel: string
 }
