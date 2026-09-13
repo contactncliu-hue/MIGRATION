@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { translations } from '../../lib/translations'
 import { Modal } from '../ui/Modal'
 import { Field } from '../ui/Field'
 import { FormMessage } from '../ui/FormMessage'
+import type { LanguageCode } from '../../types/user'
 
 interface UidLookupModalProps {
   onClose: () => void
@@ -10,6 +12,9 @@ interface UidLookupModalProps {
 
 /** Lets a member check their own migration status by UID, without signing in. */
 export function UidLookupModal({ onClose }: UidLookupModalProps) {
+  const lang = (localStorage.getItem('zoo_lang') as LanguageCode) || 'en'
+  const dict = translations[lang] ?? translations.en
+
   const [uid, setUid] = useState('')
   const [error, setError] = useState('')
   const [result, setResult] = useState<{ text: string; cls: string } | null>(null)
@@ -22,12 +27,18 @@ export function UidLookupModal({ onClose }: UidLookupModalProps) {
     return () => clearTimeout(t)
   }, [])
 
+  function statusLabel(statusKey: string) {
+    if (statusKey === 'approved') return dict.statusApproved
+    if (statusKey === 'rejected') return dict.statusRejected
+    return dict.statusPending
+  }
+
   async function runLookup() {
     setError('')
     setResult(null)
 
     if (!uid.trim()) {
-      setError('Please enter a UID.')
+      setError(dict.errorEnterUid)
       return
     }
 
@@ -43,12 +54,12 @@ export function UidLookupModal({ onClose }: UidLookupModalProps) {
 
       const row = data?.[0]
       if (!row) {
-        setError('No migration request found for this UID.')
+        setError(dict.errorNoRequestFound)
         return
       }
 
       const statusKey = (row.status || 'pending').toLowerCase()
-      setResult({ text: statusKey.toUpperCase(), cls: `status-${statusKey}` })
+      setResult({ text: statusLabel(statusKey), cls: `status-${statusKey}` })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally {
@@ -60,16 +71,16 @@ export function UidLookupModal({ onClose }: UidLookupModalProps) {
     <Modal
       open
       onClose={onClose}
-      title="Check Status"
-      subtitle="Enter your UID to see your migration status."
+      title={dict.checkStatusModalTitle}
+      subtitle={dict.checkStatusModalSubtitle}
     >
       <Field
-        label="UID"
+        label={dict.uidLabel}
         ref={inputRef}
         type="text"
         inputMode="numeric"
         maxLength={21}
-        placeholder="e.g. 1234567890123"
+        placeholder={dict.uidPlaceholderExample}
         value={uid}
         onChange={(e) => setUid(e.target.value.replace(/[^0-9]/g, '').slice(0, 21))}
         onKeyDown={(e) => {
@@ -81,7 +92,7 @@ export function UidLookupModal({ onClose }: UidLookupModalProps) {
       />
 
       <button type="button" className="submit-btn" disabled={searching} onClick={runLookup}>
-        {searching ? 'SEARCHING...' : 'SEARCH'}
+        {searching ? dict.searchingLabel : dict.searchLabel}
       </button>
 
       <FormMessage tone="error">{error}</FormMessage>
