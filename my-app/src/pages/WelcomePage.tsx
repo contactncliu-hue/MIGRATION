@@ -59,17 +59,6 @@ export function WelcomePage() {
     setSelected(key)
 
     const el = panelRefs.current[key]
-    if (!el) return
-
-    isProgrammaticScroll.current = true
-    el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
-
-    // Clear the guard after the smooth scroll has had time to finish,
-    // so subsequent user swipes are tracked normally again.
-    if (programmaticScrollTimeout.current) clearTimeout(programmaticScrollTimeout.current)
-    programmaticScrollTimeout.current = setTimeout(() => {
-      isProgrammaticScroll.current = false
-    }, 500)
   }
 
   useEffect(() => {
