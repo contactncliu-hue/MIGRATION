@@ -201,46 +201,79 @@
   color: #7a2b2b;
 }
 
+/* Fixed, out-of-flow caption used in portrait so it can be pinned to a
+   screen corner regardless of how tall the content above it is. Hidden
+   outside portrait — desktop/landscape keep using .welcome-caption. */
+.welcome-caption-fixed {
+  display: none;
+}
+
 /* ---------------------------------------------------------------------
    PORTRAIT — triggered by orientation, not a fixed pixel width, so this
    applies on tablets too (a tablet's portrait width is often well above
    760px, so a max-width breakpoint never fired for it — that was the
    root cause of the desktop row layout getting squeezed into portrait
    instead of switching to this stacked layout).
+
+   Everything must fit in one screen with no scrolling, so height is
+   locked to the viewport and overflow is hidden instead of the auto/
+   scrollable approach used previously.
    --------------------------------------------------------------------- */
 @media (orientation: portrait) {
   .welcome-stage {
-    height: auto;
-    overflow-x: hidden;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
     justify-content: flex-start;
+    /* Kill the left/right/bottom padding that was causing the "margins
+       everywhere" look — only keep a little breathing room up top. */
+    padding: var(--sp-4) 0 0;
+    position: relative;
   }
 
-  /* Show the portrait header (title/line/caption) above the panels,
-     and hide the desktop-only versions it replaces: the title nested
-     in .welcome-left, and the line/caption at the bottom of the page. */
+  .welcome-schedule-btn {
+    top: var(--sp-4);
+    left: var(--sp-4);
+  }
+
+  /* Show the portrait header (title/line) above the panels, and hide
+     the desktop-only versions it replaces: the title nested in
+     .welcome-left, and the line/caption at the bottom of the page. */
   .welcome-header-mobile {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding: 0 var(--sp-4);
+    box-sizing: border-box;
   }
   .welcome-header-mobile .welcome-title--mobile {
-    width: 60%;
-    max-width: 320px;
+    width: 46%;
+    max-width: 220px;
     height: auto;
   }
+  /* True full bleed: 100vw plus a negative margin that cancels out
+     centering, so the line spans edge-to-edge regardless of any
+     padding on its parents. */
   .welcome-header-mobile .welcome-line--mobile {
-    width: 100%;
+    width: 100vw;
     height: auto;
-    margin-top: var(--sp-3);
-  }
-  .welcome-header-mobile .welcome-caption--mobile {
     margin-top: var(--sp-2);
-    align-self: center;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
   }
+  /* Replaced by .welcome-caption-fixed, pinned to the bottom-right
+     corner of the screen — this in-flow version is no longer used
+     in portrait. */
+  .welcome-header-mobile .welcome-caption--mobile {
+    display: none;
+  }
+
   .welcome-left .welcome-title {
     display: none;
   }
+
   /* The bottom line/caption (non-mobile variant) — hide them so they
      aren't duplicated under the panels; the header ones stand in. */
   .welcome-stage > .welcome-line:not(.welcome-line--mobile),
@@ -250,22 +283,33 @@
 
   .welcome-layout {
     flex-direction: column;
-    margin-top: var(--sp-5);
+    margin-top: var(--sp-3);
+    flex: 1;
+    min-height: 0;
   }
   .welcome-left {
     width: 100%;
     max-width: none;
     height: auto;
+    padding: 0 var(--sp-4);
+    box-sizing: border-box;
   }
   .welcome-feature {
     width: 100%;
-    max-width: 420px;
+    max-width: 260px;
     margin: 0 auto;
   }
+
+  /* Pinned to the bottom-left corner of the viewport instead of sitting
+     in document flow with margins — this is what makes it "stick" /
+     magnetize to the corner regardless of content height above it. */
   .welcome-branches {
-    width: clamp(180px, 60vw, 320px);
-    margin-left: 0;
-    margin-top: var(--sp-4);
+    position: absolute;
+    left: -6%;
+    bottom: 0;
+    width: clamp(160px, 42vw, 260px);
+    margin: 0;
+    z-index: 10;
   }
 
   /* Swipeable carousel — one panel large and centered, with the
@@ -275,7 +319,7 @@
   .welcome-panels {
     width: 100%;
     flex: initial;
-    margin: var(--sp-4) 0 0;
+    margin: var(--sp-3) 0 0;
     display: flex;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -290,6 +334,20 @@
   .welcome-panel {
     flex: 0 0 78%;
     scroll-snap-align: center;
+  }
+
+  /* Fixed to the bottom-right corner of the screen, out of flow, so it
+     is always visible without needing to scroll. */
+  .welcome-caption-fixed {
+    display: block;
+    position: absolute;
+    right: var(--sp-4);
+    bottom: var(--sp-3);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: #7a2b2b;
+    z-index: 10;
   }
 }
 
