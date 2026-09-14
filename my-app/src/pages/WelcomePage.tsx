@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './WelcomePage.css'
 
+type PanelKey = 'scroll' | 'sword' | 'mystery'
+
 export function WelcomePage() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState(null) // 'scroll' | 'sword' | 'mystery' | null
+  const [selected, setSelected] = useState<PanelKey | null>(null)
 
   return (
     <div className="welcome-stage">
