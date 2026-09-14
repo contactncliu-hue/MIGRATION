@@ -39,6 +39,34 @@
   right: 0;
 }
 
+/* ---------- top-right nav: back to Welcome ---------- */
+.home-info-btn {
+  position: absolute;
+  top: var(--sp-5);
+  right: var(--sp-5);
+  z-index: 50;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--n-300);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--n-800);
+  font-family: var(--font-game);
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+.home-info-btn:hover {
+  border-color: var(--c-gold);
+  color: var(--c-gold-deep);
+}
+.home-info-btn:active {
+  transform: scale(0.94);
+}
+
 /* ---------- carousel ---------- */
 .home-carousel {
   position: absolute;
@@ -489,6 +517,11 @@
     color: var(--n-800);
     opacity: 0.7;
     pointer-events: none;
+  }
+
+  /* On mobile, keep the info button clear of the relocated top note. */
+  .home-info-btn {
+    top: var(--sp-5);
   }
 }
 
