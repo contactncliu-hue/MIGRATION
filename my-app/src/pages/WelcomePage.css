@@ -40,12 +40,13 @@
   display: flex;
   align-items: flex-start;
   gap: var(--sp-5);
-  flex: 1;
   width: 100%;
   min-width: 0;
   position: relative;
   margin-top: var(--sp-6, 40px);
   box-sizing: border-box;
+  /* caps the whole row's height the same way home-stage caps --portal-h */
+  --panel-h: min(560px, 62vh);
 }
 
 .welcome-left {
@@ -56,13 +57,14 @@
   min-width: 0;
   flex-shrink: 1;
   max-width: 420px;
-  height: 100%;
   position: relative;
 }
 
 .welcome-feature {
   width: 100%;
-  height: auto;
+  height: var(--panel-h);
+  object-fit: contain;
+  object-position: top left;
   display: block;
   position: relative;
   z-index: 1;
@@ -98,13 +100,14 @@
   gap: var(--sp-4);
   flex: 1;
   min-width: 0;
-  height: 100%;
+  height: var(--panel-h);
 }
 
 .welcome-panel {
   position: relative;
   flex: 1;
   min-width: 0;
+  height: 100%;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -114,7 +117,9 @@
 
 .welcome-panel-bg {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
   display: block;
   opacity: 0.45;
   transition: opacity 0.2s ease;
@@ -167,11 +172,16 @@
   .welcome-layout {
     flex-direction: column;
     margin-top: var(--sp-5);
+    --panel-h: min(420px, 48vh);
   }
   .welcome-left {
     width: 100%;
     max-width: none;
     height: auto;
+  }
+  .welcome-feature {
+    height: auto;
+    object-fit: unset;
   }
   .welcome-branches {
     width: 80%;
@@ -180,7 +190,7 @@
   }
   .welcome-panels {
     width: 100%;
-    height: auto;
+    height: var(--panel-h);
     margin-top: var(--sp-4);
   }
   .welcome-caption {
