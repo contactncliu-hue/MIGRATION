@@ -1,0 +1,128 @@
+.welcome-stage {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--surface-cream);
+  overflow: hidden;
+  padding: var(--sp-5);
+}
+
+.welcome-schedule-btn {
+  position: absolute;
+  top: var(--sp-5);
+  left: var(--sp-5);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border: 1.5px solid var(--n-300);
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-game);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--n-800);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+.welcome-schedule-btn:hover {
+  border-color: var(--c-gold);
+  color: var(--c-gold-deep);
+}
+.welcome-schedule-btn:active {
+  transform: scale(0.97);
+}
+
+.welcome-brand {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  max-width: 280px;
+}
+.welcome-logo {
+  width: 180px;
+  height: auto;
+}
+.welcome-flower {
+  width: 220px;
+  height: auto;
+  pointer-events: none;
+}
+
+.welcome-panels {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-4);
+  margin-top: var(--sp-5);
+  flex-wrap: wrap;
+}
+
+.welcome-panel {
+  position: relative;
+  width: 200px;
+  max-width: 22vw;
+  border-radius: 28px 28px 12px 12px;
+  overflow: hidden;
+}
+.welcome-panel-feature {
+  width: 220px;
+  max-width: 24vw;
+  display: block;
+}
+.welcome-panel-frame {
+  aspect-ratio: 0.62;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.welcome-panel-frame:hover {
+  transform: translateY(-4px);
+}
+.welcome-panel-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.welcome-panel-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 42%;
+  height: auto;
+  z-index: 2;
+}
+
+.welcome-caption {
+  position: absolute;
+  right: var(--sp-5);
+  bottom: var(--sp-4);
+  z-index: 4;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #7a2b2b;
+}
+
+@media (max-width: 760px) {
+  .welcome-panels {
+    justify-content: center;
+  }
+  .welcome-panel,
+  .welcome-panel-feature {
+    max-width: 42vw;
+  }
+  .welcome-brand {
+    align-items: center;
+    margin: 0 auto;
+    text-align: center;
+  }
+}
