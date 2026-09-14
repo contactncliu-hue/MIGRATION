@@ -30,17 +30,11 @@ export function WelcomePage() {
 
       <div className="welcome-layout">
         <div className="welcome-left">
-          <img
-            className="welcome-feature"
-            src="/assets/panel1.png"
-            alt=""
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate('/schedule')}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') navigate('/schedule')
-            }}
-          />
+          {/* Decorative — was previously wired to navigate('/schedule'),
+              which is why tapping it jumped to the schedule page. The
+              "Schedule" button above already covers that action, so
+              this is now just an image. */}
+          <img className="welcome-feature" src="/assets/panel1.png" alt="" />
           <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
           <img className="welcome-branches" src="/assets/flower.PNG" alt="" />
         </div>
