@@ -36,7 +36,6 @@ export function WelcomePage() {
               this is now just an image. */}
           <img className="welcome-feature" src="/assets/panel1.png" alt="" />
           <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
-          <img className="welcome-branches" src="/assets/flower.PNG" alt="" />
         </div>
 
         <div className="welcome-panels">
@@ -63,6 +62,11 @@ export function WelcomePage() {
           </div>
         </div>
       </div>
+
+      {/* Moved out of .welcome-left so it can anchor to the true
+          bottom-left corner of .welcome-stage (position: relative)
+          instead of floating at the bottom of the shorter left column. */}
+      <img className="welcome-branches" src="/assets/flower.PNG" alt="" />
 
       <img className="welcome-line" src="/assets/Line.PNG" alt="" />
       <div className="welcome-caption">WELCOME TO ZO.O</div>
