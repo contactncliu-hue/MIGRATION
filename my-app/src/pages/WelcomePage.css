@@ -1,10 +1,8 @@
 .welcome-stage {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
   background: var(--surface-cream);
-  overflow-x: hidden; /* was 'visible' — stops overflow from forcing a page-wide zoom-out */
+  overflow-x: hidden;
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
@@ -38,33 +36,30 @@
   transform: scale(0.97);
 }
 
-/* ---------- main two-column layout ---------- */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-5);
   flex: 1;
   width: 100%;
-  min-width: 0; /* critical: lets this row shrink instead of forcing horizontal overflow */
+  min-width: 0;
   position: relative;
   margin-top: var(--sp-6, 40px);
   box-sizing: border-box;
 }
 
-/* left stack: trophy card, red zOo title, tree branches */
 .welcome-left {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 24%;
-  min-width: 0; /* was 220px — that firm floor is what forced overflow under a narrower viewport */
+  min-width: 0;
   flex-shrink: 1;
   max-width: 420px;
   height: 100%;
   position: relative;
 }
 
-/* panel 1 — constant, always full brightness, but clickable */
 .welcome-feature {
   width: 100%;
   height: auto;
@@ -86,7 +81,6 @@
   z-index: 1;
 }
 
-/* flower/branches — bigger, in front */
 .welcome-branches {
   width: 160%;
   max-width: none;
@@ -98,13 +92,12 @@
   z-index: 10;
 }
 
-/* right: three tall arch panels */
 .welcome-panels {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-4);
   flex: 1;
-  min-width: 0; /* same fix — lets the panel row shrink instead of overflowing */
+  min-width: 0;
   height: 100%;
 }
 
@@ -152,7 +145,6 @@
   opacity: 1;
 }
 
-/* ---------- footer: full-width border + caption ---------- */
 .welcome-line {
   width: 100%;
   height: auto;
