@@ -36,17 +36,19 @@
   transform: scale(0.97);
 }
 
-/* Full width again — no max-width cap, no centering. Trophy on the far
-   left, panels filling the rest, edge to edge like the reference. */
+/* Full width, no centering. --panel-h is the ONE number controlling how
+   tall the whole hero row gets — capped so the page never needs to
+   scroll on a normal viewport. */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-5);
   width: 100%;
   min-width: 0;
-  margin-top: var(--sp-6, 40px);
+  margin-top: var(--sp-4);
   position: relative;
   box-sizing: border-box;
+  --panel-h: min(50vh, 460px);
 }
 
 .welcome-left {
@@ -62,7 +64,9 @@
 
 .welcome-feature {
   width: 100%;
-  height: auto;
+  height: var(--panel-h);
+  object-fit: contain;
+  object-position: top left;
   display: block;
   position: relative;
   z-index: 1;
@@ -81,33 +85,32 @@
   z-index: 1;
 }
 
+/* Bigger, matches the reference's proportionally larger branch art. */
 .welcome-branches {
-  width: 130%;
+  width: 170%;
   max-width: none;
   height: auto;
-  max-height: 200px;
-  object-fit: contain;
-  object-position: top left;
   margin-top: var(--sp-1, 4px);
-  margin-left: -8%;
+  margin-left: -10%;
   pointer-events: none;
   position: relative;
   z-index: 10;
 }
 
-/* Panels fill remaining width like the reference — flex, not fixed px. */
 .welcome-panels {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-4);
   flex: 1;
   min-width: 0;
+  height: var(--panel-h);
 }
 
 .welcome-panel {
   position: relative;
   flex: 1;
   min-width: 0;
+  height: 100%;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -117,7 +120,9 @@
 
 .welcome-panel-bg {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
   display: block;
   opacity: 0.45;
   transition: opacity 0.2s ease;
@@ -148,18 +153,21 @@
   opacity: 1;
 }
 
+/* Full width, no max-width, no auto-centering margin — spans the stage
+   exactly like the rest of the layout. */
 .welcome-line {
   width: 100%;
   height: auto;
   display: block;
-  margin-top: var(--sp-4);
+  margin-top: var(--sp-3);
   position: relative;
   z-index: 5;
 }
 
 .welcome-caption {
-  align-self: flex-end;
+  width: 100%;
   margin-top: var(--sp-2);
+  text-align: right;
   font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0.6px;
@@ -170,15 +178,19 @@
   .welcome-layout {
     flex-direction: column;
     margin-top: var(--sp-5);
+    --panel-h: min(40vh, 380px);
   }
   .welcome-left {
     width: 100%;
     max-width: none;
     height: auto;
   }
+  .welcome-feature {
+    height: auto;
+    object-fit: unset;
+  }
   .welcome-branches {
-    width: 80%;
-    max-height: 160px;
+    width: 90%;
     margin-left: 0;
     margin-top: var(--sp-4);
   }
@@ -187,6 +199,6 @@
     margin-top: var(--sp-4);
   }
   .welcome-caption {
-    align-self: center;
+    text-align: center;
   }
 }
