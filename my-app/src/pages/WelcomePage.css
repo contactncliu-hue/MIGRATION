@@ -49,7 +49,7 @@
 .welcome-layout {
   display: flex;
   align-items: flex-start;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
   width: 100%;
   min-width: 0;
   margin-top: var(--sp-6, 40px);
@@ -105,19 +105,21 @@
   z-index: 10;
 }
 
+/* Panels no longer forced to fill remaining width with flex:1 — each
+   sizes to its own image now (fixes the squish), so the group just
+   sits left-aligned next to .welcome-left with a small gap, matching
+   the reference instead of stretching to fill the row. */
 .welcome-panels {
   display: flex;
   align-items: flex-start;
-  gap: var(--sp-4);
-  flex: 0.85;
+  gap: var(--sp-2);
   min-width: 0;
-  margin: var(--sp-6) auto 0;
+  margin: 0;
 }
 
 .welcome-panel {
   position: relative;
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -125,10 +127,12 @@
   transform: translateY(-4px);
 }
 
+/* Height-driven sizing with width:auto lets the browser derive width
+   from the image's real aspect ratio — no more squish from width:100%
+   fighting max-height. */
 .welcome-panel-bg {
-  width: 100%;
-  max-height: 34vh;
-  height: auto;
+  height: 32vh;
+  width: auto;
   display: block;
   opacity: 0.45;
   transition: opacity 0.2s ease;
@@ -163,11 +167,6 @@
   opacity: 1;
 }
 
-/* Groups the line + caption into one block and pins that block to the
-   bottom of the stage with margin-top: auto. Needed because the stage
-   is now justify-content: flex-start (not space-between) — without this
-   wrapper, capping the art's height with vh left a huge empty gap right
-   after the panels instead of at the bottom. */
 .welcome-footer {
   margin-top: auto;
 }
@@ -246,8 +245,6 @@
     display: none;
   }
 
-  /* Hide the desktop footer (line/caption) entirely in portrait — the
-     header-mobile versions stand in for them there. */
   .welcome-footer {
     display: none;
   }
@@ -280,9 +277,10 @@
     z-index: 10;
   }
 
+  /* Portrait keeps the swipeable-carousel sizing (percentage-based),
+     since it's a different layout mode from the desktop row above. */
   .welcome-panels {
     width: 100%;
-    flex: initial;
     margin: var(--sp-3) 0 0;
     display: flex;
     overflow-x: auto;
@@ -298,6 +296,10 @@
   .welcome-panel {
     flex: 0 0 78%;
     scroll-snap-align: center;
+  }
+  .welcome-panel-bg {
+    width: 100%;
+    height: auto;
   }
 
   .welcome-caption-fixed {
