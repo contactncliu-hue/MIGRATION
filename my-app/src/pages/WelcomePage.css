@@ -192,10 +192,9 @@
 
 /* ============================================================
    PORTRAIT / MOBILE ONLY
-   Stacking order back → front: title  ->  feature (panel1)  ->  line
-   Panels: center = selected (front, full opacity), immediate
-   neighbors peek in half-scale at the sides, rest hidden.
-   Icons only reveal on the selected panel (rule inherited above).
+   True document-flow order: header (title + line) -> panel1 (welcome-left)
+   -> panel carousel. No negative-margin overlap hacks, no manual
+   z-index stacking between sections — normal flex column flow.
    ============================================================ */
 @media (orientation: portrait) {
   .welcome-stage {
@@ -220,26 +219,23 @@
     padding: 0 var(--sp-4);
     box-sizing: border-box;
     position: relative;
-    z-index: 1; /* title sits behind the feature/panel1 peek */
   }
   .welcome-header-mobile .welcome-title--mobile {
     width: 46%;
     max-width: 220px;
     height: auto;
     position: relative;
-    z-index: 1;
   }
   .welcome-header-mobile .welcome-line--mobile {
-    /* bigger + bled wider so it reads as a bolder divider */
-    width: 112vw;
+    /* bumped further: wider bleed + stronger vertical scale */
+    width: 124vw;
     height: auto;
     margin-top: var(--sp-2);
-    margin-left: calc(-56vw + 50%);
-    margin-right: calc(-56vw + 50%);
-    transform: scaleY(1.6);
+    margin-left: calc(-62vw + 50%);
+    margin-right: calc(-62vw + 50%);
+    transform: scaleY(1.9);
     transform-origin: center;
     position: relative;
-    z-index: 3; /* line renders in front of feature/panel1 */
   }
   .welcome-header-mobile .welcome-caption--mobile,
   .welcome-caption {
@@ -256,26 +252,28 @@
 
   .welcome-layout {
     flex-direction: column;
-    /* pulls feature+panels up under the line so the trophy peeks out */
-    margin-top: -8vh;
+    /* no pull-up hack — panel1 and the carousel now follow true flow order */
+    margin-top: 0;
     flex: 1;
     min-height: 0;
     position: relative;
   }
+
   .welcome-left {
     width: 100%;
     max-width: none;
     height: auto;
-    padding: 0;
+    flex: 0 0 auto;
+    padding: var(--sp-2) 0;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     position: relative;
-    z-index: 2; /* above title, below the line */
   }
   .welcome-feature {
-    width: 100%;
-    max-width: 96px;
+    /* reverted to original size — no longer artificially shrunk */
+    width: 62%;
+    max-width: 260px;
     height: auto;
     margin: 0 auto;
     transform: none;
@@ -293,16 +291,18 @@
   .welcome-panels {
     position: relative;
     width: 100%;
-    height: 48vh;
+    /* fills remaining vertical space instead of a fixed 48vh —
+       that fixed height was the cause of the dead gap underneath */
+    flex: 1;
+    min-height: 0;
     margin: var(--sp-2) 0 0;
-    z-index: 20; /* panels stack above line/feature/title */
   }
 
   .welcome-panel {
     position: absolute;
     top: 0;
     left: 50%;
-    width: 60%;
+    width: 70%;
     transform: translate(-50%, 0) scale(0.8);
     opacity: 0;
     pointer-events: none;
