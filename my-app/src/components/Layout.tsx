@@ -1,24 +1,40 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { Sidebar } from './Sidebar'
+import { MenuToggle } from './MenuToggle'
 
-node_modules
-dist
-dist-ssr
-*.local
+interface LayoutProps {
+  children: React.ReactNode
+}
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+export function Layout({ children }: LayoutProps) {
+  const location = useLocation()
+  const hideSidebar = location.pathname === '/login'
+
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 760)
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth <= 760) setSidebarOpen(false)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  if (hideSidebar) {
+    return <div className="app-shell">{children}</div>
+  }
+
+  return (
+    <div className="app-shell">
+      <Sidebar isOpen={sidebarOpen} />
+      {sidebarOpen && (
+        <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
+      )}
+      <main className="main-content">
+        <MenuToggle isOpen={sidebarOpen} onClick={() => setSidebarOpen((o) => !o)} />
+        {children}
+      </main>
+    </div>
+  )
+}
