@@ -77,7 +77,8 @@
   height: auto;
   display: block;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  pointer-events: auto;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -91,6 +92,14 @@
   margin-top: var(--sp-2);
   position: relative;
   z-index: 1;
+}
+
+/* Duplicate portrait header (title + line + caption shown above the
+   panels row). Hidden by default — only shown at the mobile/portrait
+   breakpoint below, where the desktop title and the bottom-of-page
+   line/caption get hidden in its place. */
+.welcome-header-mobile {
+  display: none;
 }
 
 /* Bigger flower/branches, sized by content (not stretched to fill
@@ -199,6 +208,40 @@
     overflow-x: hidden;
     justify-content: flex-start;
   }
+
+  /* Show the portrait header (title/line/caption) above the panels,
+     and hide the desktop-only versions it replaces: the title nested
+     in .welcome-left, and the line/caption at the bottom of the page. */
+  .welcome-header-mobile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  .welcome-header-mobile .welcome-title--mobile {
+    width: 60%;
+    max-width: 320px;
+    height: auto;
+  }
+  .welcome-header-mobile .welcome-line--mobile {
+    width: 100%;
+    height: auto;
+    margin-top: var(--sp-3);
+  }
+  .welcome-header-mobile .welcome-caption--mobile {
+    margin-top: var(--sp-2);
+    align-self: center;
+  }
+  .welcome-left .welcome-title {
+    display: none;
+  }
+  /* The bottom line/caption (non-mobile variant) — hide them so they
+     aren't duplicated under the panels; the header ones stand in. */
+  .welcome-stage > .welcome-line:not(.welcome-line--mobile),
+  .welcome-stage > .welcome-caption:not(.welcome-caption--mobile) {
+    display: none;
+  }
+
   .welcome-layout {
     flex-direction: column;
     margin-top: var(--sp-5);
@@ -218,9 +261,6 @@
     width: 100%;
     flex: initial;
     margin-top: var(--sp-4);
-  }
-  .welcome-caption {
-    align-self: center;
   }
 }
 
