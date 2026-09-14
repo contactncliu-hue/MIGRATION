@@ -6,13 +6,15 @@
   background: var(--surface-cream);
   overflow: hidden;
   padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
 }
 
 .welcome-schedule-btn {
   position: absolute;
-  top: var(--sp-5);
+  top: calc(var(--sp-5) + 52px);
   left: var(--sp-5);
-  z-index: 50;
+  z-index: 60;
   display: flex;
   align-items: center;
   gap: var(--sp-2);
@@ -35,77 +37,94 @@
   transform: scale(0.97);
 }
 
-.welcome-brand {
-  position: relative;
-  z-index: 5;
+/* ---------- main two-column layout ---------- */
+.welcome-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-5);
+  flex: 1;
+  width: 100%;
+}
+
+/* left stack: trophy card, red zOo title, tree branches */
+.welcome-left {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--sp-2);
-  max-width: 280px;
+  width: 24%;
+  min-width: 220px;
+  max-width: 420px;
+  height: 100%;
 }
-.welcome-logo {
-  width: 180px;
+
+.welcome-feature {
+  width: 100%;
   height: auto;
+  display: block;
 }
-.welcome-flower {
-  width: 220px;
+
+.welcome-title {
+  width: 82%;
   height: auto;
+  margin-top: var(--sp-3);
+}
+
+.welcome-branches {
+  width: 130%;
+  max-width: none;
+  height: auto;
+  margin-top: auto;
+  margin-left: -8%;
   pointer-events: none;
 }
 
+/* right: three tall arch panels, each at its own native aspect ratio */
 .welcome-panels {
-  position: relative;
-  z-index: 3;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: var(--sp-4);
-  margin-top: var(--sp-5);
-  flex-wrap: wrap;
+  flex: 1;
+  height: 100%;
 }
 
 .welcome-panel {
   position: relative;
-  width: 200px;
-  max-width: 22vw;
-  border-radius: 28px 28px 12px 12px;
-  overflow: hidden;
-}
-.welcome-panel-feature {
-  width: 220px;
-  max-width: 24vw;
-  display: block;
-}
-.welcome-panel-frame {
-  aspect-ratio: 0.62;
+  flex: 1;
+  min-width: 0;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-.welcome-panel-frame:hover {
+.welcome-panel:hover {
   transform: translateY(-4px);
 }
+
 .welcome-panel-bg {
-  position: absolute;
-  inset: 0;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
 }
+
 .welcome-panel-icon {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 42%;
+  width: 46%;
   height: auto;
-  z-index: 2;
+  pointer-events: none;
+}
+
+/* ---------- footer: full-width border + caption ---------- */
+.welcome-line {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: var(--sp-4);
 }
 
 .welcome-caption {
-  position: absolute;
-  right: var(--sp-5);
-  bottom: var(--sp-4);
-  z-index: 4;
+  align-self: flex-end;
+  margin-top: var(--sp-2);
   font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0.6px;
@@ -113,16 +132,24 @@
 }
 
 @media (max-width: 760px) {
+  .welcome-layout {
+    flex-direction: column;
+  }
+  .welcome-left {
+    width: 100%;
+    max-width: none;
+    height: auto;
+  }
+  .welcome-branches {
+    width: 60%;
+    margin-left: 0;
+    margin-top: var(--sp-4);
+  }
   .welcome-panels {
-    justify-content: center;
+    width: 100%;
+    height: auto;
   }
-  .welcome-panel,
-  .welcome-panel-feature {
-    max-width: 42vw;
-  }
-  .welcome-brand {
-    align-items: center;
-    margin: 0 auto;
-    text-align: center;
+  .welcome-caption {
+    align-self: center;
   }
 }
