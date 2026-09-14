@@ -161,6 +161,12 @@
   opacity: 1;
 }
 
+/* Portrait-only carousel copy of panel1 — invisible on desktop/iPad so
+   panel1 keeps rendering only via .welcome-left there. */
+.welcome-panel-feature-mobile-only {
+  display: none;
+}
+
 .welcome-footer {
   margin-top: auto;
 }
@@ -192,9 +198,9 @@
 
 /* ============================================================
    PORTRAIT / MOBILE ONLY
-   True document-flow order: header (title + line) -> panel1 (welcome-left)
-   -> panel carousel. No negative-margin overlap hacks, no manual
-   z-index stacking between sections — normal flex column flow.
+   True document-flow order: header (title + line) -> panels carousel,
+   with panel1 now included as the first member of the carousel so it
+   can take part in the same peek/select/swipe mechanics as 2/3/4.
    ============================================================ */
 @media (orientation: portrait) {
   .welcome-stage {
@@ -242,7 +248,8 @@
     display: none; /* keep just one "WELCOME TO ZO.O" (the fixed one) */
   }
 
-  .welcome-left .welcome-title {
+  /* panel1 is rendered via the carousel copy in portrait, not this block */
+  .welcome-left {
     display: none;
   }
 
@@ -252,31 +259,10 @@
 
   .welcome-layout {
     flex-direction: column;
-    /* no pull-up hack — panel1 and the carousel now follow true flow order */
     margin-top: 0;
     flex: 1;
     min-height: 0;
     position: relative;
-  }
-
-  .welcome-left {
-    width: 100%;
-    max-width: none;
-    height: auto;
-    flex: 0 0 auto;
-    padding: var(--sp-2) 0;
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    position: relative;
-  }
-  .welcome-feature {
-    /* reverted to original size — no longer artificially shrunk */
-    width: 62%;
-    max-width: 260px;
-    height: auto;
-    margin: 0 auto;
-    transform: none;
   }
 
   .welcome-branches {
@@ -338,6 +324,11 @@
     height: auto;
     /* opacity now controlled by the parent .welcome-panel, not here */
     opacity: 1;
+  }
+
+  /* panel1's carousel copy becomes visible only in portrait */
+  .welcome-panel-feature-mobile-only {
+    display: block;
   }
 
   .welcome-caption-fixed {
