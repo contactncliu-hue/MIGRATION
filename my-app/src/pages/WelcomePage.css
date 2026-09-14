@@ -36,9 +36,6 @@
   transform: scale(0.97);
 }
 
-/* Full width, no centering. --panel-h is the ONE number controlling how
-   tall the whole hero row gets — capped so the page never needs to
-   scroll on a normal viewport. */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
@@ -85,11 +82,16 @@
   z-index: 1;
 }
 
-/* Bigger, matches the reference's proportionally larger branch art. */
+/* Height capped again — this is what prevents a tall source image from
+   dragging everything below it out of view. Width still bigger than the
+   original 130% to read closer to the reference, but bounded. */
 .welcome-branches {
-  width: 170%;
+  width: 150%;
   max-width: none;
   height: auto;
+  max-height: 260px;
+  object-fit: contain;
+  object-position: top left;
   margin-top: var(--sp-1, 4px);
   margin-left: -10%;
   pointer-events: none;
@@ -153,8 +155,6 @@
   opacity: 1;
 }
 
-/* Full width, no max-width, no auto-centering margin — spans the stage
-   exactly like the rest of the layout. */
 .welcome-line {
   width: 100%;
   height: auto;
@@ -191,6 +191,7 @@
   }
   .welcome-branches {
     width: 90%;
+    max-height: 200px;
     margin-left: 0;
     margin-top: var(--sp-4);
   }
