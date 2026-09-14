@@ -1,12 +1,88 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './WelcomePage.css'
 
 type PanelKey = 'scroll' | 'sword' | 'mystery'
 
+const PANEL_ORDER: PanelKey[] = ['scroll', 'sword', 'mystery']
+
 export function WelcomePage() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState<PanelKey | null>(null)
+  const [selected, setSelected] = useState<PanelKey | null>('scroll')
+
+  const panelsRef = useRef<HTMLDivElement>(null)
+  const panelRefs = useRef<Partial<Record<PanelKey, HTMLDivElement | null>>>({})
+  const rafRef = useRef<number | null>(null)
+  // Set while we're programmatically scrolling (from a click), so the
+  // scroll listener doesn't fight the click handler's own selection.
+  const isProgrammaticScroll = useRef(false)
+  const programmaticScrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Figures out which panel's center is closest to the scroll
+  // container's center, and updates `selected` if it changed. Used
+  // both on swipe (scroll events) and once on mount so the initially
+  // visible panel starts out highlighted.
+  const updateSelectedFromScroll = () => {
+    const container = panelsRef.current
+    if (!container) return
+
+    const containerRect = container.getBoundingClientRect()
+    const containerCenter = containerRect.left + containerRect.width / 2
+
+    let closestKey: PanelKey | null = null
+    let closestDistance = Infinity
+
+    for (const key of PANEL_ORDER) {
+      const el = panelRefs.current[key]
+      if (!el) continue
+      const rect = el.getBoundingClientRect()
+      const panelCenter = rect.left + rect.width / 2
+      const distance = Math.abs(panelCenter - containerCenter)
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestKey = key
+      }
+    }
+
+    if (closestKey && closestKey !== selected) {
+      setSelected(closestKey)
+    }
+  }
+
+  const handleScroll = () => {
+    if (isProgrammaticScroll.current) return
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(updateSelectedFromScroll)
+  }
+
+  const handlePanelClick = (key: PanelKey) => {
+    setSelected(key)
+
+    const el = panelRefs.current[key]
+    if (!el) return
+
+    isProgrammaticScroll.current = true
+    el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+
+    // Clear the guard after the smooth scroll has had time to finish,
+    // so subsequent user swipes are tracked normally again.
+    if (programmaticScrollTimeout.current) clearTimeout(programmaticScrollTimeout.current)
+    programmaticScrollTimeout.current = setTimeout(() => {
+      isProgrammaticScroll.current = false
+    }, 500)
+  }
+
+  useEffect(() => {
+    // Establish initial selection based on actual scroll position
+    // (relevant on mobile, where panels overflow horizontally).
+    updateSelectedFromScroll()
+
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+      if (programmaticScrollTimeout.current) clearTimeout(programmaticScrollTimeout.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="welcome-stage">
@@ -38,24 +114,27 @@ export function WelcomePage() {
           <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
         </div>
 
-        <div className="welcome-panels">
+        <div className="welcome-panels" ref={panelsRef} onScroll={handleScroll}>
           <div
             className={`welcome-panel ${selected === 'scroll' ? 'is-selected' : ''}`}
-            onClick={() => setSelected('scroll')}
+            ref={(el) => { panelRefs.current.scroll = el }}
+            onClick={() => handlePanelClick('scroll')}
           >
             <img className="welcome-panel-bg" src="/assets/panel2.png" alt="" />
             <img className="welcome-panel-icon" src="/assets/scroll.png" alt="Scroll" />
           </div>
           <div
             className={`welcome-panel ${selected === 'sword' ? 'is-selected' : ''}`}
-            onClick={() => setSelected('sword')}
+            ref={(el) => { panelRefs.current.sword = el }}
+            onClick={() => handlePanelClick('sword')}
           >
             <img className="welcome-panel-bg" src="/assets/panel3.png" alt="" />
             <img className="welcome-panel-icon" src="/assets/sword.png" alt="Sword" />
           </div>
           <div
             className={`welcome-panel ${selected === 'mystery' ? 'is-selected' : ''}`}
-            onClick={() => setSelected('mystery')}
+            ref={(el) => { panelRefs.current.mystery = el }}
+            onClick={() => handlePanelClick('mystery')}
           >
             <img className="welcome-panel-bg" src="/assets/panel4.png" alt="" />
             <img className="welcome-panel-icon" src="/assets/quest.png" alt="Mystery" />
