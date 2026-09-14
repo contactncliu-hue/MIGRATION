@@ -38,7 +38,7 @@
 }
 
 /* ---------- main two-column layout ---------- */
-/* margin-top here moves BOTH the left column and the panels down together, evenly */
+/* single margin-top here keeps left column + panels aligned and moves both down together */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
@@ -61,15 +61,20 @@
   position: relative;
 }
 
+/* panel 1 — constant, always full brightness, but clickable */
 .welcome-feature {
   width: 100%;
   height: auto;
   display: block;
   position: relative;
   z-index: 1;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.welcome-feature:hover {
+  transform: translateY(-4px);
 }
 
-/* title pushed down a bit more */
 .welcome-title {
   width: 82%;
   height: auto;
@@ -97,7 +102,6 @@
   gap: var(--sp-4);
   flex: 1;
   height: 100%;
-  /* no separate margin-top — panels now align with left column via .welcome-layout */
 }
 
 .welcome-panel {
@@ -107,24 +111,15 @@
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-
 .welcome-panel:hover {
   transform: translateY(-4px);
-}
-
-/* Panel 1 — always constant, still clickable, never dims/scales */
-.welcome-panel.is-fixed {
-  transform: none !important;
-}
-.welcome-panel.is-fixed:hover {
-  transform: none !important;
 }
 
 .welcome-panel-bg {
   width: 100%;
   height: auto;
   display: block;
-  opacity: 1;
+  opacity: 0.45; /* dimmed by default — opacity only, no brightness (avoids wash-out) */
   transition: opacity 0.2s ease;
 }
 
@@ -136,19 +131,11 @@
   width: 46%;
   height: auto;
   pointer-events: none;
-  opacity: 1;
+  opacity: 0; /* hidden by default */
   transition: opacity 0.2s ease;
 }
 
-/* Panels 2-4 default (unselected): dim via opacity ONLY — no brightness spike, no wash-out */
-.welcome-panel:not(.is-fixed) .welcome-panel-bg {
-  opacity: 0.45;
-}
-.welcome-panel:not(.is-fixed) .welcome-panel-icon {
-  opacity: 0;
-}
-
-/* Panels 2-4 selected: full opacity, icon visible, slightly bigger */
+/* selected state: full opacity, icon visible, slightly bigger */
 .welcome-panel.is-selected {
   transform: scale(1.06) translateY(-4px);
 }
@@ -166,12 +153,10 @@
 .welcome-line {
   width: 100%;
   height: auto;
-  display: block !important;
-  visibility: visible !important;
+  display: block;
   margin-top: var(--sp-4);
   position: relative;
   z-index: 5;
-  min-height: 4px;
 }
 
 .welcome-caption {
