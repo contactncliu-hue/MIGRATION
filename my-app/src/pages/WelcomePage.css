@@ -4,10 +4,11 @@
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--surface-cream);
-  overflow: visible;
+  overflow-x: hidden; /* was 'visible' — stops overflow from forcing a page-wide zoom-out */
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 .welcome-schedule-btn {
@@ -38,15 +39,16 @@
 }
 
 /* ---------- main two-column layout ---------- */
-/* single margin-top here keeps left column + panels aligned and moves both down together */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-5);
   flex: 1;
   width: 100%;
+  min-width: 0; /* critical: lets this row shrink instead of forcing horizontal overflow */
   position: relative;
   margin-top: var(--sp-6, 40px);
+  box-sizing: border-box;
 }
 
 /* left stack: trophy card, red zOo title, tree branches */
@@ -55,7 +57,8 @@
   flex-direction: column;
   align-items: flex-start;
   width: 24%;
-  min-width: 220px;
+  min-width: 0; /* was 220px — that firm floor is what forced overflow under a narrower viewport */
+  flex-shrink: 1;
   max-width: 420px;
   height: 100%;
   position: relative;
@@ -101,6 +104,7 @@
   align-items: flex-start;
   gap: var(--sp-4);
   flex: 1;
+  min-width: 0; /* same fix — lets the panel row shrink instead of overflowing */
   height: 100%;
 }
 
@@ -119,7 +123,7 @@
   width: 100%;
   height: auto;
   display: block;
-  opacity: 0.45; /* dimmed by default — opacity only, no brightness (avoids wash-out) */
+  opacity: 0.45;
   transition: opacity 0.2s ease;
 }
 
@@ -131,11 +135,10 @@
   width: 46%;
   height: auto;
   pointer-events: none;
-  opacity: 0; /* hidden by default */
+  opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-/* selected state: full opacity, icon visible, slightly bigger */
 .welcome-panel.is-selected {
   transform: scale(1.06) translateY(-4px);
 }
