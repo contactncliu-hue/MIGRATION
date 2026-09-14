@@ -190,6 +190,13 @@
   display: none;
 }
 
+/* ============================================================
+   PORTRAIT / MOBILE ONLY
+   Stacking order back → front: title  ->  feature (panel1)  ->  line
+   Panels: center = selected (front, full opacity), immediate
+   neighbors peek in half-scale at the sides, rest hidden.
+   Icons only reveal on the selected panel (rule inherited above).
+   ============================================================ */
 @media (orientation: portrait) {
   .welcome-stage {
     height: 100dvh;
@@ -212,21 +219,31 @@
     width: 100%;
     padding: 0 var(--sp-4);
     box-sizing: border-box;
+    position: relative;
+    z-index: 1; /* title sits behind the feature/panel1 peek */
   }
   .welcome-header-mobile .welcome-title--mobile {
     width: 46%;
     max-width: 220px;
     height: auto;
+    position: relative;
+    z-index: 1;
   }
   .welcome-header-mobile .welcome-line--mobile {
-    width: 100vw;
+    /* bigger + bled wider so it reads as a bolder divider */
+    width: 112vw;
     height: auto;
     margin-top: var(--sp-2);
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
+    margin-left: calc(-56vw + 50%);
+    margin-right: calc(-56vw + 50%);
+    transform: scaleY(1.6);
+    transform-origin: center;
+    position: relative;
+    z-index: 3; /* line renders in front of feature/panel1 */
   }
-  .welcome-header-mobile .welcome-caption--mobile {
-    display: none;
+  .welcome-header-mobile .welcome-caption--mobile,
+  .welcome-caption {
+    display: none; /* keep just one "WELCOME TO ZO.O" (the fixed one) */
   }
 
   .welcome-left .welcome-title {
@@ -239,22 +256,29 @@
 
   .welcome-layout {
     flex-direction: column;
-    margin-top: var(--sp-3);
+    /* pulls feature+panels up under the line so the trophy peeks out */
+    margin-top: -8vh;
     flex: 1;
     min-height: 0;
+    position: relative;
   }
   .welcome-left {
     width: 100%;
     max-width: none;
     height: auto;
-    padding: 0 var(--sp-4);
+    padding: 0;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2; /* above title, below the line */
   }
   .welcome-feature {
     width: 100%;
-    max-width: 260px;
+    max-width: 96px;
     height: auto;
     margin: 0 auto;
+    transform: none;
   }
 
   .welcome-branches {
@@ -267,43 +291,52 @@
   }
 
   .welcome-panels {
+    position: relative;
     width: 100%;
-    margin: var(--sp-3) 0 0;
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 0 11%;
-    gap: var(--sp-4);
+    height: 48vh;
+    margin: var(--sp-2) 0 0;
+    z-index: 20; /* panels stack above line/feature/title */
   }
-  .welcome-panels::-webkit-scrollbar {
-    display: none;
-  }
+
   .welcome-panel {
-    flex: 0 0 78%;
-    scroll-snap-align: center;
-    /* Reset the desktop -4vh lift + hover/selected compound transforms
-       (defined outside this media query) — on mobile the carousel only
-       needs a scale change, not a vertical shift. */
-    transform: none;
-    transition: transform 0.25s ease;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 60%;
+    transform: translate(-50%, 0) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
-  .welcome-panel:hover {
-    transform: none;
-  }
+
   .welcome-panel.is-selected {
-    transform: scale(1.06);
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0) scale(1);
+    z-index: 3;
   }
-  .welcome-panel.is-selected:hover {
-    transform: scale(1.06);
+
+  /* previous sibling of the selected panel = left peek */
+  .welcome-panel:has(+ .is-selected) {
+    opacity: 0.55;
+    pointer-events: auto;
+    transform: translate(calc(-50% - 68%), 4%) scale(0.82);
+    z-index: 2;
   }
+
+  /* next sibling of the selected panel = right peek */
+  .is-selected + .welcome-panel {
+    opacity: 0.55;
+    pointer-events: auto;
+    transform: translate(calc(-50% + 68%), 4%) scale(0.82);
+    z-index: 2;
+  }
+
   .welcome-panel-bg {
     width: 100%;
     height: auto;
-    opacity: 0.35;
-  }
-  .welcome-panel.is-selected .welcome-panel-bg {
+    /* opacity now controlled by the parent .welcome-panel, not here */
     opacity: 1;
   }
 
@@ -316,6 +349,6 @@
     font-weight: 700;
     letter-spacing: 0.6px;
     color: #7a2b2b;
-    z-index: 10;
+    z-index: 25;
   }
 }
