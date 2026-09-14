@@ -72,18 +72,15 @@
   position: relative;
 }
 
+/* No longer interactive (it previously navigated to /schedule, which is
+   why tapping it jumped pages unexpectedly — removed in the component).
+   Purely decorative now. */
 .welcome-feature {
   width: 100%;
   height: auto;
   display: block;
   position: relative;
   z-index: 2;
-  pointer-events: auto;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-.welcome-feature:hover {
-  transform: translateY(-4px);
 }
 
 .welcome-title {
@@ -95,18 +92,20 @@
 }
 
 /* Duplicate portrait header (title + line + caption shown above the
-   panels row). Hidden by default — only shown at the mobile/portrait
-   breakpoint below, where the desktop title and the bottom-of-page
-   line/caption get hidden in its place. */
+   panels row). Hidden by default — only shown in portrait orientation
+   below, where the desktop title and the bottom-of-page line/caption
+   get hidden in its place. */
 .welcome-header-mobile {
   display: none;
 }
 
-/* Bigger flower/branches, sized by content (not stretched to fill
-   leftover column space — that was pushing it down with a big gap
-   above it on taller viewports). Pulled up closer to the title. */
+/* Flower/branches — sized with clamp() against the viewport instead of
+   a percentage of its (variable-width) parent column. A %-based width
+   looks huge in landscape (wide column) and tiny in portrait (narrow
+   column) even though the CSS never changes; clamp() keeps it visually
+   consistent across orientations. */
 .welcome-branches {
-  width: 160%;
+  width: clamp(220px, 34vw, 420px);
   max-width: none;
   height: auto;
   object-fit: contain;
@@ -202,7 +201,14 @@
   color: #7a2b2b;
 }
 
-@media (max-width: 760px) {
+/* ---------------------------------------------------------------------
+   PORTRAIT — triggered by orientation, not a fixed pixel width, so this
+   applies on tablets too (a tablet's portrait width is often well above
+   760px, so a max-width breakpoint never fired for it — that was the
+   root cause of the desktop row layout getting squeezed into portrait
+   instead of switching to this stacked layout).
+   --------------------------------------------------------------------- */
+@media (orientation: portrait) {
   .welcome-stage {
     height: auto;
     overflow-x: hidden;
@@ -251,25 +257,48 @@
     max-width: none;
     height: auto;
   }
+  .welcome-feature {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
   .welcome-branches {
-    width: 80%;
-    max-height: 160px;
+    width: clamp(180px, 60vw, 320px);
     margin-left: 0;
     margin-top: var(--sp-4);
   }
+
+  /* Swipeable carousel — one panel large and centered, with the
+     next/previous panel peeking in at the edges, matching the
+     reference. scroll-snap does the swipe/settle behavior natively,
+     no extra JS needed. */
   .welcome-panels {
     width: 100%;
     flex: initial;
-    margin-top: var(--sp-4);
+    margin: var(--sp-4) 0 0;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 11%;
+    gap: var(--sp-4);
+  }
+  .welcome-panels::-webkit-scrollbar {
+    display: none;
+  }
+  .welcome-panel {
+    flex: 0 0 78%;
+    scroll-snap-align: center;
   }
 }
 
-/* Landscape safety net — covers phones AND tablets rotated (not just
-   very short phone heights). 100dvh can be tight relative to the
-   trophy/panels row's natural height, which was pushing .welcome-line
-   and .welcome-caption below the fold (scrollable but easy to miss —
-   looked like they'd vanished). Shrinking the artwork here keeps
-   everything inside one view without needing to scroll. */
+/* ---------------------------------------------------------------------
+   LANDSCAPE short-height safety net — for phones/small tablets rotated,
+   where 100dvh can be tight relative to the trophy/panels row's natural
+   height. Shrinks the artwork so .welcome-line and .welcome-caption
+   stay inside one view instead of needing a scroll to reach them.
+   --------------------------------------------------------------------- */
 @media (orientation: landscape) and (max-height: 900px) {
   .welcome-stage {
     height: auto;
@@ -285,9 +314,7 @@
     width: auto;
   }
   .welcome-branches {
-    width: 100%;
-    max-height: 100px;
-    object-fit: contain;
+    width: clamp(160px, 24vw, 260px);
     margin-top: calc(var(--sp-1, 4px) * -1);
   }
   .welcome-panel-bg {
