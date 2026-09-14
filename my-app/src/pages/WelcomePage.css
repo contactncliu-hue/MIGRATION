@@ -201,6 +201,14 @@
    True document-flow order: header (title + line) -> panels carousel,
    with panel1 now included as the first member of the carousel so it
    can take part in the same peek/select/swipe mechanics as 2/3/4.
+
+   Peek/select roles are computed in TSX from panel index (with
+   wraparound via modulo) and applied as explicit classes —
+   welcome-panel-peek-prev / welcome-panel-peek-next — rather than
+   DOM-sibling CSS selectors. Sibling selectors like
+   `.welcome-panel:has(+ .is-selected)` can't express wraparound
+   (panel 4 has no next sibling to be "panel 1"), which is what
+   caused the carousel to dead-end instead of looping 1→2→3→4→1.
    ============================================================ */
 @media (orientation: portrait) {
   .welcome-stage {
@@ -307,16 +315,22 @@
     z-index: 3;
   }
 
-  /* previous sibling of the selected panel = left peek */
-  .welcome-panel:has(+ .is-selected) {
+  /* Left peek — the panel just "before" the selected one, in
+     PANEL_ORDER index terms with wraparound (so panel1 peeks left
+     when panel4/mystery is selected). Role assigned in TSX. */
+  .welcome-panel.welcome-panel-peek-prev {
     opacity: 0.55;
     pointer-events: auto;
     transform: translate(calc(-50% - 68%), 4%) scale(0.82);
     z-index: 2;
   }
 
-  /* next sibling of the selected panel = right peek */
-  .is-selected + .welcome-panel {
+  /* Right peek — the panel just "after" the selected one, with
+     wraparound (so panel1 peeks right when panel2/scroll is
+     selected... and panel1 peeks right when panel4 is selected is
+     NOT possible simultaneously with the left-peek case above,
+     since only one neighbor is prev and one is next at a time). */
+  .welcome-panel.welcome-panel-peek-next {
     opacity: 0.55;
     pointer-events: auto;
     transform: translate(calc(-50% + 68%), 4%) scale(0.82);
