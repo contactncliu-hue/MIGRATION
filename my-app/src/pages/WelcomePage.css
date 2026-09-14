@@ -7,6 +7,7 @@
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   box-sizing: border-box;
 }
 
@@ -37,17 +38,16 @@
   transform: scale(0.97);
 }
 
-/* Full width, edge to edge like the reference. flex: 1 so this row
-   fills whatever vertical space is left after the branches/line/caption,
-   keeping everything on one screen with no scroll. */
+/* Full width, edge to edge like the reference. Sized by its own content —
+   .welcome-stage's justify-content:space-between distributes the leftover
+   vertical space between this row, the line, and the caption instead of
+   any single child stretching to fill it. */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-5);
   width: 100%;
   min-width: 0;
-  min-height: 0;
-  flex: 1;
   margin-top: var(--sp-6, 40px);
   position: relative;
   box-sizing: border-box;
@@ -61,8 +61,6 @@
   min-width: 0;
   flex-shrink: 1;
   max-width: 360px;
-  height: 100%;
-  min-height: 0;
   position: relative;
 }
 
@@ -87,17 +85,15 @@
   z-index: 1;
 }
 
-/* Bigger flower/branches, allowed to fill the rest of the left column's
-   vertical space so it reads large like the reference. */
+/* Bigger flower/branches, sized by content (not stretched to fill
+   leftover column space — that was pushing it down with a big gap
+   above it on taller viewports). */
 .welcome-branches {
   width: 160%;
   max-width: none;
   height: auto;
-  flex: 1;
-  min-height: 0;
-  max-height: none;
   object-fit: contain;
-  object-position: bottom left;
+  object-position: top left;
   margin-top: var(--sp-2, 8px);
   margin-left: -18%;
   pointer-events: none;
@@ -193,10 +189,10 @@
   .welcome-stage {
     height: auto;
     overflow-x: hidden;
+    justify-content: flex-start;
   }
   .welcome-layout {
     flex-direction: column;
-    flex: initial;
     margin-top: var(--sp-5);
   }
   .welcome-left {
@@ -206,7 +202,6 @@
   }
   .welcome-branches {
     width: 80%;
-    flex: initial;
     max-height: 160px;
     margin-left: 0;
     margin-top: var(--sp-4);
