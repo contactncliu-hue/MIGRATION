@@ -283,10 +283,28 @@
   .welcome-panel {
     flex: 0 0 78%;
     scroll-snap-align: center;
+    /* Reset the desktop -4vh lift + hover/selected compound transforms
+       (defined outside this media query) — on mobile the carousel only
+       needs a scale change, not a vertical shift. */
+    transform: none;
+    transition: transform 0.25s ease;
+  }
+  .welcome-panel:hover {
+    transform: none;
+  }
+  .welcome-panel.is-selected {
+    transform: scale(1.06);
+  }
+  .welcome-panel.is-selected:hover {
+    transform: scale(1.06);
   }
   .welcome-panel-bg {
     width: 100%;
     height: auto;
+    opacity: 0.35;
+  }
+  .welcome-panel.is-selected .welcome-panel-bg {
+    opacity: 1;
   }
 
   .welcome-caption-fixed {
