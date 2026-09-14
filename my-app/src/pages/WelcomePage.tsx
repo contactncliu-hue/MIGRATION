@@ -1,363 +1,156 @@
-.welcome-stage {
-  position: relative;
-  width: 100%;
-  height: 100dvh;
-  min-height: 100dvh;
-  background: var(--surface-cream);
-  overflow-x: hidden;
-  overflow-y: hidden;
-  padding: var(--sp-5);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  box-sizing: border-box;
-}
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import './WelcomePage.css'
 
-.welcome-schedule-btn {
-  position: absolute;
-  top: calc(var(--sp-5) + 8px);
-  left: var(--sp-5);
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-4);
-  border: 1.5px solid var(--n-300);
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.9);
-  font-family: var(--font-game);
-  font-size: var(--fs-sm);
-  font-weight: 800;
-  color: var(--n-800);
-  cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
-}
-.welcome-schedule-btn:hover {
-  border-color: var(--c-gold);
-  color: var(--c-gold-deep);
-}
-.welcome-schedule-btn:active {
-  transform: scale(0.97);
-}
+type PanelKey = 'feature' | 'scroll' | 'sword' | 'mystery'
 
-.welcome-layout {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--sp-4);
-  width: 100%;
-  min-width: 0;
-  margin-top: var(--sp-6, 40px);
-  position: relative;
-  box-sizing: border-box;
-  flex: 1;
-  min-height: 0;
-}
+const PANEL_ORDER: PanelKey[] = ['feature', 'scroll', 'sword', 'mystery']
 
-.welcome-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 22%;
-  min-width: 0;
-  flex-shrink: 1;
-  max-width: 360px;
-  position: relative;
-}
+export function WelcomePage() {
+  const navigate = useNavigate()
+  const [selected, setSelected] = useState<PanelKey | null>('feature')
 
-.welcome-feature {
-  height: 50vh;
-  width: auto;
-  display: block;
-  position: relative;
-  z-index: 2;
-  /* was -6vh — nudged up slightly so its top clears the other panels' tops */
-  transform: translateY(-8vh);
-}
+  const panelsRef = useRef<HTMLDivElement>(null)
+  const panelRefs = useRef<Partial<Record<PanelKey, HTMLDivElement | null>>>({})
+  const rafRef = useRef<number | null>(null)
+  // Set while we're programmatically scrolling (from a click), so the
+  // scroll listener doesn't fight the click handler's own selection.
+  const isProgrammaticScroll = useRef(false)
+  const programmaticScrollTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-.welcome-title {
-  width: 85%;
-  height: auto;
-  margin-top: var(--sp-2);
-  margin-left: 0;
-  position: relative;
-  z-index: 1;
-  transform: translateY(-8vh);
-}
+  // Figures out which panel's center is closest to the scroll
+  // container's center, and updates `selected` if it changed. Used
+  // both on swipe (scroll events) and once on mount so the initially
+  // visible panel starts out highlighted.
+  const updateSelectedFromScroll = () => {
+    const container = panelsRef.current
+    if (!container) return
 
-.welcome-header-mobile {
-  display: none;
-}
+    const containerRect = container.getBoundingClientRect()
+    const containerCenter = containerRect.left + containerRect.width / 2
 
-.welcome-branches {
-  width: clamp(240px, 36vw, 460px);
-  max-height: 36vh;
-  max-width: none;
-  height: auto;
-  object-fit: contain;
-  object-position: bottom left;
-  pointer-events: none;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  margin: 0;
-  z-index: 10;
-}
+    let closestKey: PanelKey | null = null
+    let closestDistance = Infinity
 
-.welcome-panels {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--sp-5);
-  min-width: 0;
-  margin: 0;
-  /* shifts panels 2, 3, 4 right as a group, away from panel 1 */
-  margin-left: var(--sp-6, 40px);
-}
+    for (const key of PANEL_ORDER) {
+      const el = panelRefs.current[key]
+      if (!el) continue
+      const rect = el.getBoundingClientRect()
+      const panelCenter = rect.left + rect.width / 2
+      const distance = Math.abs(panelCenter - containerCenter)
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestKey = key
+      }
+    }
 
-.welcome-panel {
-  position: relative;
-  flex: 0 0 auto;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  transform: translateY(-4vh);
-}
-.welcome-panel:hover {
-  transform: translateY(calc(-4vh - 4px));
-}
-
-.welcome-panel-bg {
-  height: 74vh;
-  width: auto;
-  display: block;
-  opacity: 0.45;
-  transition: opacity 0.2s ease;
-}
-
-.welcome-panel-icon {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 46%;
-  height: auto;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.welcome-panel:first-child .welcome-panel-icon {
-  top: calc(50% + 10px);
-}
-
-.welcome-panel.is-selected {
-  transform: translateY(-4vh) scale(1.06) translateY(-4px);
-}
-.welcome-panel.is-selected:hover {
-  transform: translateY(-4vh) scale(1.06) translateY(-6px);
-}
-.welcome-panel.is-selected .welcome-panel-bg {
-  opacity: 1;
-}
-.welcome-panel.is-selected .welcome-panel-icon {
-  opacity: 1;
-}
-
-/* Portrait-only carousel copy of panel1 — invisible on desktop/iPad so
-   panel1 keeps rendering only via .welcome-left there. */
-.welcome-panel-feature-mobile-only {
-  display: none;
-}
-
-.welcome-footer {
-  margin-top: auto;
-}
-
-.welcome-line {
-  width: calc(100% + var(--sp-5) * 2);
-  height: auto;
-  display: block;
-  margin-left: calc(var(--sp-5) * -1);
-  margin-right: calc(var(--sp-5) * -1);
-  position: relative;
-  z-index: 5;
-}
-
-.welcome-caption {
-  display: block;
-  text-align: right;
-  margin-top: var(--sp-2);
-  margin-right: var(--sp-2, 8px);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  color: #7a2b2b;
-}
-
-.welcome-caption-fixed {
-  display: none;
-}
-
-/* ============================================================
-   PORTRAIT / MOBILE ONLY
-   True document-flow order: header (title + line) -> panels carousel,
-   with panel1 now included as the first member of the carousel so it
-   can take part in the same peek/select/swipe mechanics as 2/3/4.
-
-   Peek/select roles are computed in TSX from panel index (with
-   wraparound via modulo) and applied as explicit classes —
-   welcome-panel-peek-prev / welcome-panel-peek-next — rather than
-   DOM-sibling CSS selectors. Sibling selectors like
-   `.welcome-panel:has(+ .is-selected)` can't express wraparound
-   (panel 4 has no next sibling to be "panel 1"), which is what
-   caused the carousel to dead-end instead of looping 1→2→3→4→1.
-   ============================================================ */
-@media (orientation: portrait) {
-  .welcome-stage {
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
-    justify-content: flex-start;
-    padding: var(--sp-4) 0 0;
-    position: relative;
+    if (closestKey && closestKey !== selected) {
+      setSelected(closestKey)
+    }
   }
 
-  .welcome-schedule-btn {
-    top: var(--sp-4);
-    left: var(--sp-4);
+  const handleScroll = () => {
+    if (isProgrammaticScroll.current) return
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(updateSelectedFromScroll)
   }
 
-  .welcome-header-mobile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding: 0 var(--sp-4);
-    box-sizing: border-box;
-    position: relative;
-  }
-  .welcome-header-mobile .welcome-title--mobile {
-    width: 46%;
-    max-width: 220px;
-    height: auto;
-    position: relative;
-  }
-  .welcome-header-mobile .welcome-line--mobile {
-    /* bumped further: wider bleed + stronger vertical scale */
-    width: 124vw;
-    height: auto;
-    margin-top: var(--sp-2);
-    margin-left: calc(-62vw + 50%);
-    margin-right: calc(-62vw + 50%);
-    transform: scaleY(1.9);
-    transform-origin: center;
-    position: relative;
-  }
-  .welcome-header-mobile .welcome-caption--mobile,
-  .welcome-caption {
-    display: none; /* keep just one "WELCOME TO ZO.O" (the fixed one) */
+  const handlePanelClick = (key: PanelKey) => {
+    setSelected(key)
   }
 
-  .welcome-line:not(.welcome-line--mobile) {
-    display: none; /* bottom desktop line was leaking into portrait */
-  }
+  useEffect(() => {
+    // Establish initial selection based on actual scroll position
+    // (relevant on mobile, where panels overflow horizontally).
+    updateSelectedFromScroll()
 
-  /* panel1 is rendered via the carousel copy in portrait, not this block */
-  .welcome-left {
-    display: none;
-  }
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+      if (programmaticScrollTimeout.current) clearTimeout(programmaticScrollTimeout.current)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  .welcome-footer {
-    display: none;
-  }
+  return (
+    <div className="welcome-stage">
+      <button
+        className="welcome-schedule-btn"
+        onClick={() => navigate('/schedule')}
+        aria-label="View schedule"
+      >
+        Schedule
+      </button>
 
-  .welcome-layout {
-    flex-direction: column;
-    margin-top: 0;
-    flex: 1;
-    min-height: 0;
-    position: relative;
-  }
+      {/* Portrait-only header: title + line stacked above the panels
+          row, matching the reference layout. Hidden on desktop via CSS
+          (see .welcome-header-mobile in the stylesheet) — the desktop
+          title/line/caption below are the ones shown there. */}
+      <div className="welcome-header-mobile">
+        <img className="welcome-title welcome-title--mobile" src="/assets/title-red.PNG" alt="zOo" />
+        <img className="welcome-line welcome-line--mobile" src="/assets/Line.PNG" alt="" />
+        <div className="welcome-caption welcome-caption--mobile">WELCOME TO ZO.O</div>
+      </div>
 
-  .welcome-branches {
-    position: absolute;
-    left: -6%;
-    bottom: 0;
-    width: clamp(160px, 42vw, 260px);
-    margin: 0;
-    z-index: 10;
-  }
+      <div className="welcome-layout">
+        <div className="welcome-left">
+          {/* Desktop/iPad only — hidden in portrait, where panel1 lives
+              inside .welcome-panels instead (welcome-panel-feature-mobile-only
+              below) so it can take part in the carousel. */}
+          <img className="welcome-feature" src="/assets/panel1.png" alt="" />
+          <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
+        </div>
 
-  .welcome-panels {
-    position: relative;
-    width: 100%;
-    /* fills remaining vertical space instead of a fixed 48vh —
-       that fixed height was the cause of the dead gap underneath */
-    flex: 1;
-    min-height: 0;
-    margin: var(--sp-2) 0 0;
-  }
+        <div className="welcome-panels" ref={panelsRef} onScroll={handleScroll}>
+          {/* Portrait-only carousel copy of panel1. Hidden on desktop/iPad
+              via .welcome-panel-feature-mobile-only so it never doubles up
+              with .welcome-left above. */}
+          <div
+            className={`welcome-panel welcome-panel-feature-mobile-only ${selected === 'feature' ? 'is-selected' : ''}`}
+            ref={(el) => { panelRefs.current.feature = el }}
+            onClick={() => handlePanelClick('feature')}
+          >
+            <img className="welcome-panel-bg" src="/assets/panel1.png" alt="" />
+          </div>
+          <div
+            className={`welcome-panel ${selected === 'scroll' ? 'is-selected' : ''}`}
+            ref={(el) => { panelRefs.current.scroll = el }}
+            onClick={() => handlePanelClick('scroll')}
+          >
+            <img className="welcome-panel-bg" src="/assets/panel2.png" alt="" />
+            <img className="welcome-panel-icon" src="/assets/scroll.png" alt="Scroll" />
+          </div>
+          <div
+            className={`welcome-panel ${selected === 'sword' ? 'is-selected' : ''}`}
+            ref={(el) => { panelRefs.current.sword = el }}
+            onClick={() => handlePanelClick('sword')}
+          >
+            <img className="welcome-panel-bg" src="/assets/panel3.png" alt="" />
+            <img className="welcome-panel-icon" src="/assets/sword.png" alt="Sword" />
+          </div>
+          <div
+            className={`welcome-panel ${selected === 'mystery' ? 'is-selected' : ''}`}
+            ref={(el) => { panelRefs.current.mystery = el }}
+            onClick={() => handlePanelClick('mystery')}
+          >
+            <img className="welcome-panel-bg" src="/assets/panel4.png" alt="" />
+            <img className="welcome-panel-icon" src="/assets/quest.png" alt="Mystery" />
+          </div>
+        </div>
+      </div>
 
-  .welcome-panel {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 70%;
-    transform: translate(-50%, 0) scale(0.8);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
+      {/* Moved out of .welcome-left so it can anchor to the true
+          bottom-left corner of .welcome-stage (position: relative)
+          instead of floating at the bottom of the shorter left column. */}
+      <img className="welcome-branches" src="/assets/flower.PNG" alt="" />
 
-  .welcome-panel.is-selected {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translate(-50%, 0) scale(1);
-    z-index: 3;
-  }
+      <img className="welcome-line" src="/assets/Line.PNG" alt="" />
+      <div className="welcome-caption">WELCOME TO ZO.O</div>
 
-  /* Left peek — the panel just "before" the selected one, in
-     PANEL_ORDER index terms with wraparound (so panel1 peeks left
-     when panel4/mystery is selected). Role assigned in TSX. */
-  .welcome-panel.welcome-panel-peek-prev {
-    opacity: 0.55;
-    pointer-events: auto;
-    transform: translate(calc(-50% - 68%), 4%) scale(0.82);
-    z-index: 2;
-  }
-
-  /* Right peek — the panel just "after" the selected one, with
-     wraparound (so panel1 peeks right when panel2/scroll is
-     selected... and panel1 peeks right when panel4 is selected is
-     NOT possible simultaneously with the left-peek case above,
-     since only one neighbor is prev and one is next at a time). */
-  .welcome-panel.welcome-panel-peek-next {
-    opacity: 0.55;
-    pointer-events: auto;
-    transform: translate(calc(-50% + 68%), 4%) scale(0.82);
-    z-index: 2;
-  }
-
-  .welcome-panel-bg {
-    width: 100%;
-    height: auto;
-    /* opacity now controlled by the parent .welcome-panel, not here */
-    opacity: 1;
-  }
-
-  /* panel1's carousel copy becomes visible only in portrait */
-  .welcome-panel-feature-mobile-only {
-    display: block;
-  }
-
-  .welcome-caption-fixed {
-    display: block;
-    position: absolute;
-    right: var(--sp-4);
-    bottom: var(--sp-3);
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    color: #7a2b2b;
-    z-index: 25;
-  }
+      {/* Out-of-flow, pinned to the bottom-right corner — only visible
+          in portrait (see .welcome-caption-fixed). Kept as a separate
+          element from .welcome-caption so it can be absolutely
+          positioned independent of content height above it. */}
+      <div className="welcome-caption-fixed">WELCOME TO ZO.O</div>
+    </div>
+  )
 }
