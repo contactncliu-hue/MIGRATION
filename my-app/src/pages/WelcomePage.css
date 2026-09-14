@@ -4,7 +4,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   background: var(--surface-cream);
-  overflow: hidden;
+  overflow: visible; /* was 'hidden' — that was clipping the footer line */
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
@@ -44,6 +44,7 @@
   gap: var(--sp-5);
   flex: 1;
   width: 100%;
+  position: relative;
 }
 
 /* left stack: trophy card, red zOo title, tree branches */
@@ -55,36 +56,45 @@
   min-width: 220px;
   max-width: 420px;
   height: 100%;
+  position: relative;
 }
 
 .welcome-feature {
   width: 100%;
   height: auto;
   display: block;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-title {
   width: 82%;
   height: auto;
   margin-top: var(--sp-3);
+  position: relative;
+  z-index: 1;
 }
 
+/* flower/branches — brought in front of everything below it */
 .welcome-branches {
   width: 130%;
   max-width: none;
   height: auto;
-  margin-top: auto;
+  margin-top: var(--sp-2);
   margin-left: -8%;
   pointer-events: none;
+  position: relative;
+  z-index: 10;
 }
 
-/* right: three tall arch panels, each at its own native aspect ratio */
+/* right: three tall arch panels */
 .welcome-panels {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-4);
   flex: 1;
   height: 100%;
+  margin-top: var(--sp-6, 40px); /* nudges all panels lower; falls back to 40px if --sp-6 isn't defined */
 }
 
 .welcome-panel {
@@ -92,16 +102,26 @@
   flex: 1;
   min-width: 0;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
+
 .welcome-panel:hover {
   transform: translateY(-4px);
+}
+
+/* Panel 1 (trophy card) — always constant, still clickable, never dims/scales */
+.welcome-panel.is-fixed {
+  transform: none !important;
+}
+.welcome-panel.is-fixed:hover {
+  transform: none !important;
 }
 
 .welcome-panel-bg {
   width: 100%;
   height: auto;
   display: block;
+  transition: filter 0.2s ease;
 }
 
 .welcome-panel-icon {
@@ -112,14 +132,42 @@
   width: 46%;
   height: auto;
   pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+/* Panels 2-4 default (unselected) state: dimmed bg, hidden icon */
+.welcome-panel:not(.is-fixed) .welcome-panel-bg {
+  filter: brightness(1.2) opacity(0.5);
+}
+.welcome-panel:not(.is-fixed) .welcome-panel-icon {
+  opacity: 0;
+}
+
+/* Panels 2-4 selected state: full brightness, icon visible, slightly bigger */
+.welcome-panel.is-selected {
+  transform: scale(1.06) translateY(-4px);
+}
+.welcome-panel.is-selected:hover {
+  transform: scale(1.06) translateY(-6px);
+}
+.welcome-panel.is-selected .welcome-panel-bg {
+  filter: brightness(1) opacity(1);
+}
+.welcome-panel.is-selected .welcome-panel-icon {
+  opacity: 1;
 }
 
 /* ---------- footer: full-width border + caption ---------- */
 .welcome-line {
   width: 100%;
   height: auto;
-  display: block;
+  display: block !important;
+  visibility: visible !important;
   margin-top: var(--sp-4);
+  position: relative;
+  z-index: 5;
+  min-height: 4px; /* guards against a broken/zero-height image collapsing to nothing */
 }
 
 .welcome-caption {
@@ -148,6 +196,7 @@
   .welcome-panels {
     width: 100%;
     height: auto;
+    margin-top: var(--sp-4);
   }
   .welcome-caption {
     align-self: center;
