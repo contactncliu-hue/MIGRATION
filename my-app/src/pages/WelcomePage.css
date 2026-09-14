@@ -89,8 +89,8 @@
 }
 
 .welcome-branches {
-  width: clamp(220px, 33vw, 420px);
-  max-height: 33vh;
+  width: clamp(240px, 36vw, 460px);
+  max-height: 36vh;
   max-width: none;
   height: auto;
   object-fit: contain;
@@ -118,10 +118,10 @@
   flex: 0 0 auto;
   cursor: pointer;
   transition: transform 0.2s ease;
-  transform: translateY(-2vh);
+  transform: translateY(-4vh);
 }
 .welcome-panel:hover {
-  transform: translateY(calc(-2vh - 4px));
+  transform: translateY(calc(-4vh - 4px));
 }
 
 .welcome-panel-bg {
@@ -149,10 +149,10 @@
 }
 
 .welcome-panel.is-selected {
-  transform: translateY(-2vh) scale(1.06) translateY(-4px);
+  transform: translateY(-4vh) scale(1.06) translateY(-4px);
 }
 .welcome-panel.is-selected:hover {
-  transform: translateY(-2vh) scale(1.06) translateY(-6px);
+  transform: translateY(-4vh) scale(1.06) translateY(-6px);
 }
 .welcome-panel.is-selected .welcome-panel-bg {
   opacity: 1;
