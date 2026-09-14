@@ -70,6 +70,11 @@ export function Sidebar({ isOpen }: SidebarProps) {
   const rowClass = ({ isActive }: { isActive: boolean }) =>
     `zoo-sb-row ${isActive ? 'is-active' : ''}`
 
+  // Home and Schedule are the same sidebar section (Schedule is reached via
+  // the Home page's "Schedule" button, not its own nav row), so Início
+  // should stay lit on both routes instead of just an exact "/" match.
+  const isHomeSection = location.pathname === '/' || location.pathname === '/schedule'
+
   return (
     <aside className={`sidebar ${isOpen ? '' : 'sidebar-hidden'}`}>
       <div className="zoo-sb-head">
@@ -98,7 +103,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
       </div>
 
       <nav className="zoo-sb-nav">
-        <NavLink to="/" className={rowClass} end>
+        <NavLink to="/" end className={`zoo-sb-row ${isHomeSection ? 'is-active' : ''}`}>
           <RowIcon path={ICONS.home} filled />
           <span className="zoo-sb-row-label">{dict.homepage}</span>
         </NavLink>
