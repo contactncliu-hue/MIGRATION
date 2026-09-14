@@ -248,6 +248,10 @@
     display: none; /* keep just one "WELCOME TO ZO.O" (the fixed one) */
   }
 
+  .welcome-line:not(.welcome-line--mobile) {
+    display: none; /* bottom desktop line was leaking into portrait */
+  }
+
   /* panel1 is rendered via the carousel copy in portrait, not this block */
   .welcome-left {
     display: none;
