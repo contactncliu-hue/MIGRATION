@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   height: 100vh;
-  height: 100svh; /* was 100dvh — svh stays stable when the browser toolbar collapses, so flower doesn't shift out of the first screen */
+  height: 100svh;
   min-height: 100vh;
   min-height: 100svh;
   background: var(--surface-cream);
@@ -17,7 +17,6 @@
 
 .welcome-schedule-btn {
   position: absolute;
-  /* was calc(var(--sp-5) + 52px) — raised to sit level with the hamburger icon */
   top: calc(var(--sp-5) + 8px);
   left: var(--sp-5);
   z-index: 60;
@@ -57,7 +56,6 @@
 .welcome-left {
   display: flex;
   flex-direction: column;
-  /* was flex-start — centers panel1 image and title together */
   align-items: center;
   width: 22%;
   min-width: 0;
@@ -72,18 +70,18 @@
   display: block;
   position: relative;
   z-index: 2;
-  /* was -13vh — reduced further so panel 1's top drops down to match panels 2-4 */
-  transform: translateY(-6vh);
+  /* was -6vh — nudged up slightly so its top clears the other panels' tops */
+  transform: translateY(-8vh);
 }
 
 .welcome-title {
   width: 75%;
   height: auto;
   margin-top: var(--sp-2);
-  margin-left: 0; /* was var(--sp-2) — centering handled by .welcome-left now */
+  margin-left: 0;
   position: relative;
   z-index: 1;
-  transform: translateY(-6vh);
+  transform: translateY(-8vh);
 }
 
 .welcome-header-mobile {
@@ -108,10 +106,11 @@
 .welcome-panels {
   display: flex;
   align-items: flex-end;
-  /* was var(--sp-2) — more breathing room between panels 2, 3, 4 */
   gap: var(--sp-5);
   min-width: 0;
   margin: 0;
+  /* shifts panels 2, 3, 4 right as a group, away from panel 1 */
+  margin-left: var(--sp-6, 40px);
 }
 
 .welcome-panel {
