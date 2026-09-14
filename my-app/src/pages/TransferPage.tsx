@@ -1,44 +1,64 @@
-import { useNavigate } from 'react-router-dom'
-import './WelcomePage.css'
+import { useEffect, useState } from 'react'
+import { MigrationFormModal } from '../components/transfer/MigrationFormModal'
+import { UidLookupModal } from '../components/transfer/UidLookupModal'
+import { WingStatusCard } from '../components/transfer/WingStatusCard'
+import { useLanguage } from '../lib/language-context'
+import './TransferPage.css'
 
-export function WelcomePage() {
-  const navigate = useNavigate()
+export function TransferPage() {
+  const { dict } = useLanguage()
+
+  const [stageReady, setStageReady] = useState(false)
+  const [statusOpen, setStatusOpen] = useState(false)
+  const [migrationOpen, setMigrationOpen] = useState(false)
+  const [lookupOpen, setLookupOpen] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setStageReady(true), 30)
+    return () => clearTimeout(timer)
+  }, [])
+
+  const stageClass = [
+    'transfer-stage',
+    stageReady ? 'stage-ready' : '',
+    statusOpen ? 'status-open' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <div className="welcome-stage">
-      <button
-        className="welcome-schedule-btn"
-        onClick={() => navigate('/schedule')}
-        aria-label="View schedule"
-      >
-        Schedule
-      </button>
-
-      <div className="welcome-layout">
-        <div className="welcome-left">
-          <img className="welcome-feature" src="/assets/panel1.png" alt="" />
-          <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
-          <img className="welcome-branches" src="/assets/flower.PNG" alt="" />
+    <div className={stageClass}>
+      <div className="scene">
+        <div className="deco-bg">
+          <img src="/assets/transfer-bg-deco.PNG" alt="" />
         </div>
-
-        <div className="welcome-panels">
-          <div className="welcome-panel">
-            <img className="welcome-panel-bg" src="/assets/panel2.png" alt="" />
-            <img className="welcome-panel-icon" src="/assets/scroll.png" alt="Scroll" />
-          </div>
-          <div className="welcome-panel">
-            <img className="welcome-panel-bg" src="/assets/panel3.png" alt="" />
-            <img className="welcome-panel-icon" src="/assets/sword.png" alt="Sword" />
-          </div>
-          <div className="welcome-panel">
-            <img className="welcome-panel-bg" src="/assets/panel4.png" alt="" />
-            <img className="welcome-panel-icon" src="/assets/quest.png" alt="Mystery" />
-          </div>
+        <div className="arch-card">
+          <img className="arch-bg" src="/assets/transfer-arch.PNG" alt="" />
         </div>
+        <div className="header-ribbon">
+          <img src="/assets/transfer-header.PNG" alt="" />
+        </div>
+        <div className="bottom-fade" />
+
+        <button className="transfer-btn" onClick={() => setMigrationOpen(true)}>
+          <img src="/assets/transfer-button.PNG" alt="" />
+          <span className="btn-label">{dict.migrationBtnLabel}</span>
+        </button>
+
+        <button className="status-check-btn" onClick={() => setLookupOpen(true)}>
+          <img src="/assets/transfer-status-button.PNG" alt="" />
+          <span className="status-check-label">{dict.checkStatusBtnLabel}</span>
+        </button>
       </div>
 
-      <img className="welcome-line" src="/assets/Line.PNG" alt="" />
-      <div className="welcome-caption">WELCOME TO ZO.O</div>
+      <WingStatusCard
+        open={statusOpen}
+        onToggle={() => setStatusOpen((o) => !o)}
+        onClose={() => setStatusOpen(false)}
+      />
+
+      {migrationOpen && <MigrationFormModal onClose={() => setMigrationOpen(false)} />}
+      {lookupOpen && <UidLookupModal onClose={() => setLookupOpen(false)} />}
     </div>
   )
 }
