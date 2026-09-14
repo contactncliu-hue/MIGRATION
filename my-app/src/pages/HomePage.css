@@ -39,12 +39,17 @@
   right: 0;
 }
 
-/* ---------- top-right nav: back to Welcome ---------- */
+/* ---------- top-left nav: back to Welcome ---------- */
+/* Sits below the existing sidebar toggle button (also top-left) instead of
+   overlapping it. The +52px offset and z-index:60 are a guess at clearing
+   that button — adjust once Layout.tsx/Layout.css confirm its exact
+   position and stacking. */
 .home-info-btn {
   position: absolute;
-  top: var(--sp-5);
-  right: var(--sp-5);
-  z-index: 50;
+  top: calc(var(--sp-5) + 52px);
+  left: var(--sp-5);
+  right: auto;
+  z-index: 60;
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -519,9 +524,11 @@
     pointer-events: none;
   }
 
-  /* On mobile, keep the info button clear of the relocated top note. */
+  /* On mobile, .home-info-btn is top-left now, same side as the sidebar
+     toggle — keep the same clearance offset as desktop. */
   .home-info-btn {
-    top: var(--sp-5);
+    top: calc(var(--sp-5) + 52px);
+    left: var(--sp-5);
   }
 }
 
