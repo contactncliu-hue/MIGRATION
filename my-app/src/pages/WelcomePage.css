@@ -65,7 +65,7 @@
 }
 
 .welcome-feature {
-  height: 38vh;
+  height: 50vh;
   width: auto;
   display: block;
   position: relative;
@@ -119,7 +119,7 @@
 }
 
 .welcome-panel-bg {
-  height: 58vh;
+  height: 79vh;
   width: auto;
   display: block;
   opacity: 0.45;
@@ -140,6 +140,10 @@
 
 .welcome-panel:first-child .welcome-panel-icon {
   top: calc(50% + 10px);
+}
+
+.welcome-panel:nth-child(3) .welcome-panel-icon {
+  opacity: 0.85;
 }
 
 .welcome-panel.is-selected {
