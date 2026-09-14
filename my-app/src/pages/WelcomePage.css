@@ -1,8 +1,9 @@
 .welcome-stage {
   position: relative;
   width: 100%;
+  height: 100vh;
   background: var(--surface-cream);
-  overflow-x: hidden;
+  overflow: hidden;
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
@@ -36,14 +37,17 @@
   transform: scale(0.97);
 }
 
-/* Full width again — no max-width cap, no centering. Trophy on the far
-   left, panels filling the rest, edge to edge like the reference. */
+/* Full width, edge to edge like the reference. flex: 1 so this row
+   fills whatever vertical space is left after the branches/line/caption,
+   keeping everything on one screen with no scroll. */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-5);
   width: 100%;
   min-width: 0;
+  min-height: 0;
+  flex: 1;
   margin-top: var(--sp-6, 40px);
   position: relative;
   box-sizing: border-box;
@@ -57,6 +61,8 @@
   min-width: 0;
   flex-shrink: 1;
   max-width: 360px;
+  height: 100%;
+  min-height: 0;
   position: relative;
 }
 
@@ -81,27 +87,33 @@
   z-index: 1;
 }
 
+/* Bigger flower/branches, allowed to fill the rest of the left column's
+   vertical space so it reads large like the reference. */
 .welcome-branches {
-  width: 130%;
+  width: 160%;
   max-width: none;
   height: auto;
-  max-height: 200px;
+  flex: 1;
+  min-height: 0;
+  max-height: none;
   object-fit: contain;
-  object-position: top left;
-  margin-top: var(--sp-1, 4px);
-  margin-left: -8%;
+  object-position: bottom left;
+  margin-top: var(--sp-2, 8px);
+  margin-left: -18%;
   pointer-events: none;
   position: relative;
   z-index: 10;
 }
 
-/* Panels fill remaining width like the reference — flex, not fixed px. */
+/* Panels slightly smaller than full flex so a visible gap appears
+   between the group and the edges; still fill remaining width. */
 .welcome-panels {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-4);
-  flex: 1;
+  flex: 0.96;
   min-width: 0;
+  margin: 0 auto;
 }
 
 .welcome-panel {
@@ -135,6 +147,12 @@
   transition: opacity 0.2s ease;
 }
 
+/* First panel's icon sits slightly high compared to the other two —
+   nudge it down so all three icons align on the same visual center. */
+.welcome-panel:first-child .welcome-panel-icon {
+  top: calc(50% + 10px);
+}
+
 .welcome-panel.is-selected {
   transform: scale(1.06) translateY(-4px);
 }
@@ -148,11 +166,15 @@
   opacity: 1;
 }
 
+/* Full bleed, side to side — cancel out the stage's horizontal padding
+   with negative margins so there are no side gaps. */
 .welcome-line {
-  width: 100%;
+  width: calc(100% + var(--sp-5) * 2);
   height: auto;
   display: block;
   margin-top: var(--sp-4);
+  margin-left: calc(var(--sp-5) * -1);
+  margin-right: calc(var(--sp-5) * -1);
   position: relative;
   z-index: 5;
 }
@@ -160,6 +182,7 @@
 .welcome-caption {
   align-self: flex-end;
   margin-top: var(--sp-2);
+  margin-right: var(--sp-2, 8px);
   font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0.6px;
@@ -167,8 +190,13 @@
 }
 
 @media (max-width: 760px) {
+  .welcome-stage {
+    height: auto;
+    overflow-x: hidden;
+  }
   .welcome-layout {
     flex-direction: column;
+    flex: initial;
     margin-top: var(--sp-5);
   }
   .welcome-left {
@@ -178,15 +206,17 @@
   }
   .welcome-branches {
     width: 80%;
+    flex: initial;
     max-height: 160px;
     margin-left: 0;
     margin-top: var(--sp-4);
   }
   .welcome-panels {
     width: 100%;
+    flex: initial;
     margin-top: var(--sp-4);
   }
   .welcome-caption {
     align-self: center;
   }
-} 
+}
