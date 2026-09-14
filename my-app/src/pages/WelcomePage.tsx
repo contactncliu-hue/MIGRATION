@@ -18,13 +18,28 @@ export function WelcomePage() {
         Schedule
       </button>
 
+      {/* Portrait-only header: title + line + caption stacked above the
+          panels row, matching the reference layout. Hidden on desktop
+          via CSS (see .welcome-header-mobile in the stylesheet) — the
+          desktop title/line/caption below are the ones shown there. */}
+      <div className="welcome-header-mobile">
+        <img className="welcome-title welcome-title--mobile" src="/assets/title-red.PNG" alt="zOo" />
+        <img className="welcome-line welcome-line--mobile" src="/assets/Line.PNG" alt="" />
+        <div className="welcome-caption welcome-caption--mobile">WELCOME TO ZO.O</div>
+      </div>
+
       <div className="welcome-layout">
         <div className="welcome-left">
           <img
             className="welcome-feature"
             src="/assets/panel1.png"
             alt=""
+            role="button"
+            tabIndex={0}
             onClick={() => navigate('/schedule')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') navigate('/schedule')
+            }}
           />
           <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
           <img className="welcome-branches" src="/assets/flower.PNG" alt="" />
