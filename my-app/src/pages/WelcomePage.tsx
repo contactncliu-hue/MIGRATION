@@ -18,10 +18,10 @@ export function WelcomePage() {
         Schedule
       </button>
 
-      {/* Portrait-only header: title + line + caption stacked above the
-          panels row, matching the reference layout. Hidden on desktop
-          via CSS (see .welcome-header-mobile in the stylesheet) — the
-          desktop title/line/caption below are the ones shown there. */}
+      {/* Portrait-only header: title + line stacked above the panels
+          row, matching the reference layout. Hidden on desktop via CSS
+          (see .welcome-header-mobile in the stylesheet) — the desktop
+          title/line/caption below are the ones shown there. */}
       <div className="welcome-header-mobile">
         <img className="welcome-title welcome-title--mobile" src="/assets/title-red.PNG" alt="zOo" />
         <img className="welcome-line welcome-line--mobile" src="/assets/Line.PNG" alt="" />
@@ -66,6 +66,12 @@ export function WelcomePage() {
 
       <img className="welcome-line" src="/assets/Line.PNG" alt="" />
       <div className="welcome-caption">WELCOME TO ZO.O</div>
+
+      {/* Out-of-flow, pinned to the bottom-right corner — only visible
+          in portrait (see .welcome-caption-fixed). Kept as a separate
+          element from .welcome-caption so it can be absolutely
+          positioned independent of content height above it. */}
+      <div className="welcome-caption-fixed">WELCOME TO ZO.O</div>
     </div>
   )
 }
