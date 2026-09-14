@@ -11,7 +11,7 @@
   min-height: 100dvh;
   background: var(--surface-cream);
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
@@ -46,10 +46,6 @@
   transform: scale(0.97);
 }
 
-/* Full width, edge to edge like the reference. Sized by its own content —
-   .welcome-stage's justify-content:space-between distributes the leftover
-   vertical space between this row, the line, and the caption instead of
-   any single child stretching to fill it. */
 .welcome-layout {
   display: flex;
   align-items: flex-start;
@@ -72,11 +68,9 @@
   position: relative;
 }
 
-/* No longer interactive (it previously navigated to /schedule, which is
-   why tapping it jumped pages unexpectedly — removed in the component).
-   Purely decorative now. */
 .welcome-feature {
   width: 100%;
+  max-height: 30vh;
   height: auto;
   display: block;
   position: relative;
@@ -87,45 +81,37 @@
   width: 75%;
   height: auto;
   margin-top: var(--sp-2);
+  margin-left: var(--sp-2);
   position: relative;
   z-index: 1;
 }
 
-/* Duplicate portrait header (title + line + caption shown above the
-   panels row). Hidden by default — only shown in portrait orientation
-   below, where the desktop title and the bottom-of-page line/caption
-   get hidden in its place. */
 .welcome-header-mobile {
   display: none;
 }
 
-/* Flower/branches — sized with clamp() against the viewport instead of
-   a percentage of its (variable-width) parent column. A %-based width
-   looks huge in landscape (wide column) and tiny in portrait (narrow
-   column) even though the CSS never changes; clamp() keeps it visually
-   consistent across orientations. */
 .welcome-branches {
-  width: clamp(220px, 34vw, 420px);
+  width: clamp(200px, 30vw, 380px);
+  max-height: 30vh;
   max-width: none;
   height: auto;
   object-fit: contain;
-  object-position: top left;
-  margin-top: calc(var(--sp-2, 8px) * -1);
-  margin-left: -18%;
+  object-position: bottom left;
   pointer-events: none;
-  position: relative;
+  position: absolute;
+  left: -10%;
+  bottom: 0;
+  margin: 0;
   z-index: 10;
 }
 
-/* Panels slightly smaller than full flex so a visible gap appears
-   between the group and the edges; still fill remaining width. */
 .welcome-panels {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-4);
-  flex: 0.96;
+  flex: 0.85;
   min-width: 0;
-  margin: 0 auto;
+  margin: var(--sp-6) auto 0;
 }
 
 .welcome-panel {
@@ -141,6 +127,7 @@
 
 .welcome-panel-bg {
   width: 100%;
+  max-height: 34vh;
   height: auto;
   display: block;
   opacity: 0.45;
@@ -159,8 +146,6 @@
   transition: opacity 0.2s ease;
 }
 
-/* First panel's icon sits slightly high compared to the other two —
-   nudge it down so all three icons align on the same visual center. */
 .welcome-panel:first-child .welcome-panel-icon {
   top: calc(50% + 10px);
 }
@@ -178,8 +163,6 @@
   opacity: 1;
 }
 
-/* Full bleed, side to side — cancel out the stage's horizontal padding
-   with negative margins so there are no side gaps. */
 .welcome-line {
   width: calc(100% + var(--sp-5) * 2);
   height: auto;
@@ -201,23 +184,12 @@
   color: #7a2b2b;
 }
 
-/* Fixed, out-of-flow caption used in portrait so it can be pinned to a
-   screen corner regardless of how tall the content above it is. Hidden
-   outside portrait — desktop/landscape keep using .welcome-caption. */
 .welcome-caption-fixed {
   display: none;
 }
 
 /* ---------------------------------------------------------------------
-   PORTRAIT — triggered by orientation, not a fixed pixel width, so this
-   applies on tablets too (a tablet's portrait width is often well above
-   760px, so a max-width breakpoint never fired for it — that was the
-   root cause of the desktop row layout getting squeezed into portrait
-   instead of switching to this stacked layout).
-
-   Everything must fit in one screen with no scrolling, so height is
-   locked to the viewport and overflow is hidden instead of the auto/
-   scrollable approach used previously.
+   PORTRAIT
    --------------------------------------------------------------------- */
 @media (orientation: portrait) {
   .welcome-stage {
@@ -226,8 +198,6 @@
     min-height: 0;
     overflow: hidden;
     justify-content: flex-start;
-    /* Kill the left/right/bottom padding that was causing the "margins
-       everywhere" look — only keep a little breathing room up top. */
     padding: var(--sp-4) 0 0;
     position: relative;
   }
@@ -237,9 +207,6 @@
     left: var(--sp-4);
   }
 
-  /* Show the portrait header (title/line) above the panels, and hide
-     the desktop-only versions it replaces: the title nested in
-     .welcome-left, and the line/caption at the bottom of the page. */
   .welcome-header-mobile {
     display: flex;
     flex-direction: column;
@@ -253,9 +220,6 @@
     max-width: 220px;
     height: auto;
   }
-  /* True full bleed: 100vw plus a negative margin that cancels out
-     centering, so the line spans edge-to-edge regardless of any
-     padding on its parents. */
   .welcome-header-mobile .welcome-line--mobile {
     width: 100vw;
     height: auto;
@@ -263,9 +227,6 @@
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
   }
-  /* Replaced by .welcome-caption-fixed, pinned to the bottom-right
-     corner of the screen — this in-flow version is no longer used
-     in portrait. */
   .welcome-header-mobile .welcome-caption--mobile {
     display: none;
   }
@@ -274,8 +235,6 @@
     display: none;
   }
 
-  /* The bottom line/caption (non-mobile variant) — hide them so they
-     aren't duplicated under the panels; the header ones stand in. */
   .welcome-stage > .welcome-line:not(.welcome-line--mobile),
   .welcome-stage > .welcome-caption:not(.welcome-caption--mobile) {
     display: none;
@@ -300,9 +259,6 @@
     margin: 0 auto;
   }
 
-  /* Pinned to the bottom-left corner of the viewport instead of sitting
-     in document flow with margins — this is what makes it "stick" /
-     magnetize to the corner regardless of content height above it. */
   .welcome-branches {
     position: absolute;
     left: -6%;
@@ -312,10 +268,6 @@
     z-index: 10;
   }
 
-  /* Swipeable carousel — one panel large and centered, with the
-     next/previous panel peeking in at the edges, matching the
-     reference. scroll-snap does the swipe/settle behavior natively,
-     no extra JS needed. */
   .welcome-panels {
     width: 100%;
     flex: initial;
@@ -336,8 +288,6 @@
     scroll-snap-align: center;
   }
 
-  /* Fixed to the bottom-right corner of the screen, out of flow, so it
-     is always visible without needing to scroll. */
   .welcome-caption-fixed {
     display: block;
     position: absolute;
@@ -348,39 +298,5 @@
     letter-spacing: 0.6px;
     color: #7a2b2b;
     z-index: 10;
-  }
-}
-
-/* ---------------------------------------------------------------------
-   LANDSCAPE short-height safety net — for phones/small tablets rotated,
-   where 100dvh can be tight relative to the trophy/panels row's natural
-   height. Shrinks the artwork so .welcome-line and .welcome-caption
-   stay inside one view instead of needing a scroll to reach them.
-   --------------------------------------------------------------------- */
-@media (orientation: landscape) and (max-height: 900px) {
-  .welcome-stage {
-    height: auto;
-    min-height: 100dvh;
-    padding-top: var(--sp-4);
-    padding-bottom: var(--sp-4);
-  }
-  .welcome-layout {
-    margin-top: var(--sp-4);
-  }
-  .welcome-feature {
-    max-height: 34vh;
-    width: auto;
-  }
-  .welcome-branches {
-    width: clamp(160px, 24vw, 260px);
-    margin-top: calc(var(--sp-1, 4px) * -1);
-  }
-  .welcome-panel-bg {
-    max-height: 34vh;
-    width: auto;
-    margin: 0 auto;
-  }
-  .welcome-line {
-    margin-top: var(--sp-3, 12px);
   }
 }
