@@ -57,8 +57,6 @@ export function WelcomePage() {
 
   const handlePanelClick = (key: PanelKey) => {
     setSelected(key)
-
-    const el = panelRefs.current[key]
   }
 
   useEffect(() => {
