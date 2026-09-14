@@ -15,7 +15,7 @@
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   box-sizing: border-box;
 }
 
@@ -163,11 +163,19 @@
   opacity: 1;
 }
 
+/* Groups the line + caption into one block and pins that block to the
+   bottom of the stage with margin-top: auto. Needed because the stage
+   is now justify-content: flex-start (not space-between) — without this
+   wrapper, capping the art's height with vh left a huge empty gap right
+   after the panels instead of at the bottom. */
+.welcome-footer {
+  margin-top: auto;
+}
+
 .welcome-line {
   width: calc(100% + var(--sp-5) * 2);
   height: auto;
   display: block;
-  margin-top: var(--sp-4);
   margin-left: calc(var(--sp-5) * -1);
   margin-right: calc(var(--sp-5) * -1);
   position: relative;
@@ -175,7 +183,8 @@
 }
 
 .welcome-caption {
-  align-self: flex-end;
+  display: block;
+  text-align: right;
   margin-top: var(--sp-2);
   margin-right: var(--sp-2, 8px);
   font-size: var(--fs-sm);
@@ -189,7 +198,9 @@
 }
 
 /* ---------------------------------------------------------------------
-   PORTRAIT
+   PORTRAIT — triggered by orientation, not a fixed pixel width, so this
+   applies on tablets too. Everything must fit in one screen with no
+   scrolling, so height is locked to the viewport and overflow is hidden.
    --------------------------------------------------------------------- */
 @media (orientation: portrait) {
   .welcome-stage {
@@ -235,8 +246,9 @@
     display: none;
   }
 
-  .welcome-stage > .welcome-line:not(.welcome-line--mobile),
-  .welcome-stage > .welcome-caption:not(.welcome-caption--mobile) {
+  /* Hide the desktop footer (line/caption) entirely in portrait — the
+     header-mobile versions stand in for them there. */
+  .welcome-footer {
     display: none;
   }
 
