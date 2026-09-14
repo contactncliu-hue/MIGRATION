@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './WelcomePage.css'
 
-type PanelKey = 'scroll' | 'sword' | 'mystery'
+type PanelKey = 'feature' | 'scroll' | 'sword' | 'mystery'
 
-const PANEL_ORDER: PanelKey[] = ['scroll', 'sword', 'mystery']
+const PANEL_ORDER: PanelKey[] = ['feature', 'scroll', 'sword', 'mystery']
 
 export function WelcomePage() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState<PanelKey | null>('scroll')
+  const [selected, setSelected] = useState<PanelKey | null>('feature')
 
   const panelsRef = useRef<HTMLDivElement>(null)
   const panelRefs = useRef<Partial<Record<PanelKey, HTMLDivElement | null>>>({})
@@ -106,15 +106,24 @@ export function WelcomePage() {
 
       <div className="welcome-layout">
         <div className="welcome-left">
-          {/* Decorative — was previously wired to navigate('/schedule'),
-              which is why tapping it jumped to the schedule page. The
-              "Schedule" button above already covers that action, so
-              this is now just an image. */}
+          {/* Desktop/iPad only — hidden in portrait, where panel1 lives
+              inside .welcome-panels instead (welcome-panel-feature-mobile-only
+              below) so it can take part in the carousel. */}
           <img className="welcome-feature" src="/assets/panel1.png" alt="" />
           <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
         </div>
 
         <div className="welcome-panels" ref={panelsRef} onScroll={handleScroll}>
+          {/* Portrait-only carousel copy of panel1. Hidden on desktop/iPad
+              via .welcome-panel-feature-mobile-only so it never doubles up
+              with .welcome-left above. */}
+          <div
+            className={`welcome-panel welcome-panel-feature-mobile-only ${selected === 'feature' ? 'is-selected' : ''}`}
+            ref={(el) => { panelRefs.current.feature = el }}
+            onClick={() => handlePanelClick('feature')}
+          >
+            <img className="welcome-panel-bg" src="/assets/panel1.png" alt="" />
+          </div>
           <div
             className={`welcome-panel ${selected === 'scroll' ? 'is-selected' : ''}`}
             ref={(el) => { panelRefs.current.scroll = el }}
