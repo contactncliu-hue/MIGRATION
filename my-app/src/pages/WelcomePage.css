@@ -70,6 +70,7 @@
   display: block;
   position: relative;
   z-index: 2;
+  transform: translateY(-18vh);
 }
 
 .welcome-title {
@@ -79,6 +80,7 @@
   margin-left: var(--sp-2);
   position: relative;
   z-index: 1;
+  transform: translateY(-18vh);
 }
 
 .welcome-header-mobile {
@@ -119,7 +121,7 @@
 }
 
 .welcome-panel-bg {
-  height: 79vh;
+  height: 74vh;
   width: auto;
   display: block;
   opacity: 0.45;
@@ -140,10 +142,6 @@
 
 .welcome-panel:first-child .welcome-panel-icon {
   top: calc(50% + 10px);
-}
-
-.welcome-panel:nth-child(3) .welcome-panel-icon {
-  opacity: 0.85;
 }
 
 .welcome-panel.is-selected {
