@@ -15,7 +15,6 @@ export function Layout({ children }: LayoutProps) {
 
   useEffect(() => {
     function handleResize() {
-      // Only auto-correct at the breakpoint crossing, don't fight manual toggles mid-session.
       if (window.innerWidth <= 760) setSidebarOpen(false)
     }
     window.addEventListener('resize', handleResize)
@@ -32,7 +31,7 @@ export function Layout({ children }: LayoutProps) {
       {sidebarOpen && (
         <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
       )}
-      <main className="main-content" style={{ marginLeft: sidebarOpen ? 240 : 0 }}>
+      <main className="main-content">
         <MenuToggle isOpen={sidebarOpen} onClick={() => setSidebarOpen((o) => !o)} />
         {children}
       </main>
