@@ -1,10 +1,6 @@
 .welcome-stage {
   position: relative;
   width: 100%;
-  /* 100vh is unreliable on mobile Safari (doesn't recompute cleanly on
-     rotation). dvh tracks the real visible viewport and updates on
-     orientation change; vh is kept only as a fallback for browsers
-     that don't support dvh. */
   height: 100vh;
   height: 100dvh;
   min-height: 100vh;
@@ -48,7 +44,7 @@
 
 .welcome-layout {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: var(--sp-4);
   width: 100%;
   min-width: 0;
@@ -69,9 +65,8 @@
 }
 
 .welcome-feature {
-  width: 100%;
-  max-height: 30vh;
-  height: auto;
+  height: 38vh;
+  width: auto;
   display: block;
   position: relative;
   z-index: 2;
@@ -105,13 +100,9 @@
   z-index: 10;
 }
 
-/* Panels no longer forced to fill remaining width with flex:1 — each
-   sizes to its own image now (fixes the squish), so the group just
-   sits left-aligned next to .welcome-left with a small gap, matching
-   the reference instead of stretching to fill the row. */
 .welcome-panels {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: var(--sp-2);
   min-width: 0;
   margin: 0;
@@ -127,11 +118,8 @@
   transform: translateY(-4px);
 }
 
-/* Height-driven sizing with width:auto lets the browser derive width
-   from the image's real aspect ratio — no more squish from width:100%
-   fighting max-height. */
 .welcome-panel-bg {
-  height: 32vh;
+  height: 58vh;
   width: auto;
   display: block;
   opacity: 0.45;
@@ -196,11 +184,6 @@
   display: none;
 }
 
-/* ---------------------------------------------------------------------
-   PORTRAIT — triggered by orientation, not a fixed pixel width, so this
-   applies on tablets too. Everything must fit in one screen with no
-   scrolling, so height is locked to the viewport and overflow is hidden.
-   --------------------------------------------------------------------- */
 @media (orientation: portrait) {
   .welcome-stage {
     height: 100vh;
@@ -265,6 +248,7 @@
   .welcome-feature {
     width: 100%;
     max-width: 260px;
+    height: auto;
     margin: 0 auto;
   }
 
@@ -277,8 +261,6 @@
     z-index: 10;
   }
 
-  /* Portrait keeps the swipeable-carousel sizing (percentage-based),
-     since it's a different layout mode from the desktop row above. */
   .welcome-panels {
     width: 100%;
     margin: var(--sp-3) 0 0;
