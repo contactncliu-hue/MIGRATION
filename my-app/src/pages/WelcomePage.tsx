@@ -6,6 +6,18 @@ type PanelKey = 'feature' | 'scroll' | 'sword' | 'mystery'
 
 const PANEL_ORDER: PanelKey[] = ['feature', 'scroll', 'sword', 'mystery']
 
+// Returns this panel's distance (0-3) from the selected panel, going
+// forward through PANEL_ORDER with wraparound. 0 = front/selected,
+// 1/2/3 = successively further back in the receding mobile stack.
+// Returns -1 when nothing is selected yet (fully hidden).
+function getStackPosition(key: PanelKey, selected: PanelKey | null): number {
+  if (!selected) return -1
+  const total = PANEL_ORDER.length
+  const selectedIndex = PANEL_ORDER.indexOf(selected)
+  const index = PANEL_ORDER.indexOf(key)
+  return (index - selectedIndex + total) % total
+}
+
 export function WelcomePage() {
   const navigate = useNavigate()
   const [selected, setSelected] = useState<PanelKey | null>('feature')
@@ -103,16 +115,18 @@ export function WelcomePage() {
         <div className="welcome-panels" ref={panelsRef} onScroll={handleScroll}>
           {/* Portrait-only carousel copy of panel1. Hidden on desktop/iPad
               via .welcome-panel-feature-mobile-only so it never doubles up
-              with .welcome-left above. */}
+              with .welcome-left above. Stack position (pos-0..pos-3) is
+              computed from distance-from-selected with wraparound — see
+              getStackPosition() above — not from DOM adjacency. */}
           <div
-            className={`welcome-panel welcome-panel-feature-mobile-only ${selected === 'feature' ? 'is-selected' : ''}`}
+            className={`welcome-panel welcome-panel-feature-mobile-only welcome-panel-pos-${getStackPosition('feature', selected)}`}
             ref={(el) => { panelRefs.current.feature = el }}
             onClick={() => handlePanelClick('feature')}
           >
             <img className="welcome-panel-bg" src="/assets/panel1.png" alt="" />
           </div>
           <div
-            className={`welcome-panel ${selected === 'scroll' ? 'is-selected' : ''}`}
+            className={`welcome-panel welcome-panel-pos-${getStackPosition('scroll', selected)}`}
             ref={(el) => { panelRefs.current.scroll = el }}
             onClick={() => handlePanelClick('scroll')}
           >
@@ -120,7 +134,7 @@ export function WelcomePage() {
             <img className="welcome-panel-icon" src="/assets/scroll.png" alt="Scroll" />
           </div>
           <div
-            className={`welcome-panel ${selected === 'sword' ? 'is-selected' : ''}`}
+            className={`welcome-panel welcome-panel-pos-${getStackPosition('sword', selected)}`}
             ref={(el) => { panelRefs.current.sword = el }}
             onClick={() => handlePanelClick('sword')}
           >
@@ -128,7 +142,7 @@ export function WelcomePage() {
             <img className="welcome-panel-icon" src="/assets/sword.png" alt="Sword" />
           </div>
           <div
-            className={`welcome-panel ${selected === 'mystery' ? 'is-selected' : ''}`}
+            className={`welcome-panel welcome-panel-pos-${getStackPosition('mystery', selected)}`}
             ref={(el) => { panelRefs.current.mystery = el }}
             onClick={() => handlePanelClick('mystery')}
           >
