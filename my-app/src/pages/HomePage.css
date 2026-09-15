@@ -476,15 +476,15 @@
     display: none;
   }
 
-  /* Guest CTA is now the topmost element on the page — above the "server
-     time" note, and (since the portal header/title/center panel all sit
-     lower in normal flow and start well below this offset) above both
-     the header art and the center panel too. Previously this sat below
-     the note; swapped the two so the button leads. z-index (47) was
+  /* Guest CTA sits between the "server time" note (above it) and the
+     header art / center panel (below it) — the note stays topmost at
+     var(--sp-5), and the button sits just under it. z-index (47) is
      already above the portal header (14) and center panel (20), so no
-     stacking change was needed there — only the vertical position. */
+     stacking change is needed — this is purely a vertical-position fix,
+     reverting an earlier change that incorrectly put the button above
+     the note instead of between the note and the header. */
   .home-guest-actions {
-    top: var(--sp-5);
+    top: calc(var(--sp-5) + 34px);
     bottom: auto;
     left: 50%;
     right: auto;
@@ -499,19 +499,18 @@
     font-size: var(--fs-label);
   }
 
-  /* "Server time · subject to change" — now sits just below the guest
-     CTA instead of above it. IMPORTANT: this only works if the note's
-     markup lives outside .home-portal — that ancestor has a `transform`,
-     which traps any absolutely-positioned descendant and drags it
-     around with the slide/scale animation. It must be a sibling of
-     .home-guest-actions / .home-dots (a direct child of .home-stage or
-     .home-carousel), with its class swapped from .home-schedule-note to
-     .home-top-note.
+  /* "Server time · subject to change" — topmost, above the guest CTA.
+     IMPORTANT: this only works if the note's markup lives outside
+     .home-portal — that ancestor has a `transform`, which traps any
+     absolutely-positioned descendant and drags it around with the
+     slide/scale animation. It must be a sibling of .home-guest-actions /
+     .home-dots (a direct child of .home-stage or .home-carousel), with
+     its class swapped from .home-schedule-note to .home-top-note.
   */
   .home-top-note {
     display: block;
     position: absolute;
-    top: calc(var(--sp-5) + 34px);
+    top: var(--sp-5);
     left: 0;
     right: 0;
     z-index: 48;
