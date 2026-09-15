@@ -163,12 +163,6 @@
   display: none;
 }
 
-/* Portrait-only: the title png relocated under panel1's artwork so it
-   travels with panel1 through the carousel stack (it's a normal child
-   of the feature panel, so it inherits that panel's transform/opacity
-   automatically — no separate positioning logic needed). Hidden on
-   desktop/iPad, where the original top-of-column title still renders
-   via .welcome-title inside .welcome-left. */
 .welcome-panel-title-mobile-only {
   display: none;
 }
@@ -202,24 +196,6 @@
   display: none;
 }
 
-/* ============================================================
-   PORTRAIT / MOBILE ONLY
-   Fanned/stacked carousel: the selected panel sits front-and-center
-   (pos-0). The other three recede behind it — pos-1 peeks from the
-   right (the "next" panel), pos-2 sits back-and-center, raised above
-   the front card (the panel two away), and pos-3 peeks from the left
-   (the panel it just came from, three steps forward = one step back
-   with wraparound). "Rotating" means whichever panel is clicked
-   becomes pos-0, and the rest reshuffle based on their distance (with
-   wraparound) from it — computed in TSX via getStackPosition(), not
-   via DOM-sibling CSS selectors (those can't express wraparound or a
-   3-deep stack).
-
-   NOTE: pos-1 and pos-3 were previously both offset toward the right
-   (two stacks on the same side, matching neither the design nor the
-   reference image, which showed one peek left and one peek right).
-   pos-3 now mirrors pos-1 to the left instead.
-   ============================================================ */
 @media (orientation: portrait) {
   .welcome-stage {
     height: 100dvh;
@@ -243,10 +219,6 @@
     padding: 0 var(--sp-4);
     box-sizing: border-box;
     position: relative;
-    /* Schedule button and menu icon are position: absolute and don't
-       reserve space in flow, so this pushes the line/panels/title
-       (all downstream siblings in the same flex-column) below them
-       instead of starting flush under the status bar. */
     margin-top: clamp(56px, 15vw, 84px);
   }
   .welcome-header-mobile .welcome-line--mobile {
@@ -303,8 +275,6 @@
     transition: transform 0.35s ease, opacity 0.35s ease;
   }
 
-  /* pos-0: front and center — the selected panel. Full size, full
-     opacity, icon visible, on top of the stack. */
   .welcome-panel.welcome-panel-pos-0 {
     opacity: 1;
     pointer-events: auto;
@@ -318,8 +288,6 @@
     opacity: 1;
   }
 
-  /* pos-1: next panel — peeks from the right, just behind the front
-     card. */
   .welcome-panel.welcome-panel-pos-1 {
     opacity: 0.7;
     pointer-events: auto;
@@ -327,8 +295,6 @@
     z-index: 3;
   }
 
-  /* pos-2: two panels ahead — sits back and center, raised above the
-     front card, smaller and dimmer. */
   .welcome-panel.welcome-panel-pos-2 {
     opacity: 0.45;
     pointer-events: auto;
@@ -336,8 +302,6 @@
     z-index: 2;
   }
 
-  /* pos-3: three panels ahead (= one step back, with wraparound) —
-     mirrors pos-1, peeking from the left instead of the right. */
   .welcome-panel.welcome-panel-pos-3 {
     opacity: 0.7;
     pointer-events: auto;
@@ -377,4 +341,17 @@
     color: #7a2b2b;
     z-index: 25;
   }
+}
+
+/* Pill labels used by the welcome popup panels (requirements list,
+   contacts, migration exceptions). Background color is set per-pill
+   inline by the admin's chosen color; text is always white. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  color: #fff;
+  font-weight: 700;
+  margin: 4px 6px 4px 0;
 }
