@@ -8,8 +8,9 @@ const PANEL_ORDER: PanelKey[] = ['feature', 'scroll', 'sword', 'mystery']
 
 // Returns this panel's distance (0-3) from the selected panel, going
 // forward through PANEL_ORDER with wraparound. 0 = front/selected,
-// 1/2/3 = successively further back in the receding mobile stack.
-// Returns -1 when nothing is selected yet (fully hidden).
+// 1 = next (right peek), 2 = back-center, 3 = one step back with
+// wraparound (left peek). Returns -1 when nothing is selected yet
+// (fully hidden).
 function getStackPosition(key: PanelKey, selected: PanelKey | null): number {
   if (!selected) return -1
   const total = PANEL_ORDER.length
@@ -93,12 +94,14 @@ export function WelcomePage() {
         Schedule
       </button>
 
-      {/* Portrait-only header: title + line stacked above the panels
-          row, matching the reference layout. Hidden on desktop via CSS
-          (see .welcome-header-mobile in the stylesheet) — the desktop
+      {/* Portrait-only header: just the divider line above the panels
+          row now — the title png moved down into panel1's own div
+          (see welcome-panel-title-mobile-only below) so it travels
+          with panel1 through the carousel instead of staying pinned
+          at the top. Hidden on desktop via CSS (see
+          .welcome-header-mobile in the stylesheet) — the desktop
           title/line/caption below are the ones shown there. */}
       <div className="welcome-header-mobile">
-        <img className="welcome-title welcome-title--mobile" src="/assets/title-red.PNG" alt="zOo" />
         <img className="welcome-line welcome-line--mobile" src="/assets/Line.PNG" alt="" />
         <div className="welcome-caption welcome-caption--mobile">WELCOME TO ZO.O</div>
       </div>
@@ -117,13 +120,17 @@ export function WelcomePage() {
               via .welcome-panel-feature-mobile-only so it never doubles up
               with .welcome-left above. Stack position (pos-0..pos-3) is
               computed from distance-from-selected with wraparound — see
-              getStackPosition() above — not from DOM adjacency. */}
+              getStackPosition() above — not from DOM adjacency. The title
+              png is nested inside this same panel div (mobile-only), so
+              it inherits panel1's transform/opacity and rotates through
+              the stack right along with it. */}
           <div
             className={`welcome-panel welcome-panel-feature-mobile-only welcome-panel-pos-${getStackPosition('feature', selected)}`}
             ref={(el) => { panelRefs.current.feature = el }}
             onClick={() => handlePanelClick('feature')}
           >
             <img className="welcome-panel-bg" src="/assets/panel1.png" alt="" />
+            <img className="welcome-panel-title-mobile-only" src="/assets/title-red.PNG" alt="zOo" />
           </div>
           <div
             className={`welcome-panel welcome-panel-pos-${getStackPosition('scroll', selected)}`}
