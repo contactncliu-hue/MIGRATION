@@ -70,7 +70,6 @@
   display: block;
   position: relative;
   z-index: 2;
-  /* was -6vh — nudged up slightly so its top clears the other panels' tops */
   transform: translateY(-8vh);
 }
 
@@ -109,7 +108,6 @@
   gap: var(--sp-5);
   min-width: 0;
   margin: 0;
-  /* shifts panels 2, 3, 4 right as a group, away from panel 1 */
   margin-left: var(--sp-6, 40px);
 }
 
@@ -161,8 +159,6 @@
   opacity: 1;
 }
 
-/* Portrait-only carousel copy of panel1 — invisible on desktop/iPad so
-   panel1 keeps rendering only via .welcome-left there. */
 .welcome-panel-feature-mobile-only {
   display: none;
 }
@@ -198,17 +194,15 @@
 
 /* ============================================================
    PORTRAIT / MOBILE ONLY
-   True document-flow order: header (title + line) -> panels carousel,
-   with panel1 now included as the first member of the carousel so it
-   can take part in the same peek/select/swipe mechanics as 2/3/4.
-
-   Peek/select roles are computed in TSX from panel index (with
-   wraparound via modulo) and applied as explicit classes —
-   welcome-panel-peek-prev / welcome-panel-peek-next — rather than
-   DOM-sibling CSS selectors. Sibling selectors like
-   `.welcome-panel:has(+ .is-selected)` can't express wraparound
-   (panel 4 has no next sibling to be "panel 1"), which is what
-   caused the carousel to dead-end instead of looping 1→2→3→4→1.
+   Fanned/stacked carousel: the selected panel sits front-and-center
+   (pos-0). The other three recede behind it in a rising stack toward
+   the upper-right (pos-1 closest/slightly up-right, pos-2 further
+   back and more centered/up, pos-3 furthest back and most hidden,
+   peeking at the right edge). "Rotating" means whichever panel is
+   clicked becomes pos-0, and the rest reshuffle into that same
+   receding order based on their distance (with wraparound) from it —
+   computed in TSX via getStackPosition(), not via DOM-sibling CSS
+   selectors (those can't express wraparound or a 3-deep stack).
    ============================================================ */
 @media (orientation: portrait) {
   .welcome-stage {
@@ -241,7 +235,6 @@
     position: relative;
   }
   .welcome-header-mobile .welcome-line--mobile {
-    /* bumped further: wider bleed + stronger vertical scale */
     width: 124vw;
     height: auto;
     margin-top: var(--sp-2);
@@ -253,14 +246,13 @@
   }
   .welcome-header-mobile .welcome-caption--mobile,
   .welcome-caption {
-    display: none; /* keep just one "WELCOME TO ZO.O" (the fixed one) */
+    display: none;
   }
 
   .welcome-line:not(.welcome-line--mobile) {
-    display: none; /* bottom desktop line was leaking into portrait */
+    display: none;
   }
 
-  /* panel1 is rendered via the carousel copy in portrait, not this block */
   .welcome-left {
     display: none;
   }
@@ -289,8 +281,6 @@
   .welcome-panels {
     position: relative;
     width: 100%;
-    /* fills remaining vertical space instead of a fixed 48vh —
-       that fixed height was the cause of the dead gap underneath */
     flex: 1;
     min-height: 0;
     margin: var(--sp-2) 0 0;
@@ -301,50 +291,58 @@
     top: 0;
     left: 50%;
     width: 70%;
-    transform: translate(-50%, 0) scale(0.8);
-    opacity: 0;
     pointer-events: none;
-    z-index: 1;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.35s ease, opacity 0.35s ease;
   }
 
-  .welcome-panel.is-selected {
+  /* pos-0: front and center — the selected panel. Full size, full
+     opacity, icon visible, on top of the stack. */
+  .welcome-panel.welcome-panel-pos-0 {
     opacity: 1;
     pointer-events: auto;
     transform: translate(-50%, 0) scale(1);
+    z-index: 4;
+  }
+  .welcome-panel.welcome-panel-pos-0 .welcome-panel-bg {
+    opacity: 1;
+  }
+  .welcome-panel.welcome-panel-pos-0 .welcome-panel-icon {
+    opacity: 1;
+  }
+
+  /* pos-1: closest of the receding panels — peeks from the upper
+     right, just behind the front card. */
+  .welcome-panel.welcome-panel-pos-1 {
+    opacity: 0.7;
+    pointer-events: auto;
+    transform: translate(-24%, -14%) scale(0.82);
     z-index: 3;
   }
 
-  /* Left peek — the panel just "before" the selected one, in
-     PANEL_ORDER index terms with wraparound (so panel1 peeks left
-     when panel4/mystery is selected). Role assigned in TSX. */
-  .welcome-panel.welcome-panel-peek-prev {
-    opacity: 0.55;
+  /* pos-2: next one back — more centered but pushed further up,
+     smaller and dimmer, mostly hidden behind pos-0/pos-1. */
+  .welcome-panel.welcome-panel-pos-2 {
+    opacity: 0.45;
     pointer-events: auto;
-    transform: translate(calc(-50% - 68%), 4%) scale(0.82);
+    transform: translate(-46%, -26%) scale(0.68);
     z-index: 2;
   }
 
-  /* Right peek — the panel just "after" the selected one, with
-     wraparound (so panel1 peeks right when panel2/scroll is
-     selected... and panel1 peeks right when panel4 is selected is
-     NOT possible simultaneously with the left-peek case above,
-     since only one neighbor is prev and one is next at a time). */
-  .welcome-panel.welcome-panel-peek-next {
-    opacity: 0.55;
+  /* pos-3: furthest back — barely peeking at the right edge, most
+     hidden and dimmest of the stack. */
+  .welcome-panel.welcome-panel-pos-3 {
+    opacity: 0.3;
     pointer-events: auto;
-    transform: translate(calc(-50% + 68%), 4%) scale(0.82);
-    z-index: 2;
+    transform: translate(-10%, -20%) scale(0.6);
+    z-index: 1;
   }
 
   .welcome-panel-bg {
     width: 100%;
     height: auto;
-    /* opacity now controlled by the parent .welcome-panel, not here */
     opacity: 1;
   }
 
-  /* panel1's carousel copy becomes visible only in portrait */
   .welcome-panel-feature-mobile-only {
     display: block;
   }
