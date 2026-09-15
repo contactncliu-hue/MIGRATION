@@ -1,10 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Modal } from '../components/ui/Modal'
+import { RankingPanel } from '../components/welcome/RankingPanel'
+import { ServerInfoPanel } from '../components/welcome/ServerInfoPanel'
+import { RequirementsPanel } from '../components/welcome/RequirementsPanel'
+import { AdditionalInfoPanel } from '../components/welcome/AdditionalInfoPanel'
 import './WelcomePage.css'
 
 type PanelKey = 'feature' | 'scroll' | 'sword' | 'mystery'
 
 const PANEL_ORDER: PanelKey[] = ['feature', 'scroll', 'sword', 'mystery']
+
+const PANEL_TITLES: Record<PanelKey, string> = {
+  feature: 'Rankings',
+  scroll: 'Server Information',
+  sword: 'Server Requirements',
+  mystery: 'Additional Information',
+}
 
 // Returns this panel's distance (0-3) from the selected panel, going
 // forward through PANEL_ORDER with wraparound. 0 = front/selected,
@@ -22,6 +34,7 @@ function getStackPosition(key: PanelKey, selected: PanelKey | null): number {
 export function WelcomePage() {
   const navigate = useNavigate()
   const [selected, setSelected] = useState<PanelKey | null>('feature')
+  const [openPanel, setOpenPanel] = useState<PanelKey | null>(null)
 
   const panelsRef = useRef<HTMLDivElement>(null)
   const panelRefs = useRef<Partial<Record<PanelKey, HTMLDivElement | null>>>({})
@@ -70,6 +83,7 @@ export function WelcomePage() {
 
   const handlePanelClick = (key: PanelKey) => {
     setSelected(key)
+    setOpenPanel(key)
   }
 
   useEffect(() => {
@@ -110,8 +124,15 @@ export function WelcomePage() {
         <div className="welcome-left">
           {/* Desktop/iPad only — hidden in portrait, where panel1 lives
               inside .welcome-panels instead (welcome-panel-feature-mobile-only
-              below) so it can take part in the carousel. */}
-          <img className="welcome-feature" src="/assets/panel1.png" alt="" />
+              below) so it can take part in the carousel. Now clickable
+              to open the Rankings popup, matching the mobile carousel copy. */}
+          <img
+            className="welcome-feature"
+            src="/assets/panel1.png"
+            alt=""
+            onClick={() => handlePanelClick('feature')}
+            style={{ cursor: 'pointer' }}
+          />
           <img className="welcome-title" src="/assets/title-red.PNG" alt="zOo" />
         </div>
 
@@ -172,6 +193,17 @@ export function WelcomePage() {
           element from .welcome-caption so it can be absolutely
           positioned independent of content height above it. */}
       <div className="welcome-caption-fixed">WELCOME TO ZO.O</div>
+
+      <Modal
+        open={openPanel !== null}
+        onClose={() => setOpenPanel(null)}
+        title={openPanel ? PANEL_TITLES[openPanel] : ''}
+      >
+        {openPanel === 'feature' && <RankingPanel />}
+        {openPanel === 'scroll' && <ServerInfoPanel />}
+        {openPanel === 'sword' && <RequirementsPanel />}
+        {openPanel === 'mystery' && <AdditionalInfoPanel />}
+      </Modal>
     </div>
   )
 }
