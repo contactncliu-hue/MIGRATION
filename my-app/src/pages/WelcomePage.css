@@ -243,14 +243,20 @@
     padding: 0 var(--sp-4);
     box-sizing: border-box;
     position: relative;
+    /* Schedule button and menu icon are position: absolute and don't
+       reserve space in flow, so this pushes the line/panels/title
+       (all downstream siblings in the same flex-column) below them
+       instead of starting flush under the status bar. */
+    margin-top: clamp(56px, 15vw, 84px);
   }
   .welcome-header-mobile .welcome-line--mobile {
-    width: 124vw;
+    /* slightly bigger than before, per request */
+    width: 130vw;
     height: auto;
     margin-top: var(--sp-2);
-    margin-left: calc(-62vw + 50%);
-    margin-right: calc(-62vw + 50%);
-    transform: scaleY(1.9);
+    margin-left: calc(-65vw + 50%);
+    margin-right: calc(-65vw + 50%);
+    transform: scaleY(2.1);
     transform-origin: center;
     position: relative;
   }
