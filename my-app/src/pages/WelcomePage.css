@@ -250,15 +250,7 @@
     margin-top: clamp(56px, 15vw, 84px);
   }
   .welcome-header-mobile .welcome-line--mobile {
-    /* slightly bigger than before, per request */
-    width: 130vw;
-    height: auto;
-    margin-top: var(--sp-2);
-    margin-left: calc(-65vw + 50%);
-    margin-right: calc(-65vw + 50%);
-    transform: scaleY(2.1);
-    transform-origin: center;
-    position: relative;
+    display: none;
   }
   .welcome-header-mobile .welcome-caption--mobile,
   .welcome-caption {
