@@ -37,24 +37,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false
 
-    // onAuthStateChange fires once on subscribe with the restored session,
-    // so it covers the initial load too — no separate getUser() call needed.
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const nextUser = session?.user ?? null
+    // getSession() is the authoritative initial check — unlike the first
+    // onAuthStateChange callback, it's a promise that actually waits for
+    // the persisted session to finish being read from storage. That read
+    // can take an extra tick on mobile, where onAuthStateChange's first
+    // callback was firing with session = null (restore not done yet)
+    // before firing again moments later with the real session — flipping
+    // loading to false too early and causing guest-only UI to flash
+    // visible, then disappear once the real (logged-in) state arrived.
+    // getSession() up front avoids that: loading only goes false once,
+    // after the real state is known.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return
+      const initialUser = session?.user ?? null
+      setUser(initialUser)
 
-      if (!nextUser) {
-        if (cancelled) return
-        setUser(null)
+      if (!initialUser) {
         setProfile(null)
         setLoading(false)
         return
       }
 
-      setUser(nextUser)
-      fetchProfile(nextUser).then((p) => {
+      fetchProfile(initialUser).then((p) => {
         if (cancelled) return
         setProfile(p)
         setLoading(false)
+      })
+    })
+
+    // Now just for live updates after the initial load — sign-in,
+    // sign-out, token refresh while the app is open. Deliberately does
+    // not touch `loading`: that's fully owned by the getSession() check
+    // above, so a live update can't re-introduce the same premature
+    // "loading finished" race.
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      const nextUser = session?.user ?? null
+      setUser(nextUser)
+
+      if (!nextUser) {
+        setProfile(null)
+        return
+      }
+
+      fetchProfile(nextUser).then((p) => {
+        if (cancelled) return
+        setProfile(p)
       })
     })
 
