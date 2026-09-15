@@ -163,6 +163,16 @@
   display: none;
 }
 
+/* Portrait-only: the title png relocated under panel1's artwork so it
+   travels with panel1 through the carousel stack (it's a normal child
+   of the feature panel, so it inherits that panel's transform/opacity
+   automatically — no separate positioning logic needed). Hidden on
+   desktop/iPad, where the original top-of-column title still renders
+   via .welcome-title inside .welcome-left. */
+.welcome-panel-title-mobile-only {
+  display: none;
+}
+
 .welcome-footer {
   margin-top: auto;
 }
@@ -195,14 +205,20 @@
 /* ============================================================
    PORTRAIT / MOBILE ONLY
    Fanned/stacked carousel: the selected panel sits front-and-center
-   (pos-0). The other three recede behind it in a rising stack toward
-   the upper-right (pos-1 closest/slightly up-right, pos-2 further
-   back and more centered/up, pos-3 furthest back and most hidden,
-   peeking at the right edge). "Rotating" means whichever panel is
-   clicked becomes pos-0, and the rest reshuffle into that same
-   receding order based on their distance (with wraparound) from it —
-   computed in TSX via getStackPosition(), not via DOM-sibling CSS
-   selectors (those can't express wraparound or a 3-deep stack).
+   (pos-0). The other three recede behind it — pos-1 peeks from the
+   right (the "next" panel), pos-2 sits back-and-center, raised above
+   the front card (the panel two away), and pos-3 peeks from the left
+   (the panel it just came from, three steps forward = one step back
+   with wraparound). "Rotating" means whichever panel is clicked
+   becomes pos-0, and the rest reshuffle based on their distance (with
+   wraparound) from it — computed in TSX via getStackPosition(), not
+   via DOM-sibling CSS selectors (those can't express wraparound or a
+   3-deep stack).
+
+   NOTE: pos-1 and pos-3 were previously both offset toward the right
+   (two stacks on the same side, matching neither the design nor the
+   reference image, which showed one peek left and one peek right).
+   pos-3 now mirrors pos-1 to the left instead.
    ============================================================ */
 @media (orientation: portrait) {
   .welcome-stage {
@@ -226,12 +242,6 @@
     width: 100%;
     padding: 0 var(--sp-4);
     box-sizing: border-box;
-    position: relative;
-  }
-  .welcome-header-mobile .welcome-title--mobile {
-    width: 46%;
-    max-width: 220px;
-    height: auto;
     position: relative;
   }
   .welcome-header-mobile .welcome-line--mobile {
@@ -310,8 +320,8 @@
     opacity: 1;
   }
 
-  /* pos-1: closest of the receding panels — peeks from the upper
-     right, just behind the front card. */
+  /* pos-1: next panel — peeks from the right, just behind the front
+     card. */
   .welcome-panel.welcome-panel-pos-1 {
     opacity: 0.7;
     pointer-events: auto;
@@ -319,8 +329,8 @@
     z-index: 3;
   }
 
-  /* pos-2: next one back — more centered but pushed further up,
-     smaller and dimmer, mostly hidden behind pos-0/pos-1. */
+  /* pos-2: two panels ahead — sits back and center, raised above the
+     front card, smaller and dimmer. */
   .welcome-panel.welcome-panel-pos-2 {
     opacity: 0.45;
     pointer-events: auto;
@@ -328,12 +338,12 @@
     z-index: 2;
   }
 
-  /* pos-3: furthest back — barely peeking at the right edge, most
-     hidden and dimmest of the stack. */
+  /* pos-3: three panels ahead (= one step back, with wraparound) —
+     mirrors pos-1, peeking from the left instead of the right. */
   .welcome-panel.welcome-panel-pos-3 {
-    opacity: 0.3;
+    opacity: 0.7;
     pointer-events: auto;
-    transform: translate(-10%, -20%) scale(0.6);
+    transform: translate(-76%, -14%) scale(0.82);
     z-index: 1;
   }
 
@@ -345,6 +355,17 @@
 
   .welcome-panel-feature-mobile-only {
     display: block;
+  }
+
+  .welcome-panel-title-mobile-only {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translate(-50%, var(--sp-2));
+    width: 46%;
+    height: auto;
+    pointer-events: none;
   }
 
   .welcome-caption-fixed {
