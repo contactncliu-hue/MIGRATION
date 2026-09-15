@@ -40,10 +40,12 @@
 }
 
 /* ---------- top-left nav: back to Welcome ---------- */
-/* Sits below the existing sidebar toggle button (also top-left) instead of
-   overlapping it. The +52px offset and z-index:60 are a guess at clearing
-   that button — adjust once Layout.tsx/Layout.css confirm its exact
-   position and stacking. */
+/* Desktop position — sits below the existing sidebar toggle button (also
+   top-left) instead of overlapping it. The +52px offset and z-index:60 are
+   a guess at clearing that button — adjust once Layout.tsx/Layout.css
+   confirm its exact position and stacking. Left as-is: mobile now aligns
+   to the sidebar toggle differently (see the mobile media query), but
+   desktop keeps its original "below the toggle" placement. */
 .home-info-btn {
   position: absolute;
   top: calc(var(--sp-5) + 52px);
@@ -337,28 +339,6 @@
   color: var(--c-gold-deep);
 }
 
-@media (max-width: 760px) {
-  /* Moved from hugging the bottom edge to sitting just below the
-     relocated "server time" note near the top of the screen, and
-     narrowed instead of spanning the full width. Nudge `top` to match
-     wherever .home-top-note actually lands once it's in the markup. */
-  .home-guest-actions {
-    top: calc(var(--sp-5) + 34px);
-    bottom: auto;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    width: min(48%, 220px);
-    justify-content: center;
-  }
-  .home-guest-primary,
-  .home-guest-secondary {
-    flex: 1 1 0;
-    padding: 0 var(--sp-2);
-    font-size: var(--fs-label);
-  }
-}
-
 /* ---------- indicator ---------- */
 .home-dots {
   position: absolute;
@@ -496,21 +476,42 @@
     display: none;
   }
 
-  /* "Server time · subject to change", relocated to the top of the
-     screen, level with the sidebar/hamburger button. IMPORTANT: this
-     only works if the note's markup is moved out from under
-     .home-portal — that ancestor has a `transform`, which traps any
-     absolutely-positioned descendant and drags it around with the
-     slide/scale animation. Move it to be a sibling of
+  /* Guest CTA is now the topmost element on the page — above the "server
+     time" note, and (since the portal header/title/center panel all sit
+     lower in normal flow and start well below this offset) above both
+     the header art and the center panel too. Previously this sat below
+     the note; swapped the two so the button leads. z-index (47) was
+     already above the portal header (14) and center panel (20), so no
+     stacking change was needed there — only the vertical position. */
+  .home-guest-actions {
+    top: var(--sp-5);
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(48%, 220px);
+    justify-content: center;
+  }
+  .home-guest-primary,
+  .home-guest-secondary {
+    flex: 1 1 0;
+    padding: 0 var(--sp-2);
+    font-size: var(--fs-label);
+  }
+
+  /* "Server time · subject to change" — now sits just below the guest
+     CTA instead of above it. IMPORTANT: this only works if the note's
+     markup lives outside .home-portal — that ancestor has a `transform`,
+     which traps any absolutely-positioned descendant and drags it
+     around with the slide/scale animation. It must be a sibling of
      .home-guest-actions / .home-dots (a direct child of .home-stage or
-     .home-carousel) and swap its class from .home-schedule-note to
-     .home-top-note. Nudge `top` to match your sidebar button exactly —
-     that button's CSS isn't in this file, so this is an estimate.
+     .home-carousel), with its class swapped from .home-schedule-note to
+     .home-top-note.
   */
   .home-top-note {
     display: block;
     position: absolute;
-    top: var(--sp-5);
+    top: calc(var(--sp-5) + 34px);
     left: 0;
     right: 0;
     z-index: 48;
@@ -524,10 +525,14 @@
     pointer-events: none;
   }
 
-  /* On mobile, .home-info-btn is top-left now, same side as the sidebar
-     toggle — keep the same clearance offset as desktop. */
+  /* Aligned to the sidebar toggle instead of stacked below it — this
+     assumes the toggle sits at top: var(--sp-5) (the same baseline used
+     by .home-top-note above and elsewhere in this codebase). There's no
+     Layout.css in hand to confirm the toggle's exact position, so treat
+     this as a best estimate and nudge `top` once it's checked against
+     the real sidebar button on-device. */
   .home-info-btn {
-    top: calc(var(--sp-5) + 52px);
+    top: var(--sp-5);
     left: var(--sp-5);
   }
 }
