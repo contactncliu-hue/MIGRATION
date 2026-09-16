@@ -27,6 +27,22 @@ export interface LanguageStrings {
   admin: string
   language: string
 
+  // --- Welcome page ---
+  schedule: string
+  rankings: string
+  allianceComposition: string
+  serverInformation: string
+  memberGeography: string
+  territoriesAndArmories: string
+  serverRequirements: string
+  additionalInformation: string
+  contactInquiry: string
+  migrationExceptions: string
+  reasonableExceptionsNote: string
+  addLabel: string
+  saveLabel: string
+  savingWelcomeLabel: string
+
   // --- Transfer / migration page ---
   serverTimeNotice: string
   migrationBtnLabel: string
