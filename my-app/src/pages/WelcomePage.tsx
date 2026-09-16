@@ -5,17 +5,23 @@ import { RankingPanel } from '../components/welcome/RankingPanel'
 import { ServerInfoPanel } from '../components/welcome/ServerInfoPanel'
 import { RequirementsPanel } from '../components/welcome/RequirementsPanel'
 import { AdditionalInfoPanel } from '../components/welcome/AdditionalInfoPanel'
+import { useLanguage } from '../lib/language-context'
+import type { LanguageStrings } from '../types/user'
 import './WelcomePage.css'
 
 type PanelKey = 'feature' | 'scroll' | 'sword' | 'mystery'
 
 const PANEL_ORDER: PanelKey[] = ['feature', 'scroll', 'sword', 'mystery']
 
-const PANEL_TITLES: Record<PanelKey, string> = {
-  feature: 'Rankings',
-  scroll: 'Server Information',
-  sword: 'Server Requirements',
-  mystery: 'Additional Information',
+// Built from the dict instead of a static object, so panel titles follow
+// the selected language.
+function getPanelTitles(dict: LanguageStrings): Record<PanelKey, string> {
+  return {
+    feature: dict.rankings,
+    scroll: dict.serverInformation,
+    sword: dict.serverRequirements,
+    mystery: dict.additionalInformation,
+  }
 }
 
 // Returns this panel's distance (0-3) from the selected panel, going
@@ -46,6 +52,8 @@ function getPanelClassName(key: PanelKey, selected: PanelKey | null, extra?: str
 
 export function WelcomePage() {
   const navigate = useNavigate()
+  const { dict } = useLanguage()
+  const PANEL_TITLES = getPanelTitles(dict)
   const [selected, setSelected] = useState<PanelKey | null>('feature')
   const [openPanel, setOpenPanel] = useState<PanelKey | null>(null)
 
@@ -118,7 +126,7 @@ export function WelcomePage() {
         onClick={() => navigate('/schedule')}
         aria-label="View schedule"
       >
-        Schedule
+        {dict.schedule}
       </button>
 
       {/* Portrait-only header: just the divider line above the panels
