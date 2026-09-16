@@ -1,15 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../lib/auth-context'
+import { useLanguage } from '../../lib/language-context'
+import { TranslatedText } from '../ui/TranslatedText'
 import type { ServerInfoField } from '../../types/panels'
-
-// Field keys in the DB stay the same ('languages' / 'territory')
-// — only the display labels changed, so no migration/schema change needed.
-// 'diplomacy' has been removed entirely from this panel.
-const LABELS: Record<string, string> = {
-  languages: 'Member Geography',
-  territory: 'Territories and Armories',
-}
 
 // `languages` content is stored as a JSON array string, e.g. '["Luzon","Visayas"]'.
 // Falls back to comma-splitting in case older rows still hold plain comma text.
@@ -26,6 +20,14 @@ function parseList(content: string | undefined): string[] {
 
 export function ServerInfoPanel() {
   const { isAdmin } = useAuth()
+  const { dict } = useLanguage()
+  // Field keys in the DB stay the same ('languages' / 'territory')
+  // — only the display labels are translated, so no migration needed.
+  // 'diplomacy' has been removed entirely from this panel.
+  const LABELS: Record<string, string> = {
+    languages: dict.memberGeography,
+    territory: dict.territoriesAndArmories,
+  }
   const [rows, setRows] = useState<ServerInfoField[]>([])
   const [newLanguage, setNewLanguage] = useState('')
   const [savingField, setSavingField] = useState<string | null>(null)
@@ -88,7 +90,7 @@ export function ServerInfoPanel() {
               className="pill"
               style={{ background: '#5b7db1', color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}
             >
-              {lang}
+              <TranslatedText text={lang} />
               {isAdmin && (
                 <button onClick={() => removeLanguage(lang)} style={{ marginLeft: 2 }}>×</button>
               )}
@@ -104,7 +106,7 @@ export function ServerInfoPanel() {
               onChange={(e) => setNewLanguage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && addLanguage()}
             />
-            <button onClick={addLanguage} disabled={savingField === 'languages'}>Add</button>
+            <button onClick={addLanguage} disabled={savingField === 'languages'}>{dict.addLabel}</button>
           </div>
         )}
       </div>
@@ -127,11 +129,13 @@ export function ServerInfoPanel() {
                   disabled={savingField === f}
                   style={{ marginTop: 6 }}
                 >
-                  {savingField === f ? 'Saving…' : 'Save'}
+                  {savingField === f ? dict.savingWelcomeLabel : dict.saveLabel}
                 </button>
               </div>
+            ) : row?.content ? (
+              <p><TranslatedText text={row.content} /></p>
             ) : (
-              <p>{row?.content || '—'}</p>
+              <p>—</p>
             )}
           </div>
         )
