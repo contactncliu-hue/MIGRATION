@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../lib/auth-context'
+import { useLanguage } from '../../lib/language-context'
+import { TranslatedText } from '../ui/TranslatedText'
 import type { RankingEntry, CompositionRange, Tier } from '../../types/panels'
 
 const TIER_COLOR: Record<Tier, string> = { gold: '#d4af37', silver: '#a8a8a8', bronze: '#b06a35' }
@@ -10,6 +12,7 @@ const TIER_BY_RANK: Tier[] = ['gold', 'silver', 'bronze']
 
 export function RankingPanel() {
   const { isAdmin } = useAuth()
+  const { dict } = useLanguage()
   const [rankings, setRankings] = useState<RankingEntry[]>([])
   const [comps, setComps] = useState<CompositionRange[]>([])
   const [newPower, setNewPower] = useState('')
@@ -97,7 +100,7 @@ export function RankingPanel() {
 
   return (
     <div>
-      <h3>Rankings</h3>
+      <h3>{dict.rankings}</h3>
       {sorted.map((r, i) => {
         const tier = TIER_BY_RANK[i] // undefined past 3rd place
         return (
@@ -121,7 +124,7 @@ export function RankingPanel() {
             ) : (
               <span style={{ width: 28, textAlign: 'center', color: '#888' }}>{i + 1}</span>
             )}
-            <span>{r.display_label}</span>
+            <span><TranslatedText text={r.display_label} /></span>
             {isAdmin && <button onClick={() => removeRanking(r.id)}>Remove</button>}
           </div>
         )
@@ -130,14 +133,14 @@ export function RankingPanel() {
         <div style={{ marginTop: 10, display: 'flex', gap: 6 }}>
           <input placeholder="Power e.g. 16.9" value={newPower} onChange={(e) => setNewPower(e.target.value)} />
           <input placeholder="Label (optional)" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} />
-          <button onClick={addRanking} disabled={saving}>Add</button>
+          <button onClick={addRanking} disabled={saving}>{dict.addLabel}</button>
         </div>
       )}
 
-      <h3 style={{ marginTop: 20 }}>Server Composition</h3>
+      <h3 style={{ marginTop: 20 }}>{dict.allianceComposition}</h3>
       {comps.map((c) => (
         <div key={c.id} style={{ display: 'flex', gap: 10, marginBottom: 4 }}>
-          <span>{c.range_label} = {c.player_count} players</span>
+          <span><TranslatedText text={c.range_label} /> = {c.player_count} players</span>
           {isAdmin && <button onClick={() => removeComp(c.id)}>Remove</button>}
         </div>
       ))}
@@ -145,7 +148,7 @@ export function RankingPanel() {
         <div style={{ marginTop: 10, display: 'flex', gap: 6 }}>
           <input placeholder="Range e.g. 5-9G" value={newRange} onChange={(e) => setNewRange(e.target.value)} />
           <input placeholder="Total players" value={newCount} onChange={(e) => setNewCount(e.target.value)} />
-          <button onClick={addComp} disabled={saving}>Add</button>
+          <button onClick={addComp} disabled={saving}>{dict.addLabel}</button>
         </div>
       )}
     </div>
