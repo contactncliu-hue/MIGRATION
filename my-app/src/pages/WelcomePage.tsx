@@ -31,6 +31,19 @@ function getStackPosition(key: PanelKey, selected: PanelKey | null): number {
   return (index - selectedIndex + total) % total
 }
 
+// Builds the full className for a panel div: base class, the mobile-carousel
+// stack-position class, and `is-selected` when this is the active panel.
+// `is-selected` is what actually reveals the panel icon on desktop (see
+// .welcome-panel.is-selected .welcome-panel-icon in WelcomePage.css) — the
+// welcome-panel-pos-0 class only does that for the portrait carousel.
+function getPanelClassName(key: PanelKey, selected: PanelKey | null, extra?: string): string {
+  const classes = ['welcome-panel']
+  if (extra) classes.push(extra)
+  classes.push(`welcome-panel-pos-${getStackPosition(key, selected)}`)
+  if (key === selected) classes.push('is-selected')
+  return classes.join(' ')
+}
+
 export function WelcomePage() {
   const navigate = useNavigate()
   const [selected, setSelected] = useState<PanelKey | null>('feature')
@@ -144,9 +157,11 @@ export function WelcomePage() {
               getStackPosition() above — not from DOM adjacency. The title
               png is nested inside this same panel div (mobile-only), so
               it inherits panel1's transform/opacity and rotates through
-              the stack right along with it. */}
+              the stack right along with it. `is-selected` is also applied
+              here (see getPanelClassName) so desktop click-to-reveal works
+              consistently even though this particular div is mobile-only. */}
           <div
-            className={`welcome-panel welcome-panel-feature-mobile-only welcome-panel-pos-${getStackPosition('feature', selected)}`}
+            className={getPanelClassName('feature', selected, 'welcome-panel-feature-mobile-only')}
             ref={(el) => { panelRefs.current.feature = el }}
             onClick={() => handlePanelClick('feature')}
           >
@@ -154,7 +169,7 @@ export function WelcomePage() {
             <img className="welcome-panel-title-mobile-only" src="/assets/title-red.PNG" alt="zOo" />
           </div>
           <div
-            className={`welcome-panel welcome-panel-pos-${getStackPosition('scroll', selected)}`}
+            className={getPanelClassName('scroll', selected)}
             ref={(el) => { panelRefs.current.scroll = el }}
             onClick={() => handlePanelClick('scroll')}
           >
@@ -162,7 +177,7 @@ export function WelcomePage() {
             <img className="welcome-panel-icon" src="/assets/scroll.png" alt="Scroll" />
           </div>
           <div
-            className={`welcome-panel welcome-panel-pos-${getStackPosition('sword', selected)}`}
+            className={getPanelClassName('sword', selected)}
             ref={(el) => { panelRefs.current.sword = el }}
             onClick={() => handlePanelClick('sword')}
           >
@@ -170,7 +185,7 @@ export function WelcomePage() {
             <img className="welcome-panel-icon" src="/assets/sword.png" alt="Sword" />
           </div>
           <div
-            className={`welcome-panel welcome-panel-pos-${getStackPosition('mystery', selected)}`}
+            className={getPanelClassName('mystery', selected)}
             ref={(el) => { panelRefs.current.mystery = el }}
             onClick={() => handlePanelClick('mystery')}
           >
