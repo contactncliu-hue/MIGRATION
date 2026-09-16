@@ -1,127 +1,143 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../lib/auth-context'
-import type { AdditionalInfoItem } from '../../types/panels'
+import type { ServerInfoField } from '../../types/panels'
 
-type Section = 'contact' | 'migration_exception'
-
-const SECTION_TITLE: Record<Section, string> = {
-  contact: 'For more inquiries, contact:',
-  migration_exception: 'Migration Exceptions',
+// Field keys in the DB stay the same ('languages' / 'territory' / 'diplomacy')
+// — only the display labels changed, so no migration/schema change needed.
+const LABELS: Record<string, string> = {
+  languages: 'Member Geography',
+  territory: 'Territories and Armories',
+  diplomacy: 'Diplomacy',
 }
 
-export function AdditionalInfoPanel() {
+// `languages` content is stored as a JSON array string, e.g. '["Luzon","Visayas"]'.
+// Falls back to comma-splitting in case older rows still hold plain comma text.
+function parseList(content: string | undefined): string[] {
+  if (!content) return []
+  try {
+    const parsed = JSON.parse(content)
+    if (Array.isArray(parsed)) return parsed.filter((x): x is string => typeof x === 'string')
+  } catch {
+    // not JSON — treat as legacy comma-separated text
+  }
+  return content.split(',').map((s) => s.trim()).filter(Boolean)
+}
+
+export function ServerInfoPanel() {
   const { isAdmin } = useAuth()
-  const [items, setItems] = useState<AdditionalInfoItem[]>([])
+  const [rows, setRows] = useState<ServerInfoField[]>([])
+  const [newLanguage, setNewLanguage] = useState('')
+  const [savingField, setSavingField] = useState<string | null>(null)
+
+  // Local drafts for the free-text fields, so typing doesn't save until "Save" is clicked.
+  const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [hasSeeded, setHasSeeded] = useState(false)
 
   const load = async () => {
-    const { data, error } = await supabase.from('additional_info').select('*').order('sort_order')
+    const { data, error } = await supabase.from('server_info').select('*')
     if (error) {
-      console.error('Failed to load additional info:', error.message)
+      console.error('Failed to load server info:', error.message)
       return
     }
-    setItems(data ?? [])
+    setRows(data ?? [])
+    if (!hasSeeded) {
+      const seeded: Record<string, string> = {}
+      for (const f of ['territory', 'diplomacy']) {
+        seeded[f] = (data ?? []).find((r) => r.field === f)?.content ?? ''
+      }
+      setDrafts(seeded)
+      setHasSeeded(true)
+    }
   }
   useEffect(() => { load() }, [])
 
-  const remove = async (id: string) => {
-    const { error } = await supabase.from('additional_info').delete().eq('id', id)
+  const save = async (field: string, content: string) => {
+    setSavingField(field)
+    const { error } = await supabase.from('server_info').upsert({ field, content }, { onConflict: 'field' })
+    setSavingField(null)
     if (error) {
-      console.error('Failed to remove item:', error.message)
-      alert(`Could not remove item: ${error.message}`)
+      console.error(`Failed to save ${field}:`, error.message)
+      alert(`Could not save ${LABELS[field] ?? field}: ${error.message}`)
       return
     }
     load()
   }
 
-  const renderItem = (item: AdditionalInfoItem) => (
-    <span
-      key={item.id}
-      className="pill"
-      style={{
-        background: item.section === 'contact' ? '#333' : '#5b7db1',
-        fontWeight: item.is_emphasized ? 800 : 700,
-        fontSize: item.is_emphasized ? '1.1em' : undefined,
-        color: item.is_emphasized ? '#c9660a' : '#fff',
-      }}
-    >
-      {item.label}
-      {isAdmin && <button onClick={() => remove(item.id)} style={{ marginLeft: 6 }}>×</button>}
-    </span>
-  )
+  const languagesRow = rows.find((r) => r.field === 'languages')
+  const languages = parseList(languagesRow?.content)
 
-  const contactItems = items.filter((i) => i.section === 'contact')
-  const exceptionItems = items.filter((i) => i.section === 'migration_exception')
+  const addLanguage = async () => {
+    const val = newLanguage.trim()
+    if (!val || languages.includes(val)) return
+    await save('languages', JSON.stringify([...languages, val]))
+    setNewLanguage('')
+  }
 
-  return (
-    <div>
-      {/* --- Contact: fully separate section from Migration Exceptions --- */}
-      <p>{SECTION_TITLE.contact}</p>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{contactItems.map(renderItem)}</div>
-      {isAdmin && (
-        <AddForm section="contact" sortOrder={contactItems.length} onAdded={load} />
-      )}
-
-      {/* --- Migration Exceptions: its own section with its own form --- */}
-      <h3 style={{ marginTop: 20, marginBottom: 2 }}>{SECTION_TITLE.migration_exception}</h3>
-      <p style={{ margin: '0 0 8px', fontSize: '0.85em', color: '#666' }}>
-        Reasonable exceptions can be made for:
-      </p>
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{exceptionItems.map(renderItem)}</div>
-      {isAdmin && (
-        <AddForm section="migration_exception" sortOrder={exceptionItems.length} onAdded={load} />
-      )}
-    </div>
-  )
-}
-
-function AddForm({
-  section,
-  sortOrder,
-  onAdded,
-}: {
-  section: Section
-  sortOrder: number
-  onAdded: () => void
-}) {
-  const [label, setLabel] = useState('')
-  const [emph, setEmph] = useState(false)
-  const [saving, setSaving] = useState(false)
-
-  const add = async () => {
-    const trimmed = label.trim()
-    if (!trimmed) return
-    setSaving(true)
-    const { error } = await supabase.from('additional_info').insert({
-      section,
-      label: trimmed,
-      is_emphasized: emph,
-      sort_order: sortOrder,
-    })
-    setSaving(false)
-
-    if (error) {
-      console.error(`Failed to add ${section} item:`, error.message)
-      alert(`Could not save "${trimmed}": ${error.message}`)
-      return
-    }
-    setLabel('')
-    setEmph(false)
-    onAdded()
+  const removeLanguage = async (lang: string) => {
+    await save('languages', JSON.stringify(languages.filter((l) => l !== lang)))
   }
 
   return (
-    <div style={{ marginTop: 10, display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-      <input
-        placeholder="Name / label"
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && add()}
-      />
-      <label>
-        <input type="checkbox" checked={emph} onChange={(e) => setEmph(e.target.checked)} /> Bold/emphasized
-      </label>
-      <button onClick={add} disabled={saving}>{saving ? 'Adding…' : 'Add'}</button>
+    <div>
+      {/* Member Geography (formerly "Languages spoken"): add/remove pills */}
+      <div style={{ marginBottom: 16 }}>
+        <strong>{LABELS.languages}</strong>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+          {languages.map((lang) => (
+            <span
+              key={lang}
+              className="pill"
+              style={{ background: '#5b7db1', color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              {lang}
+              {isAdmin && (
+                <button onClick={() => removeLanguage(lang)} style={{ marginLeft: 2 }}>×</button>
+              )}
+            </span>
+          ))}
+          {languages.length === 0 && <p style={{ margin: 0, color: '#888' }}>—</p>}
+        </div>
+        {isAdmin && (
+          <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
+            <input
+              placeholder="Add a location"
+              value={newLanguage}
+              onChange={(e) => setNewLanguage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && addLanguage()}
+            />
+            <button onClick={addLanguage} disabled={savingField === 'languages'}>Add</button>
+          </div>
+        )}
+      </div>
+
+      {/* Territories and Armories / Diplomacy: free text with an explicit Save button */}
+      {['territory', 'diplomacy'].map((f) => {
+        const row = rows.find((r) => r.field === f)
+        return (
+          <div key={f} style={{ marginBottom: 16 }}>
+            <strong>{LABELS[f]}</strong>
+            {isAdmin ? (
+              <div>
+                <textarea
+                  value={drafts[f] ?? ''}
+                  onChange={(e) => setDrafts((d) => ({ ...d, [f]: e.target.value }))}
+                  style={{ width: '100%', minHeight: 40, display: 'block', marginTop: 6 }}
+                />
+                <button
+                  onClick={() => save(f, drafts[f] ?? '')}
+                  disabled={savingField === f}
+                  style={{ marginTop: 6 }}
+                >
+                  {savingField === f ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            ) : (
+              <p>{row?.content || '—'}</p>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
