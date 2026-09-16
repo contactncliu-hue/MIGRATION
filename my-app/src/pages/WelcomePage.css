@@ -146,17 +146,24 @@
   top: calc(50% + 10px);
 }
 
-.welcome-panel.is-selected {
-  transform: translateY(-4vh) scale(1.06) translateY(-4px);
-}
-.welcome-panel.is-selected:hover {
-  transform: translateY(-4vh) scale(1.06) translateY(-6px);
-}
-.welcome-panel.is-selected .welcome-panel-bg {
-  opacity: 1;
-}
-.welcome-panel.is-selected .welcome-panel-icon {
-  opacity: 1;
+/* Desktop/landscape only — reveals the icon + full-opacity background for
+   whichever panel is currently selected. Scoped out of portrait on purpose:
+   the mobile carousel already handles this via .welcome-panel-pos-0 below,
+   so letting these rules leak into portrait fights that positioning and
+   breaks the carousel layout when a panel is tapped. */
+@media (orientation: landscape) {
+  .welcome-panel.is-selected {
+    transform: translateY(-4vh) scale(1.06) translateY(-4px);
+  }
+  .welcome-panel.is-selected:hover {
+    transform: translateY(-4vh) scale(1.06) translateY(-6px);
+  }
+  .welcome-panel.is-selected .welcome-panel-bg {
+    opacity: 1;
+  }
+  .welcome-panel.is-selected .welcome-panel-icon {
+    opacity: 1;
+  }
 }
 
 .welcome-panel-feature-mobile-only {
