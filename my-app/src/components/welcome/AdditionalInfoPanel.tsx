@@ -63,7 +63,10 @@ export function AdditionalInfoPanel() {
       )}
 
       {/* --- Migration Exceptions: its own section with its own form --- */}
-      <h3 style={{ marginTop: 20 }}>{SECTION_TITLE.migration_exception}</h3>
+      <h3 style={{ marginTop: 20, marginBottom: 2 }}>{SECTION_TITLE.migration_exception}</h3>
+      <p style={{ margin: '0 0 8px', fontSize: '0.85em', color: '#666' }}>
+        Reasonable exceptions can be made for:
+      </p>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{exceptionItems.map(renderItem)}</div>
       {isAdmin && (
         <AddForm section="migration_exception" sortOrder={exceptionItems.length} onAdded={load} />
