@@ -3,12 +3,12 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../lib/auth-context'
 import type { ServerInfoField } from '../../types/panels'
 
-// Field keys in the DB stay the same ('languages' / 'territory' / 'diplomacy')
+// Field keys in the DB stay the same ('languages' / 'territory')
 // — only the display labels changed, so no migration/schema change needed.
+// 'diplomacy' has been removed entirely from this panel.
 const LABELS: Record<string, string> = {
   languages: 'Member Geography',
   territory: 'Territories and Armories',
-  diplomacy: 'Diplomacy',
 }
 
 // `languages` content is stored as a JSON array string, e.g. '["Luzon","Visayas"]'.
@@ -43,9 +43,7 @@ export function ServerInfoPanel() {
     setRows(data ?? [])
     if (!hasSeeded) {
       const seeded: Record<string, string> = {}
-      for (const f of ['territory', 'diplomacy']) {
-        seeded[f] = (data ?? []).find((r) => r.field === f)?.content ?? ''
-      }
+      seeded.territory = (data ?? []).find((r) => r.field === 'territory')?.content ?? ''
       setDrafts(seeded)
       setHasSeeded(true)
     }
@@ -111,8 +109,8 @@ export function ServerInfoPanel() {
         )}
       </div>
 
-      {/* Territories and Armories / Diplomacy: free text with an explicit Save button */}
-      {['territory', 'diplomacy'].map((f) => {
+      {/* Territories and Armories: free text with an explicit Save button */}
+      {['territory'].map((f) => {
         const row = rows.find((r) => r.field === f)
         return (
           <div key={f} style={{ marginBottom: 16 }}>
