@@ -1,46 +1,38 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabase'
-import { useAuth } from '../../lib/auth-context'
-import type { ServerInfoField } from '../../types/panels'
+export type Tier = 'gold' | 'silver' | 'bronze'
 
-const LABELS: Record<string, string> = {
-  languages: 'Languages spoken', territory: 'Territory sharing', diplomacy: 'Diplomacy',
+export interface RankingEntry {
+  id: string
+  power: number
+  display_label: string
+  sort_order: number
+  // tier is intentionally NOT stored — it's derived by sorting on `power`
+  // (top 3 = gold/silver/bronze) in RankingPanel, so it can never go stale.
 }
 
-export function ServerInfoPanel() {
-  const { isAdmin } = useAuth()
-  const [rows, setRows] = useState<ServerInfoField[]>([])
+export interface CompositionRange {
+  id: string
+  range_label: string
+  player_count: number
+  sort_order: number
+}
 
-  const load = async () => {
-    const { data } = await supabase.from('server_info').select('*')
-    setRows(data ?? [])
-  }
-  useEffect(() => { load() }, [])
+export interface ServerInfoField {
+  id: string
+  field: 'languages' | 'territory' | 'diplomacy'
+  content: string
+}
 
-  const save = async (field: string, content: string) => {
-    await supabase.from('server_info').upsert({ field, content }, { onConflict: 'field' })
-    load()
-  }
+export interface RequirementRow {
+  id: string
+  row_number: number
+  content: string
+  sort_order: number
+}
 
-  return (
-    <div>
-      {['languages', 'territory', 'diplomacy'].map((f) => {
-        const row = rows.find((r) => r.field === f)
-        return (
-          <div key={f} style={{ marginBottom: 12 }}>
-            <strong>{LABELS[f]}</strong>
-            {isAdmin ? (
-              <textarea
-                defaultValue={row?.content ?? ''}
-                onBlur={(e) => save(f, e.target.value)}
-                style={{ width: '100%', minHeight: 40 }}
-              />
-            ) : (
-              <p>{row?.content || '—'}</p>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
+export interface AdditionalInfoItem {
+  id: string
+  section: 'contact' | 'migration_exception'
+  label: string
+  is_emphasized: boolean
+  sort_order: number
 }
