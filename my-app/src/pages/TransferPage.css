@@ -240,11 +240,13 @@
 .faction-btn[data-state="3"]{ background:var(--wing-orange); border-color:var(--wing-orange); }
 
 .add-member-btn{
-  display:none; width:100%; border:1.5px dashed var(--n-400); background:transparent;
+  display:block; width:100%; border:1.5px dashed var(--n-400); background:transparent;
   border-radius:var(--r-sm); padding:var(--sp-3); font-weight:700; font-size:var(--fs-sm); color:var(--n-700);
   cursor:pointer; margin-bottom:18px;
 }
 .add-member-btn:hover{ border-color:var(--c-primary); color:var(--c-primary); }
+.add-member-btn.remove-last-btn{ border-color:var(--c-danger); color:var(--c-danger); }
+.add-member-btn.remove-last-btn:hover{ background:var(--c-danger-bg); border-color:var(--c-danger); color:var(--c-danger); }
 
 /* ---------- UID status lookup result ---------- */
 .uid-lookup-result{

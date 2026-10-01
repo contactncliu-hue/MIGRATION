@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useLanguage } from '../../lib/language-context'
 import {
@@ -18,16 +18,50 @@ interface MigrationFormModalProps {
 
 const ROLE_OPTIONS = Array.from({ length: 10 }, (_, i) => `i${i + 1}`)
 
+const DRAFT_KEY = 'migration-draft'
+
+interface Draft {
+  transferType: TransferType
+  allianceTag: string
+  members: MemberDraft[]
+}
+
+function loadDraft(): Draft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return null
+    const d = JSON.parse(raw)
+    if (!Array.isArray(d.members) || d.members.length === 0) return null
+    return {
+      transferType: d.transferType === 'group' ? 'group' : 'solo',
+      allianceTag: d.allianceTag ?? '',
+      members: d.members.map((m: Partial<MemberDraft>) => ({ ...emptyMember(), ...m })),
+    }
+  } catch {
+    return null
+  }
+}
+
 /** Solo or group migration request form. Owns its own draft state. */
 export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
   const { dict } = useLanguage()
 
-  const [transferType, setTransferType] = useState<TransferType>('solo')
-  const [allianceTag, setAllianceTag] = useState('')
-  const [members, setMembers] = useState<MemberDraft[]>([emptyMember()])
+  const [draft] = useState(loadDraft)
+  const [transferType, setTransferType] = useState<TransferType>(draft?.transferType ?? 'solo')
+  const [allianceTag, setAllianceTag] = useState(draft?.allianceTag ?? '')
+  const [members, setMembers] = useState<MemberDraft[]>(draft?.members ?? [emptyMember()])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  // Autosave the draft so an accidental close/refresh doesn't lose it.
+  useEffect(() => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ transferType, allianceTag, members }))
+    } catch {
+      // storage full or blocked, ignore
+    }
+  }, [transferType, allianceTag, members])
 
   function updateMember(idx: number, patch: Partial<MemberDraft>) {
     setMembers((prev) => prev.map((m, i) => (i === idx ? { ...m, ...patch } : m)))
@@ -58,10 +92,18 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
       return
     }
 
+    // Everything is mandatory except Faction 2 power.
     const missing = members.some(
       (m) =>
-        !m.uid || !m.username || !m.prevAlliance || !m.prevServer ||
-        !m.killcount || !m.faction || !m.role || !m.f1Power
+        !m.uid.trim() ||
+        !m.username.trim() ||
+        !m.prevAlliance.trim() ||
+        !m.prevServer.trim() ||
+        !m.killcount ||
+        !m.faction ||
+        !m.role ||
+        !m.migrationScore.trim() ||
+        !m.f1Power.trim()
     )
     if (missing) {
       setError(dict.errorFillAllFields)
@@ -78,7 +120,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
         kill_count: m.killcount ? `${m.killcount}M` : '',
         faction: FACTION_LETTERS[m.faction],
         role: m.role,
-        migration_score: m.migrationScore ? Number(m.migrationScore) : null,
+        migration_score: Number(m.migrationScore),
         f1_power: Number(m.f1Power),
         f2_power: m.f2Power ? Number(m.f2Power) : null,
       }))
@@ -96,6 +138,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
       if (membersError) throw membersError
 
       setSuccess('Migration request sent!')
+      localStorage.removeItem(DRAFT_KEY)
       setTimeout(onClose, 1200)
     } catch (err) {
       console.error('Migration submit failed:', err)
@@ -240,6 +283,7 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
               label={dict.migrationScoreLabel}
               type="text"
               inputMode="numeric"
+              required
               value={m.migrationScore}
               onChange={(e) => updateMember(idx, { migrationScore: e.target.value })}
             />
@@ -262,13 +306,24 @@ export function MigrationFormModal({ onClose }: MigrationFormModalProps) {
         ))}
 
         {isGroup && (
-          <button
-            type="button"
-            className="add-member-btn"
-            onClick={() => setMembers((prev) => [...prev, emptyMember()])}
-          >
-            {dict.addMemberBtn}
-          </button>
+          <>
+            <button
+              type="button"
+              className="add-member-btn"
+              onClick={() => setMembers((prev) => [...prev, emptyMember()])}
+            >
+              {dict.addMemberBtn}
+            </button>
+            {members.length > 1 && (
+              <button
+                type="button"
+                className="add-member-btn remove-last-btn"
+                onClick={() => removeMember(members.length - 1)}
+              >
+                {dict.removeMember}
+              </button>
+            )}
+          </>
         )}
 
         <FormMessage tone="error">{error}</FormMessage>
